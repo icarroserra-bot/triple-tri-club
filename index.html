@@ -182,7 +182,7 @@
       <button onclick="document.getElementById('import-file').click()" class="w-full text-xs text-zinc-500 hover:text-zinc-300 py-1.5 flex items-center gap-2 justify-center">Import Backup</button>
       <input type="file" id="import-file" accept=".json" onchange="importData(event)" class="hidden">
       <button onclick="forceRefresh()" class="w-full text-[10px] text-zinc-600 hover:text-zinc-400 py-1 flex items-center gap-1 justify-center">Clear Cache & Reload</button>
-      <div class="text-[9px] text-zinc-700 text-center">v3.0</div>
+      <div class="text-[9px] text-zinc-700 text-center">v3.1</div>
     </div>
   </aside>
 
@@ -927,13 +927,14 @@ function updateSidebarActive(){
 }
 function renderPage(){
   const main=document.getElementById('main-content');
-  // If no athletes or no active athlete, show profile picker
-  if(!Store.hasAthletes()||!Store.state.activeAthleteId){
+  const page=Store.state.ui.currentPage;
+  // If no athletes, or navigated to 'profiles', show profile picker
+  if(!Store.hasAthletes()||!Store.state.activeAthleteId||page==='profiles'){
     main.innerHTML=renderProfilePicker();
+    updateSidebarActive();
     return;
   }
-  const page=Store.state.ui.currentPage;
-  const pages={today:renderToday,dashboard:renderDashboard,plan:renderPlanView,overview:renderOverview,calendar:renderCalendar,profiles:renderProfiles,zones:renderZones,raceday:renderRaceDay,mobility:renderMobility,integrations:renderIntegrations,'ai-coach':renderAICoach};
+  const pages={today:renderToday,dashboard:renderDashboard,plan:renderPlanView,overview:renderOverview,calendar:renderCalendar,zones:renderZones,raceday:renderRaceDay,mobility:renderMobility,integrations:renderIntegrations,'ai-coach':renderAICoach};
   main.innerHTML=(pages[page]||renderToday)();
   updateSidebarActive();
   loadAudioPlayers();
@@ -990,14 +991,19 @@ function renderProfilePicker(){
         <h2 class="text-sm font-semibold text-zinc-400 uppercase tracking-wider mb-3">Choose your profile</h2>
         <div class="space-y-2 mb-6">
           ${athletes.map(a=>`
-            <button onclick="switchAthlete('${a.id}');navigate('today')" class="w-full bg-bg-secondary border border-bg-border rounded-lg p-4 flex items-center gap-4 hover:border-brand/40 transition text-left">
-              <div class="w-12 h-12 rounded-full bg-brand/20 flex items-center justify-center text-brand-light text-lg font-bold flex-shrink-0">${a.name.charAt(0).toUpperCase()}</div>
-              <div class="flex-1 min-w-0">
-                <p class="text-base font-semibold text-white">${a.name}</p>
-                <p class="text-xs text-zinc-500 capitalize">${a.sport||'triathlon'} · FTP ${a.ftp||'--'}W · ${formatPace(a.thresholdPace)}/km</p>
+            <div class="w-full bg-bg-secondary border ${a.id===Store.state.activeAthleteId?'border-brand/40 ring-1 ring-brand/20':'border-bg-border'} rounded-lg p-4 flex items-center gap-4 transition">
+              <button onclick="switchAthlete('${a.id}');navigate('today')" class="flex items-center gap-4 flex-1 min-w-0 text-left">
+                <div class="w-12 h-12 rounded-full bg-brand/20 flex items-center justify-center text-brand-light text-lg font-bold flex-shrink-0">${a.name.charAt(0).toUpperCase()}</div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-base font-semibold text-white">${a.name}${a.id===Store.state.activeAthleteId?' <span class="text-[10px] text-brand-light font-normal bg-brand/20 px-1.5 py-0.5 rounded ml-1">Active</span>':''}</p>
+                  <p class="text-xs text-zinc-500 capitalize">${a.sport||'triathlon'} · FTP ${a.ftp||'--'}W · ${formatPace(a.thresholdPace)}/km</p>
+                </div>
+              </button>
+              <div class="flex gap-1 flex-shrink-0">
+                <button onclick="showProfileModal('${a.id}')" class="text-[10px] px-2 py-1 rounded bg-bg-tertiary text-zinc-400 hover:text-white border border-bg-border transition" title="Edit">Edit</button>
+                ${athletes.length>1?`<button onclick="deleteAthlete('${a.id}')" class="text-[10px] px-2 py-1 rounded text-red-400 hover:bg-red-400/10 border border-red-500/20 transition" title="Delete">Del</button>`:''}
               </div>
-              <svg class="w-5 h-5 text-zinc-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-            </button>
+            </div>
           `).join('')}
         </div>
         <div class="border-t border-bg-border pt-4">
@@ -1024,6 +1030,12 @@ function renderProfilePicker(){
           <p class="text-[11px] text-zinc-500 leading-relaxed">Answer questions about my fitness and goals to generate a plan</p>
         </button>
       </div>
+
+      ${athletes.length>0?`
+        <div class="mt-6 text-center">
+          <button onclick="navigate('today')" class="text-xs text-brand-light hover:text-white transition">← Back to training</button>
+        </div>
+      `:''}
     </div>
   </div>`;
 }
@@ -2741,7 +2753,7 @@ async function deleteFeedbackAudio(fbKey){
     delete Store.state.feedback[fbKey].audioRef;
     delete Store.state.feedback[fbKey].audioDate;
     delete Store.state.feedback[fbKey].audioTranscription;
-    delete Store.state.feedback[fbKey].audioUrl;
+    delete Store.state.feedback[fbKey]._blobUrl;
     Store.save();
   }
   openFeedback(fbKey);showToast('Recording deleted.');
@@ -2766,22 +2778,36 @@ async function toggleRecording(fbKey){
       const blob=new Blob(_audioChunks,{type:'audio/webm'});
       const transcript = Transcriber.stop();
 
-      // Save to IndexedDB
-      try{
-        await AudioDB.save(fbKey, blob, transcript);
-      }catch(e){
-        console.warn('IndexedDB save failed, falling back to localStorage',e);
-      }
-
       if(!Store.state.feedback) Store.state.feedback={};
       if(!Store.state.feedback[fbKey]) Store.state.feedback[fbKey]={};
+
+      // Save to IndexedDB (primary storage)
+      let savedToIDB=false;
+      try{
+        await AudioDB.save(fbKey, blob, transcript);
+        savedToIDB=true;
+      }catch(e){
+        console.warn('IndexedDB save failed, using base64 fallback',e);
+      }
+
+      // If IndexedDB failed, store as base64 in localStorage as fallback
+      if(!savedToIDB){
+        try{
+          const reader=new FileReader();
+          reader.onload=()=>{
+            Store.state.feedback[fbKey].audioData=reader.result;
+            Store.save();
+          };
+          reader.readAsDataURL(blob);
+        }catch(e){}
+      }
+
       Store.state.feedback[fbKey].audioRef=fbKey;
       Store.state.feedback[fbKey].audioDate=new Date().toLocaleString();
       Store.state.feedback[fbKey].audioTranscription=transcript||'';
-      // Keep a small data URL fallback for immediate playback
-      const url=URL.createObjectURL(blob);
-      Store.state.feedback[fbKey].audioUrl=url;
       Store.state._recording=null;
+      // Cache object URL for immediate playback (won't persist across refresh)
+      Store.state.feedback[fbKey]._blobUrl=URL.createObjectURL(blob);
       Store.save();renderPage();
       showToast(transcript?'Audio saved & transcribed!':'Audio saved!');
     };
@@ -2809,16 +2835,17 @@ async function toggleRecordingInModal(fbKey){
 // Load audio from IndexedDB and return an object URL for playback
 async function getAudioUrl(fbKey){
   const fb=Store.state.feedback&&Store.state.feedback[fbKey];
-  // If there's already a cached object URL, use it
-  if(fb&&fb.audioUrl) return fb.audioUrl;
-  // If there's old base64 data, use it directly
+  // If there's a runtime cached blob URL, use it
+  if(fb&&fb._blobUrl) return fb._blobUrl;
+  // If there's old base64 data (localStorage fallback), use it directly
   if(fb&&fb.audioData) return fb.audioData;
   // Try IndexedDB
   try{
-    const rec=await AudioDB.get(fb&&fb.audioRef||fbKey);
+    const refKey=fb&&fb.audioRef||fbKey;
+    const rec=await AudioDB.get(refKey);
     if(rec&&rec.blob){
       const url=URL.createObjectURL(rec.blob);
-      if(fb) fb.audioUrl=url; // cache it
+      if(fb) fb._blobUrl=url; // cache for this session
       return url;
     }
   }catch(e){}

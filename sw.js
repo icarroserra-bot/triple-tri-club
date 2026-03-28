@@ -1,4 +1,4 @@
-const CACHE_NAME = 'triple-tri-v5';
+const CACHE_NAME = 'triple-tri-v6';
 const URLS_TO_CACHE = [
   './',
   './index.html',
