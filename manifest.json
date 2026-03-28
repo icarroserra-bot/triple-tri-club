@@ -1,0 +1,16 @@
+{
+  "name": "Triple Tri Club",
+  "short_name": "TripleTri",
+  "description": "Training plan manager for triathletes",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#060a10",
+  "theme_color": "#2196F3",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M12 68 Q22 38 48 32 Q40 46 46 54 Q52 28 72 18 Q58 40 53 50 Q68 28 88 22 Q63 48 43 68 Q28 78 12 68Z' fill='%232196F3'/%3E%3C/svg%3E",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

@@ -1,0 +1,1906 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Triple Tri Club — Training Plan</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M15 65 Q25 35 50 30 Q42 45 48 55 Q55 30 75 20 Q60 40 55 50 Q70 30 90 25 Q65 50 45 70 Q30 80 15 65Z' fill='%232196F3'/%3E%3C/svg%3E">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#2196F3">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            bg: { primary: '#060a10', secondary: '#0a0f18', tertiary: '#0d1320', hover: '#131d2e', border: '#131d2e' },
+            accent: { swim: '#60a5fa', bike: '#fbbf24', run: '#4ade80', strength: '#f87171', brick: '#c084fc', mob: '#2dd4bf', test: '#ffd700', rest: '#9ca3af', race: '#ffd700' },
+            brand: { DEFAULT: '#2196F3', light: '#42a5f5', dark: '#1976D2', glow: '#1565C0' },
+            phase: { recovery: '#64748b', foundation: '#00c9b1', specific: '#f97316', sharpening: '#e11d48', taper: '#a78bfa', raceweek: '#fbbf24' }
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    * { font-family: 'Inter', sans-serif; box-sizing: border-box; }
+    body { background: #060a10; color: #e2e8f0; margin: 0; }
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: #0a0f18; }
+    ::-webkit-scrollbar-thumb { background: #1e2a3a; border-radius: 3px; }
+    .mono { font-family: 'JetBrains Mono', monospace; }
+    .sidebar-item { transition: all 0.15s ease; }
+    .sidebar-item:hover { background: rgba(33,150,243,0.08); }
+    .sidebar-item.active { background: rgba(33,150,243,0.12); border-right: 3px solid #2196F3; }
+    .fade-in { animation: fadeIn 0.2s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+    .modal-backdrop { background: rgba(0,0,0,0.65); backdrop-filter: blur(4px); }
+    .zone-bar { transition: width 0.3s ease; }
+    .sess:hover { background: rgba(255,255,255,0.025) !important; }
+    .pill { transition: all 0.15s; }
+    .pill:hover { opacity: 0.8; }
+    .chat-msg { animation: slideUp 0.2s ease; }
+    @keyframes slideUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+    .pulse-dot { animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.5; } }
+    .tab-btn { transition: all 0.15s; cursor: pointer; }
+    .tab-btn:hover { color: #e2e8f0 !important; }
+    .option-card { transition: all 0.15s; cursor: pointer; }
+    .option-card:hover { border-color: #374151 !important; }
+    select, input, textarea { outline: none; }
+    .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .rec-pulse { animation: recPulse 1s infinite; }
+    @keyframes recPulse { 0%,100% { opacity:1; box-shadow:0 0 0 0 rgba(239,68,68,0.4); } 50% { opacity:0.8; box-shadow:0 0 0 8px rgba(239,68,68,0); } }
+    .tt-logo-glow { filter: drop-shadow(0 0 6px rgba(33,150,243,0.3)); }
+    .drag-over { border-color: #2196F3 !important; background: rgba(33,150,243,0.05) !important; }
+  </style>
+</head>
+<body class="min-h-screen flex">
+<div id="app" class="flex w-full min-h-screen">
+
+  <!-- SIDEBAR -->
+  <aside id="sidebar" class="w-56 bg-bg-secondary border-r border-bg-border flex flex-col flex-shrink-0 h-screen sticky top-0">
+    <div class="p-4 border-b border-bg-border">
+      <div class="flex items-center gap-2.5">
+        <svg class="w-8 h-8 tt-logo-glow" viewBox="0 0 100 100" fill="none">
+          <defs><linearGradient id="birdG" x1="10%" y1="80%" x2="90%" y2="20%"><stop offset="0%" stop-color="#1565C0"/><stop offset="50%" stop-color="#2196F3"/><stop offset="100%" stop-color="#42a5f5"/></linearGradient></defs>
+          <path d="M12 68 Q22 38 48 32 Q40 46 46 54 Q52 28 72 18 Q58 40 53 50 Q68 28 88 22 Q63 48 43 68 Q28 78 12 68Z" fill="url(#birdG)"/>
+        </svg>
+        <div>
+          <h1 class="text-sm font-bold text-white tracking-wide leading-none">TRIPLE TRI</h1>
+          <p class="text-[9px] text-zinc-500 tracking-[0.2em] uppercase">Club</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="p-3 border-b border-bg-border">
+      <label class="text-[10px] uppercase tracking-wider text-zinc-600 mb-1 block">Active Athlete</label>
+      <select id="athlete-select" onchange="switchAthlete(this.value)" class="w-full bg-bg-tertiary text-sm text-zinc-200 rounded px-2 py-1.5 border border-bg-border focus:border-brand"></select>
+    </div>
+
+    <nav class="flex-1 py-2 overflow-y-auto">
+      <div onclick="navigate('dashboard')" class="sidebar-item px-4 py-2.5 flex items-center gap-3 cursor-pointer text-sm" data-page="dashboard">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+        Dashboard
+      </div>
+      <div onclick="navigate('plan')" class="sidebar-item px-4 py-2.5 flex items-center gap-3 cursor-pointer text-sm" data-page="plan">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+        Training Plan
+      </div>
+      <div onclick="navigate('overview')" class="sidebar-item px-4 py-2.5 flex items-center gap-3 cursor-pointer text-sm" data-page="overview">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+        Overview
+      </div>
+      <div onclick="navigate('profiles')" class="sidebar-item px-4 py-2.5 flex items-center gap-3 cursor-pointer text-sm" data-page="profiles">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        Profiles
+      </div>
+      <div onclick="navigate('zones')" class="sidebar-item px-4 py-2.5 flex items-center gap-3 cursor-pointer text-sm" data-page="zones">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+        Zones
+      </div>
+      <div onclick="navigate('calendar')" class="sidebar-item px-4 py-2.5 flex items-center gap-3 cursor-pointer text-sm" data-page="calendar">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+        Calendar
+      </div>
+      <div onclick="navigate('schedule')" class="sidebar-item px-4 py-2.5 flex items-center gap-3 cursor-pointer text-sm" data-page="schedule">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        Day Preferences
+      </div>
+      <div onclick="navigate('raceday')" class="sidebar-item px-4 py-2.5 flex items-center gap-3 cursor-pointer text-sm" data-page="raceday">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm0 0h18"/></svg>
+        Race Day
+      </div>
+      <div onclick="navigate('mobility')" class="sidebar-item px-4 py-2.5 flex items-center gap-3 cursor-pointer text-sm" data-page="mobility">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+        Mobility
+      </div>
+      <div onclick="navigate('integrations')" class="sidebar-item px-4 py-2.5 flex items-center gap-3 cursor-pointer text-sm" data-page="integrations">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+        Integrations
+      </div>
+      <div onclick="navigate('ai-coach')" class="sidebar-item px-4 py-2.5 flex items-center gap-3 cursor-pointer text-sm" data-page="ai-coach">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714a2.25 2.25 0 00.659 1.591L19 14.5"/></svg>
+        AI Coach
+        <span class="ml-auto text-[10px] bg-purple-600/20 text-purple-400 px-1.5 py-0.5 rounded">AI</span>
+      </div>
+    </nav>
+
+    <div class="p-3 border-t border-bg-border space-y-1">
+      <button onclick="document.getElementById('plan-file').click()" class="w-full text-xs text-brand-light hover:text-white py-1.5 flex items-center gap-2 justify-center font-medium">
+        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+        Upload Training Plan
+      </button>
+      <input type="file" id="plan-file" accept=".jsx,.json,.txt,.csv" onchange="importPlanFile(event)" class="hidden">
+      <button onclick="exportData()" class="w-full text-xs text-zinc-500 hover:text-zinc-300 py-1.5 flex items-center gap-2 justify-center">Export Data</button>
+      <button onclick="document.getElementById('import-file').click()" class="w-full text-xs text-zinc-500 hover:text-zinc-300 py-1.5 flex items-center gap-2 justify-center">Import Backup</button>
+      <input type="file" id="import-file" accept=".json" onchange="importData(event)" class="hidden">
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main id="main-content" class="flex-1 overflow-y-auto h-screen"></main>
+</div>
+<div id="modal-container"></div>
+
+<script>
+// ============================================================================
+// UTILITY
+// ============================================================================
+function uid() { return crypto.randomUUID ? crypto.randomUUID() : 'id-' + Math.random().toString(36).substr(2,9) + Date.now().toString(36); }
+function p(pct, ftp) { return Math.round((ftp||278) * pct); }
+function formatPace(sec) { if(!sec||sec<=0) return '--:--'; const m=Math.floor(sec/60); const s=Math.round(sec%60); return `${m}:${s.toString().padStart(2,'0')}`; }
+function parsePace(str) { const pts=str.split(':'); return pts.length===2 ? parseInt(pts[0])*60+parseInt(pts[1]) : null; }
+function escapeHtml(t) { const d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
+
+// ============================================================================
+// PHASE COLORS
+// ============================================================================
+const PC = { recovery:'#64748b', foundation:'#00c9b1', specific:'#f97316', sharpening:'#e11d48', taper:'#a78bfa', raceweek:'#fbbf24' };
+const TAG_COLORS = {
+  swim:{bg:'rgba(59,130,246,0.12)',text:'#60a5fa',border:'rgba(59,130,246,0.25)'},
+  bike:{bg:'rgba(234,179,8,0.12)',text:'#fbbf24',border:'rgba(234,179,8,0.25)'},
+  run:{bg:'rgba(34,197,94,0.12)',text:'#4ade80',border:'rgba(34,197,94,0.25)'},
+  strength:{bg:'rgba(239,68,68,0.12)',text:'#f87171',border:'rgba(239,68,68,0.25)'},
+  brick:{bg:'rgba(168,85,247,0.12)',text:'#c084fc',border:'rgba(168,85,247,0.25)'},
+  mob:{bg:'rgba(20,184,166,0.12)',text:'#2dd4bf',border:'rgba(20,184,166,0.25)'},
+  test:{bg:'rgba(255,200,0,0.12)',text:'#ffd700',border:'rgba(255,200,0,0.3)'},
+  rest:{bg:'rgba(107,114,128,0.1)',text:'#9ca3af',border:'rgba(107,114,128,0.2)'},
+  race:{bg:'rgba(255,215,0,0.15)',text:'#ffd700',border:'rgba(255,215,0,0.5)'},
+};
+
+// ============================================================================
+// MOBILITY ROUTINES
+// ============================================================================
+const MOB = {
+  friday: {
+    title: "Friday Mobility — 15 min",
+    focus: "Thoracic spine · Hip flexors · Aero position recovery",
+    items: [
+      {name:"Thoracic rotation (seated, hands behind head)",dose:"10 reps/side",note:"Unlock the upper back compressed by your aero tuck. Do slowly."},
+      {name:"Chest opener on foam roll",dose:"2×30s",note:"Thoracic spine across the roll, arms wide. Critical for breathing in aero."},
+      {name:"Hip flexor lunge stretch",dose:"2×45s/side",note:"Deep lunge, posterior tilt. Undoes hip flexor shortening from 4+ hrs on the bike."},
+      {name:"Pigeon pose",dose:"2×45s/side",note:"External hip rotation. Direct ITB tension relief."},
+      {name:"Standing calf / Achilles stretch",dose:"2×45s/side",note:"Straight-leg + bent-knee versions. Run durability protection."},
+      {name:"Neck side stretch + upper trap release",dose:"2×30s/side",note:"Releases tension from the aero neck position on long rides."},
+    ]
+  },
+  sunday: {
+    title: "Sunday Mobility — 20 min",
+    focus: "Full recovery · ITB · Glutes · Lower back after brick",
+    items: [
+      {name:"Hip 90/90",dose:"2×45s/side",note:"Best single hip mobility exercise. Both internal and external rotation."},
+      {name:"Supine figure-4 (glute/piriformis)",dose:"2×45s/side",note:"Lie on back, ankle over knee. Releases glute compression from cycling."},
+      {name:"Lying hamstring stretch",dose:"2×45s/side",note:"Strap or towel. Keep knee soft. Run-specific."},
+      {name:"Standing quad / hip flexor stretch",dose:"2×45s/side",note:"Posterior tilt maintained throughout."},
+      {name:"IT band / TFL release",dose:"2×45s/side",note:"Cross-leg standing stretch or foam roll lateral quad. Critical given ITB history."},
+      {name:"Supine spinal twist",dose:"2×30s/side",note:"Lower back decompression after long rides and brick runs."},
+      {name:"Child's pose",dose:"60s",note:"Full spinal decompression. Breathe into lower back."},
+      {name:"Ankle circles + calf stretch",dose:"10 reps/direction + 30s",note:"Ankle mobility for run efficiency and Achilles durability."},
+    ]
+  }
+};
+
+// ============================================================================
+// RACE DAY PROTOCOL
+// ============================================================================
+const RACE_DAY = [
+  {phase:"T–3 hrs",col:"#00c9b1",detail:"Large carb meal. Rice, toast, banana. 500ml water. No fibre, fat, or anything new."},
+  {phase:"T–45 min",col:"#00c9b1",detail:"1 Precision Fuel gel + 300ml Carb+ drink. Pre-load."},
+  {phase:"T–15 min",col:"#00c9b1",detail:"200ml water only. Get to Palm Cove. 400m easy warm-up swim."},
+  {phase:"Swim 1.9 km",col:"#60a5fa",detail:"1:29/100m (~27 min). Don't sprint first 200m. Settle, sight, manage current."},
+  {phase:"T1",col:"#fbbf24",detail:"Gel within 5 min of mounting bike. Carb+ drink immediately. Do not wait."},
+  {phase:"Bike km 0–30",col:"#fbbf24",detail:"Settle 220–230W avg. Flatter early — do NOT overcook it. Gel at km 20."},
+  {phase:"Bike km 30–60",col:"#fbbf24",detail:"Rolling hills begin. Rex's Lookout ~km 50: surge on climb, recover on descent. NP target 240W. Gel at km 40."},
+  {phase:"Bike km 60–90",col:"#fbbf24",detail:"SE trade wind headwind on return. Hold effort not watts. Gel at km 65 and km 82."},
+  {phase:"T2",col:"#4ade80",detail:"CRITICAL: Gel immediately as you rack the bike. Most important gel of the race."},
+  {phase:"Run km 0–7",col:"#4ade80",detail:"5:00/km. Not faster. Not slower. Discipline here changes everything. Gel at km 1."},
+  {phase:"Run km 7–14",col:"#4ade80",detail:"Gel at km 6 and km 12. Controlled? Start building to 4:50–4:55/km."},
+  {phase:"Run km 14–21",col:"#e11d48",detail:"YOUR WEAPON ZONE. Attack. 4:35–4:45/km target km 14–19. Gel at km 17. Finish faster than you started."},
+];
+
+// ============================================================================
+// TRACK OPTIONS
+// ============================================================================
+const TRACK = {
+  w1:[{label:"A — Speed",pace:"Faster than 5K pace",set:"8×400m — 60s standing rest"},{label:"B — Threshold",pace:"5K pace",set:"5×800m — 90s standing rest"},{label:"C — Tempo",pace:"10K pace",set:"3×2 km — 2 min jog rest"}],
+  w2:[{label:"A — Speed",pace:"Faster than 5K pace",set:"10×400m — 60s standing rest"},{label:"B — Threshold",pace:"5K pace",set:"6×800m — 90s standing rest"},{label:"C — Tempo",pace:"10K pace",set:"3×2 km — 90s jog rest"}],
+  w3:[{label:"A — Speed",pace:"Faster than 5K pace",set:"6×600m — 75s standing rest"},{label:"B — Threshold",pace:"5K–10K pace",set:"4×1.2 km — 90s jog rest"},{label:"C — Tempo",pace:"10K pace",set:"4×2 km — 2 min jog rest"}],
+  w4:[{label:"A — Speed",pace:"Faster than 5K pace",set:"6×400m — 75s standing rest"},{label:"B — Threshold",pace:"5K pace",set:"4×800m — 2 min rest"},{label:"C — Tempo",pace:"10K pace",set:"3×1.5 km — 2 min jog rest"}],
+  w5:[{label:"A — Speed",pace:"Faster than 5K pace",set:"8×600m — 75s standing rest"},{label:"B — Threshold",pace:"5K–10K pace",set:"5×1 km — 90s standing rest"},{label:"C — Tempo",pace:"10K pace",set:"3×2.5 km — 2 min jog rest"}],
+  w6:[{label:"A — Speed",pace:"Faster than 5K pace",set:"6×400m — 60s standing rest"},{label:"B — Threshold",pace:"5K pace",set:"5×800m — 90s standing rest"},{label:"C — Tempo",pace:"10K pace",set:"3×2 km — 2 min jog rest"}],
+  w7:[{label:"A — Speed",pace:"Faster than 5K pace",set:"6×800m — 90s standing rest"},{label:"B — Race build",pace:"10K → HM pace",set:"2×(2 km @ 10K, 1 km @ HM pace) — 2 min between reps, 4 min between sets"},{label:"C — Tempo",pace:"HM pace",set:"5×2 km — 90s jog rest"}],
+  w8:[{label:"A — Speed",pace:"Faster than 5K pace",set:"8×600m — 75s standing rest"},{label:"B — Race build",pace:"10K → HM pace",set:"3×(1.5 km @ 10K, 1 km @ HM pace) — 90s jog between, 3 min between sets"},{label:"C — Tempo",pace:"HM pace",set:"4×2.5 km — 90s jog rest"}],
+  w9:[{label:"A — Sharp",pace:"Faster than 5K pace",set:"5×800m — 60s standing rest. Go. Sharpest session of the plan."},{label:"B — Race build",pace:"10K → HM pace",set:"4×(1 km @ 10K, 1 km @ HM pace) — 60s jog between, 3 min between sets"},{label:"C — Tempo",pace:"HM pace",set:"3×3 km — 90s jog rest"}],
+  w10:[{label:"A — Sharp",pace:"Faster than 5K pace",set:"4×800m — 90s standing rest. Fast and done."},{label:"B — Threshold",pace:"5K–10K pace",set:"4×1 km — 2 min rest"},{label:"C — Easy",pace:"10K pace",set:"3×1.5 km — 2 min jog rest"}],
+};
+
+// ============================================================================
+// GENERATE FULL CAIRNS PLAN — Exact data from cairns-v5
+// ============================================================================
+function generateCairnsPlan(athlete) {
+  const ftp = athlete.ftp || 278;
+  const f = (pct) => Math.round(ftp * pct);
+
+  return {
+    id: uid(), athleteId: athlete.id, name: 'Cairns 70.3 — 11-Week Plan',
+    raceDate: '2026-06-14', raceTarget: 'Swim ~27 min · Bike ~2:27–2:32 (240W NP) · Run ~1:27–1:32 (4:10–4:20/km) · Total ~4:05–4:15',
+    weeks: [
+// W0
+{id:0,label:"W0",name:"Post-Race Recovery",dates:"Mar 24–30",phase:"recovery",hours:"~6 hrs",
+context:"Your exact recovery week. No structure, no targets. Every session here is deliberate rest.",
+flags:["Sleep 8–9 hrs every night","Do not diet this week — eat to recover","HRV below 80 = skip that session entirely"],
+totals:{swim:4,bike:120,run:12},
+days:[
+  {day:"MON",sessions:[{tag:"rest",label:"Full Rest",target:"Nothing.",why:""}]},
+  {day:"TUE",sessions:[{tag:"rest",label:"Full Rest",target:"Nothing.",why:""}]},
+  {day:"WED",sessions:[{tag:"swim",label:"Swim 2 km (PM after office)",target:"Easy 2 km total. 1000m WU + ~700m easy main set + 300m CD. No pace, no effort.",why:"Gentle movement. Post-race blood flow, not training."}]},
+  {day:"THU",sessions:[{tag:"bike",label:"Easy Ride — 1h 30 min",target:`Z1–Z2 only. ${f(0.50)}–${f(0.70)}W. Flat route. Completely conversational.`,why:"Leg flush. Wakes the body without stressing it."}]},
+  {day:"FRI",sessions:[{tag:"swim",label:"Swim 2 km (PM after office)",target:"Easy 2 km total. Same as Wednesday — no effort, no pace target.",why:""}]},
+  {day:"SAT",sessions:[{tag:"bike",label:"Easy Ride 60 km",target:`${f(0.56)}–${f(0.72)}W. Flat. Relaxed. Nutrition: just drink water.`,why:"Aerobic flush at controlled intensity."}]},
+  {day:"SUN",sessions:[{tag:"run",label:"Easy Run 12 km",target:"5:30–5:45/km throughout. No structure. Just run.",why:"Long easy run. First decent run effort post-race."}]},
+]},
+// W1
+{id:1,label:"W1",name:"Foundation — Rebuild + FTP Test Saturday",dates:"Mar 31–Apr 6",phase:"foundation",hours:"~14 hrs",
+context:"FTP test is Saturday at Dandenong. Thursday has light intervals only — don't pre-fatigue for the test. All watt targets below are placeholders. Recalibrate everything after Saturday's result.",
+flags:["⚡ FTP TEST: Saturday at Dandenong — mandatory. Avg power × 0.95 = FTP.","Thursday: light intervals only — protect legs for Saturday test","All watt targets (*) recalibrate after Saturday","Strength A: before work. Swim: after work."],
+totals:{swim:9,bike:200,run:33},
+days:[
+  {day:"MON",sessions:[
+    {tag:"strength",label:"Strength A — 40 min (before work)",target:"Goblet Squat 3×10 (light), RDL 3×10 (3s eccentric), Push-Up 3×12, Dead Bug 3×10/side, KB Swing 3×12. 90s rest.",why:"Foundation movement quality. Slow eccentric RDL builds the hamstring-glute chain."},
+    {tag:"swim",label:"Swim 3 km (after work)",target:"MAIN SET (after 1000m WU): 8×200m @ 1:45/100m — 20s rest",why:"Re-establishes water feel at well below race pace."},
+  ]},
+  {day:"TUE",sessions:[
+    {tag:"bike",label:"Easy Ride 25 km (AM — before track)",target:`Z2 only. ${f(0.56)}–${f(0.75)}W. 45 min. Legs loose before track.`,why:"Pre-track activation."},
+    {tag:"run",label:"Track — Run to Track + Session (PM ~6:15)",target:"5 km run to track @ 5:30/km (warm-up) | Choose from 3 options below | 2–3 km CD",why:"Running to the track banks warm-up volume.",trackKey:"w1"},
+  ]},
+  {day:"WED",sessions:[
+    {tag:"strength",label:"Strength A — 40 min (before work)",target:"Same as Monday. Second session in W1 only if you felt good Monday. Otherwise skip.",why:"W1 — keep it to Session A only while you establish the routine."},
+    {tag:"swim",label:"Swim 3 km (after work)",target:"MAIN SET (after 1000m WU): 8×200m @ 1:40/100m — 20s rest",why:"Slightly faster than Monday. Progressive pace through the week."},
+  ]},
+  {day:"THU",sessions:[
+    {tag:"run",label:"Easy Jog — 8 km (AM before work)",target:"~45 min @ 5:30/km.",why:"Keeps the aerobic volume without adding a new session slot."},
+    {tag:"bike",label:"Light Bike Intervals — 55 km (PM — outdoor)",target:`20 min WU @ ${f(0.58)}W | 4×8 min @ ${f(0.83)}W (83% FTP*) — 3 min Z1 between | 15 min CD. Light only — protecting Saturday's FTP test.`,why:"Light stimulus only. Won't pre-fatigue your legs for Saturday."},
+  ]},
+  {day:"FRI",sessions:[
+    {tag:"swim",label:"Swim 3 km (after office)",target:"MAIN SET (after 1000m WU): 4×400m @ 1:42/100m — 25s rest",why:"Easy Friday swim. Blood flow, not training."},
+    {tag:"mob",label:"Mobility — 15 min (evening)",target:"Friday routine. See Mobility tab.",why:"Thoracic + hip flexor release before FTP test."},
+  ]},
+  {day:"SAT",sessions:[
+    {tag:"test",label:"⚡ FTP TEST AT DANDENONG — ~70 km total",target:"20 min WU building to Z2 | 20-min ALL-OUT effort → avg power × 0.95 = FTP | Easy riding remainder to ~70 km total. Record exact result. Recalibrate ALL (*) targets.",why:"CRITICAL. Your FTP may differ on the Trinity. Lower result doesn't mean weaker — it means accurate."},
+  ]},
+  {day:"SUN",sessions:[
+    {tag:"brick",label:"Brick — Ride 45 km + Run 12 km (EASY)",target:`Ride 45 km @ Z2 (${f(0.56)}–${f(0.75)}W), gel every 25 min | T2 | Run 12 km @ 5:20–5:30/km EASY. Gel in first 3 min of run.`,why:"Foundation brick — fuelling habit + neuromuscular T2 transition."},
+    {tag:"mob",label:"Mobility — 20 min (evening)",target:"Sunday routine. See Mobility tab.",why:"Full recovery after brick."},
+  ]},
+]},
+// W2
+{id:2,label:"W2",name:"Foundation — Build All Disciplines",dates:"Apr 7–13",phase:"foundation",hours:"~15 hrs",
+context:"All watt targets now use your Trinity FTP from Saturday's test. Bike volume steps up. Strength B introduced Wednesday AM. Long ride grows to 90 km.",
+flags:["Use Trinity FTP for all bike targets from now on","Strength B: Wednesday AM before commute to office","Long ride Saturday: nutrition every 25 min — no exceptions"],
+totals:{swim:9,bike:235,run:38},
+days:[
+  {day:"MON",sessions:[
+    {tag:"strength",label:"Strength A — 40 min (before work)",target:"Goblet Squat 3×10 (+5–10% vs W1), RDL 3×10 (slow eccentric), Push-Up 3×12, Dead Bug 3×10/side, KB Swing 3×12.",why:"Progressive load in small steps."},
+    {tag:"swim",label:"Swim 3 km (after work)",target:"MAIN SET (after 1000m WU): 8×200m @ 1:38/100m — 20s rest",why:"7 sec faster than W1. Small weekly progressions compound toward race pace (1:29)."},
+  ]},
+  {day:"TUE",sessions:[
+    {tag:"bike",label:"Easy Ride 25 km (AM)",target:`Z2. ${f(0.56)}–${f(0.75)}W. 45 min.`,why:"Pre-track activation."},
+    {tag:"run",label:"Track — Run to Track + Session (PM ~6:15)",target:"5 km to track @ 5:30/km | Choose option below | 2–3 km CD",why:"",trackKey:"w2"},
+  ]},
+  {day:"WED",sessions:[
+    {tag:"strength",label:"Strength B — 40 min (before work / AM)",target:"Bulgarian Split Squat 3×10/side, Single-Leg RDL 3×10/side, Step-Up weighted 3×10/side, Lat Pulldown 3×10, Copenhagen Plank 3×20s/side, Calf Raise 3×15/side.",why:"Single-leg dominant — most important S&C pattern for triathletes."},
+    {tag:"swim",label:"Swim 3 km (after work)",target:"MAIN SET (after 1000m WU): 4×500m @ 1:35/100m — 30s rest",why:"500m blocks — first sustained open-water-simulation set."},
+  ]},
+  {day:"THU",sessions:[
+    {tag:"run",label:"Easy Jog — 9 km (AM before work)",target:"~50 min @ 5:30/km.",why:""},
+    {tag:"bike",label:"Bike Intervals — 65 km (PM — outdoor) ★",target:`20 min WU @ ${f(0.58)}W | 3×12 min @ ${f(0.88)}W (88% FTP*) — 4 min Z1 between | 15 min CD. FULL AERO.`,why:"88% FTP = sweetspot. Most efficient zone for raising FTP. Full aero position throughout."},
+  ]},
+  {day:"FRI",sessions:[
+    {tag:"swim",label:"Swim 3 km (after office)",target:"MAIN SET (after 1000m WU): 6×250m @ 1:38/100m — 20s rest",why:"Friday recovery swim. Aerobic, not hard."},
+    {tag:"mob",label:"Mobility — 15 min (evening)",target:"Friday routine. See Mobility tab.",why:""},
+  ]},
+  {day:"SAT",sessions:[
+    {tag:"bike",label:"Long Ride 90 km ★",target:`~2.75 hrs @ Z2 (${f(0.56)}–${f(0.76)}W). Include 2×10 min @ ${f(0.76)}W race effort at km 45 and km 75. NUTRITION: 70g carbs/hr, gel every 25 min + Carb+.`,why:"Race-effort blocks late in the ride directly simulate Cairns mid-course hills."},
+  ]},
+  {day:"SUN",sessions:[
+    {tag:"brick",label:"Brick — Ride 55 km + Run 15 km (EASY)",target:`Ride 55 km @ Z2, gel every 20 min | T2 | Run 15 km @ 5:15–5:25/km EASY. Gel at min 1, every 6 km. Checkpoint: km 11–13.`,why:"Foundation brick — unstructured. Run easy, fuel on board."},
+    {tag:"mob",label:"Mobility — 20 min (evening)",target:"Sunday routine. See Mobility tab.",why:""},
+  ]},
+]},
+// W3
+{id:3,label:"W3",name:"Foundation — First 100+ km Ride",dates:"Apr 14–20",phase:"foundation",hours:"~16 hrs",
+context:"Long ride hits 110 km for the first time. Brick run extends to 18 km with a light challenge at km 15.",
+flags:["Long ride: first time above 100 km — mental milestone","Nutrition every 25 min on the long ride — make it automatic","Brick: still unstructured but challenge km 15–18 to hold effort"],
+totals:{swim:9,bike:260,run:43},
+days:[
+  {day:"MON",sessions:[
+    {tag:"strength",label:"Strength A — 45 min (before work)",target:"Goblet Squat 3×12 (heavier), RDL 3×12 (slow eccentric), Push-Up 3×15 (band/weight), Dead Bug 3×12/side, KB Swing 3×15.",why:"Load steps up. Each week slightly harder."},
+    {tag:"swim",label:"Swim 3 km (after work)",target:"MAIN SET (after 1000m WU): 3×(4×200m @ 1:35/100m, 15s rest) — 45s between sets",why:"Set structure with partial reset between groups."},
+  ]},
+  {day:"TUE",sessions:[
+    {tag:"bike",label:"Easy Ride 30 km (AM)",target:`Z2. ${f(0.56)}–${f(0.75)}W. 55 min.`,why:""},
+    {tag:"run",label:"Track — Run to Track + Session (PM ~6:15)",target:"5 km to track @ 5:30/km | Choose option below | 2–3 km CD",why:"",trackKey:"w3"},
+  ]},
+  {day:"WED",sessions:[
+    {tag:"strength",label:"Strength B — 45 min (before work)",target:"Bulgarian Split Squat 3×10/side (+load), Single-Leg RDL 3×10/side, Step-Up 3×10/side, Lat Pulldown 3×10, Copenhagen Plank 3×20s/side, Calf Raise 3×15/side.",why:"Load increases across all movements."},
+    {tag:"swim",label:"Swim 3 km (after work)",target:"MAIN SET (after 1000m WU): 4×500m @ 1:32/100m — 30s rest",why:"Race-pace 500m blocks. 1:32 is just outside race pace."},
+  ]},
+  {day:"THU",sessions:[
+    {tag:"run",label:"Easy Jog — 10 km (AM before work)",target:"~55 min @ 5:30/km.",why:""},
+    {tag:"bike",label:"Bike Intervals — 68 km (PM — outdoor, hills) ★",target:`20 min WU @ ${f(0.58)}W | 4×10 min @ ${f(0.90)}W (90% FTP*) — 4 min Z1 between | 15 min CD. On climbs: surge ${f(0.93)}–${f(0.95)}W. Full aero.`,why:"4 reps at 90% FTP — one more than W2. Hilly outdoor route is critical."},
+  ]},
+  {day:"FRI",sessions:[
+    {tag:"swim",label:"Swim 3 km (after office)",target:"MAIN SET (after 1000m WU): 4×400m @ 1:35/100m — 25s rest",why:"Friday recovery swim."},
+    {tag:"mob",label:"Mobility — 15 min (evening)",target:"Friday routine. See Mobility tab.",why:""},
+  ]},
+  {day:"SAT",sessions:[
+    {tag:"bike",label:"Long Ride 110 km ★",target:`~3.5 hrs @ Z2. Include 2×15 min @ ${f(0.76)}W race effort at km 45 and km 80. NUTRITION: 75g carbs/hr.`,why:"First 100+ km ride — mental and physical landmark."},
+  ]},
+  {day:"SUN",sessions:[
+    {tag:"brick",label:"Brick — Ride 55 km + Run 18 km",target:`Ride 55 km @ Z2, gel every 20 min | T2 | Run 18 km @ 5:10–5:20/km easy. CHALLENGE: km 15–18 — hold effort, don't back off.`,why:"Light challenge at km 15–18. Building the habit of pushing through."},
+    {tag:"mob",label:"Mobility — 20 min (evening)",target:"Sunday routine. See Mobility tab.",why:""},
+  ]},
+]},
+// W4
+{id:4,label:"W4",name:"Recovery — Foundation Absorption",dates:"Apr 21–27",phase:"recovery",hours:"~11 hrs",
+context:"Three weeks of foundation load needs consolidation. Volume drops ~25%. Fitness appears during recovery weeks.",
+flags:["Volume: ~25% reduction across all disciplines","One strength session only — Monday","HRV should trend upward by Thursday"],
+totals:{swim:6,bike:190,run:27},
+days:[
+  {day:"MON",sessions:[
+    {tag:"strength",label:"Strength A — 30 min (before work)",target:"Same movements. 80% of W3 load. Quality only.",why:"Maintain pattern without new stress."},
+    {tag:"swim",label:"Swim 2.5 km (after work)",target:"MAIN SET (after 1000m WU): 5×200m @ 1:40/100m — 25s rest",why:"Maintenance volume."},
+  ]},
+  {day:"TUE",sessions:[
+    {tag:"bike",label:"Easy Ride 25 km (AM)",target:"Z2. 45 min.",why:""},
+    {tag:"run",label:"Track — Run to Track + Session (PM ~6:15)",target:"3 km easy to track | Choose option below | 2 km CD",why:"",trackKey:"w4"},
+  ]},
+  {day:"WED",sessions:[{tag:"swim",label:"Swim 2 km (after work)",target:"MAIN SET (after 1000m WU): 4×250m @ 1:40/100m — 25s rest. Easy.",why:"Shorter Wednesday in recovery week."}]},
+  {day:"THU",sessions:[
+    {tag:"run",label:"Easy Jog — 7 km (AM before work)",target:"~40 min @ 5:30/km.",why:""},
+    {tag:"bike",label:"Bike Intervals — 50 km (PM — outdoor) ★",target:`20 min WU | 2×12 min @ ${f(0.83)}W (83% FTP*) — 5 min easy between | 15 min CD.`,why:"Two reps at reduced intensity. Keeps adaptations alive."},
+  ]},
+  {day:"FRI",sessions:[
+    {tag:"swim",label:"Swim 1.5 km (after office)",target:"MAIN SET (after 1000m WU): 3×100m @ 1:40/100m — 30s rest. Truly easy.",why:"Recovery week. Shortest swim of the plan."},
+    {tag:"mob",label:"Mobility — 15 min (evening)",target:"Friday routine. See Mobility tab.",why:""},
+  ]},
+  {day:"SAT",sessions:[{tag:"bike",label:"Long Ride 75 km",target:`~2.2 hrs @ Z2 (${f(0.56)}–${f(0.74)}W). No race efforts. Nutrition practice continues.`,why:"Short long ride. Recovery priority."}]},
+  {day:"SUN",sessions:[
+    {tag:"brick",label:"Brick — Ride 50 km + Run 10 km (EASY)",target:"Ride 50 km Z2, nutrition | T2 | Run 10 km @ 5:25–5:35/km. Note: does km 8–9 feel better than W3?",why:"Reduced brick. Should feel noticeably better than W3."},
+    {tag:"mob",label:"Mobility — 20 min (evening)",target:"Sunday routine. See Mobility tab.",why:""},
+  ]},
+]},
+// W5
+{id:5,label:"W5",name:"Race Specific — Block 2 Begins",dates:"Apr 28–May 4",phase:"specific",hours:"~18 hrs",
+context:"Block 2 starts. Every session from here has a direct Cairns context. Brick runs now have three options with interval suggestions.",
+flags:["Brick runs: pick your option Sunday morning based on Saturday legs + HRV","Strength A adds Box Jumps this week — power phase begins","Wednesday swim grows to 4 km this week"],
+totals:{swim:10,bike:280,run:48},
+days:[
+  {day:"MON",sessions:[
+    {tag:"strength",label:"Strength A — Power Phase (before work)",target:"Box Jump 3×6 (NEW), Heavy Goblet Squat 3×10, RDL 3×10 (slow eccentric), Push-Up 3×15 (weighted), Dead Bug 3×12/side, KB Swing 3×15.",why:"Box jumps introduce power. Explosive work activates fast-twitch fibres."},
+    {tag:"swim",label:"Swim 3 km (after work)",target:"MAIN SET (after 1000m WU): 3×(4×200m @ 1:32/100m, 10s rest) — 45s between sets",why:"10s rest is very tight — forces pace maintenance under fatigue."},
+  ]},
+  {day:"TUE",sessions:[
+    {tag:"bike",label:"Easy Ride 30 km (AM)",target:`Z2. ${f(0.56)}–${f(0.75)}W. 55 min.`,why:""},
+    {tag:"run",label:"Track — Run to Track + Session (PM ~6:15)",target:"5 km to track @ 5:25/km | Choose option below | 2–3 km CD",why:"",trackKey:"w5"},
+  ]},
+  {day:"WED",sessions:[
+    {tag:"strength",label:"Strength B — Power Phase (before work)",target:"Bulgarian Split Squat 3×8/side (heavier), Single-Leg RDL 3×8/side, Hip Thrust 3×12 (NEW), Ring Row 3×10, Pallof Press 3×10/side, Copenhagen Plank 3×25s/side.",why:"Hip Thrust added — single most effective exercise for cycling power and run propulsion."},
+    {tag:"swim",label:"Swim 4 km (after work) ★",target:"MAIN SET (after 1000m WU): 5×500m @ 1:30/100m — 30s rest",why:"1:30/100m is race pace. 5×500m = 2.5 km of race-pace work. Benchmark swim session."},
+  ]},
+  {day:"THU",sessions:[
+    {tag:"run",label:"Easy Jog — 11 km (AM before work)",target:"~60 min @ 5:30/km.",why:""},
+    {tag:"bike",label:"Bike Intervals — 70 km (PM — outdoor, hills) ★",target:`20 min WU @ ${f(0.58)}W | 3×15 min @ ${f(0.91)}W (91% FTP*) — 4 min Z1 between | 15 min CD. On climbs: surge ${f(0.95)}–${f(1.00)}W. Full aero.`,why:"91% FTP for 15 min blocks — genuine threshold work."},
+  ]},
+  {day:"FRI",sessions:[
+    {tag:"swim",label:"Swim 3 km (after office)",target:"MAIN SET (after 1000m WU): 4×400m @ 1:32/100m — 25s rest",why:"Recovery swim. Aerobic before big weekend."},
+    {tag:"mob",label:"Mobility — 15 min (evening)",target:"Friday routine. See Mobility tab.",why:""},
+  ]},
+  {day:"SAT",sessions:[{tag:"bike",label:"Long Ride 120 km ★",target:`~3.75 hrs. Z2 base (${f(0.56)}–${f(0.76)}W) + 2×20 min @ ${f(0.76)}W race effort at km 50 and km 90. NUTRITION: 80g carbs/hr.`,why:"First 120 km ride. 20 min race-effort blocks late in the ride."}]},
+  {day:"SUN",sessions:[
+    {tag:"brick",label:"Brick — Ride 60 km + Run 21 km",target:`Ride 60 km @ ${f(0.70)}–${f(0.76)}W, gel every 20 min | T2 | Run 21 km — choose option below`,why:"First structured brick. Pick based on how Saturday's 120 km felt.",isBrick:true,
+      brickOpts:[
+        {label:"Option A — Race Effort Intervals",intensity:"hard",detail:`Run 21 km: 3 km easy @ 5:20/km | 4×6 min @ HM race effort (4:10–4:15/km) — 3 min easy jog between | easy km home. Gel at min 1, km 8, km 15.`},
+        {label:"Option B — Progressive Build",intensity:"moderate",detail:"Run 21 km: 6 km @ 5:10/km | 9 km building every 3 km to 4:45/km | 6 km @ 4:45–4:55/km. Gel at min 1, km 7, km 14."},
+        {label:"Option C — Easy + Surges",intensity:"easy",detail:"Run 21 km: 17 km easy @ 5:15/km | 5×2 min @ race effort (4:10/km) scattered through km 12–18 — 3 min easy between | finish easy. Gel every 5 km."},
+      ]},
+    {tag:"mob",label:"Mobility — 20 min (evening)",target:"Sunday routine. See Mobility tab.",why:""},
+  ]},
+]},
+// W6
+{id:6,label:"W6",name:"Recovery — Mid-Block Reset",dates:"May 5–11",phase:"recovery",hours:"~12 hrs",
+context:"Recovery week mid-block. W7–W9 are three consecutive hard weeks — arriving at W7 fresh is the entire point of this week.",
+flags:["One strength session only — Monday","HRV target: 95+ by Thursday = green light for W7","Sunday brick: Option C only — no exceptions"],
+totals:{swim:7,bike:195,run:31},
+days:[
+  {day:"MON",sessions:[
+    {tag:"strength",label:"Strength A — 30 min (before work)",target:"80% of W5 loads. Box Jump 3×5 (light). Same movements.",why:"One session this week. Maintain pattern."},
+    {tag:"swim",label:"Swim 2.5 km (after work)",target:"MAIN SET (after 1000m WU): 5×300m @ 1:37/100m — 25s rest",why:""},
+  ]},
+  {day:"TUE",sessions:[
+    {tag:"bike",label:"Easy Ride 25 km (AM)",target:"Z2. 45 min.",why:""},
+    {tag:"run",label:"Track — Run to Track + Session (PM ~6:15)",target:"3 km easy to track | Choose option below | 2 km CD",why:"",trackKey:"w6"},
+  ]},
+  {day:"WED",sessions:[{tag:"swim",label:"Swim 2.5 km (after work)",target:"MAIN SET (after 1000m WU): 4×300m @ 1:38/100m — 25s rest. Easy.",why:"Maintenance swim. Recovery week."}]},
+  {day:"THU",sessions:[
+    {tag:"run",label:"Easy Jog — 8 km (AM before work)",target:"~45 min @ 5:30/km.",why:""},
+    {tag:"bike",label:"Bike Intervals — 52 km (PM — outdoor)",target:`20 min WU | 2×12 min @ ${f(0.84)}W — 5 min between | 15 min CD.`,why:"Half the reps of W5. Remind the body of the threshold stimulus."},
+  ]},
+  {day:"FRI",sessions:[
+    {tag:"swim",label:"Swim 2 km (after office)",target:"MAIN SET (after 1000m WU): 3×200m @ 1:40/100m — 30s rest. Easy.",why:""},
+    {tag:"mob",label:"Mobility — 15 min (evening)",target:"Friday routine. See Mobility tab.",why:""},
+  ]},
+  {day:"SAT",sessions:[{tag:"bike",label:"Long Ride 73 km",target:"~2.2 hrs @ Z2. No race efforts. Just ride and recover.",why:"Short long ride. Recovery priority."}]},
+  {day:"SUN",sessions:[
+    {tag:"brick",label:"Brick — Ride 45 km + Run 16 km (EASY)",target:"Ride 45 km Z2, nutrition | T2 | Run 16 km — Option C only this week",why:"Recovery week brick — Option C only. No exceptions.",isBrick:true,
+      brickOpts:[{label:"Option C only — Easy + Light Surges",intensity:"easy",detail:"Run 16 km: 13 km easy @ 5:20–5:30/km | 3×2 min @ 4:30/km at km 10–14 — 2 min easy between. Gel at min 1, every 6 km."}]},
+    {tag:"mob",label:"Mobility — 20 min (evening)",target:"Sunday routine. See Mobility tab.",why:""},
+  ]},
+]},
+// W7
+{id:7,label:"W7",name:"Race Specific — Peak Block Week 1 of 3",dates:"May 12–18",phase:"specific",hours:"~19 hrs",
+context:"First of three consecutive hard weeks. No recovery week until the taper. Eat more and sleep 8+ hrs every night.",
+flags:["THREE consecutive hard weeks: W7, W8, W9 — no recovery between","Eat above maintenance","Sleep 8+ hrs every night — this is training","HRV below 78 = downgrade that session to Z2"],
+totals:{swim:10,bike:305,run:53},
+days:[
+  {day:"MON",sessions:[
+    {tag:"strength",label:"Strength A — 45 min (before work)",target:"Box Jump 3×6, KB or Trap Bar Deadlift 3×8 (heavier than KB Swing), Goblet Squat 3×10, Push-Up 3×15, Dead Bug 3×12/side.",why:"Deadlift replaces swing — greater posterior chain load."},
+    {tag:"swim",label:"Swim 3 km (after work)",target:"MAIN SET (after 1000m WU): 3×(6×100m @ 1:30/100m, 10s rest) — 45s between sets",why:"Short reps at race pace with 10s rest."},
+  ]},
+  {day:"TUE",sessions:[
+    {tag:"bike",label:"Easy Ride 30 km (AM)",target:`Z2. ${f(0.56)}–${f(0.75)}W. 55 min.`,why:""},
+    {tag:"run",label:"Track — Run to Track + Session (PM ~6:15)",target:"5 km to track @ 5:25/km | Choose option below | 3 km CD",why:"",trackKey:"w7"},
+  ]},
+  {day:"WED",sessions:[
+    {tag:"strength",label:"Strength B — 45 min (before work)",target:"Bulgarian Split Squat heavy 3×8/side, Hip Thrust heavy 3×10, Ring Row 3×10, Pallof Press 3×10/side, Copenhagen Plank 3×25s/side.",why:"All loads heavier than W5. Progressive overload continues."},
+    {tag:"swim",label:"Swim 4 km (after work) ★",target:"MAIN SET (after 1000m WU): 4×600m @ 1:30/100m — 35s rest",why:"600m blocks at race pace — each rep ~9 min. 2.4 km of race-pace work."},
+  ]},
+  {day:"THU",sessions:[
+    {tag:"run",label:"Easy Jog — 12 km (AM before work)",target:"~65 min @ 5:30/km.",why:""},
+    {tag:"bike",label:"Bike Intervals — 72 km (PM — outdoor, hills) ★",target:`20 min WU @ ${f(0.58)}W | 2×25 min @ ${f(0.90)}W (90% FTP*) — 5 min Z1 between | 15 min CD. On climbs: ${f(0.95)}W. Full aero.`,why:"25 min threshold blocks — the longest sustained intervals of the plan."},
+  ]},
+  {day:"FRI",sessions:[
+    {tag:"swim",label:"Swim 3 km (after office)",target:"MAIN SET (after 1000m WU): 4×400m @ 1:31/100m — 20s rest",why:"Recovery swim. Controlled before the biggest weekend so far."},
+    {tag:"mob",label:"Mobility — 15 min (evening)",target:"Friday routine. See Mobility tab.",why:""},
+  ]},
+  {day:"SAT",sessions:[{tag:"bike",label:"Long Ride 140 km ★",target:`~4.5 hrs. Z2 base + 3×15 min @ ${f(0.76)}W race effort at km 40, km 80, km 120. NUTRITION: 80–90g carbs/hr.`,why:"140 km is your new longest ride. Three race-effort blocks spread progressively."}]},
+  {day:"SUN",sessions:[
+    {tag:"brick",label:"Brick — Ride 63 km + Run 25 km",target:`Ride 63 km @ ${f(0.70)}–${f(0.76)}W, full nutrition every 20 min | T2 | Run 25 km — choose option below`,why:"First big brick of the 3-week hard block.",isBrick:true,
+      brickOpts:[
+        {label:"Option A — Race Effort Intervals",intensity:"hard",detail:"Run 25 km: 3 km easy | 5×8 min @ HM race effort (4:10–4:15/km) — 3 min easy jog between | easy km to finish. Gel at min 1, km 8, km 16, km 22."},
+        {label:"Option B — Progressive Negative Split",intensity:"moderate",detail:"Run 25 km: 8 km @ 5:05/km | 9 km building to 4:40/km | 8 km @ 4:35–4:45/km. Gel at min 1, km 7, km 14, km 21."},
+        {label:"Option C — Easy + Race Surges",intensity:"easy",detail:"Run 25 km: 19 km easy @ 5:10/km | 4×3 min @ race effort (4:10/km) at km 14, 16, 18, 20 — 2 min easy between | easy finish. Gel every 5 km."},
+      ]},
+    {tag:"mob",label:"Mobility — 20 min (evening)",target:"Sunday routine. See Mobility tab.",why:""},
+  ]},
+]},
+// W8
+{id:8,label:"W8",name:"PEAK WEEK — Maximum Load",dates:"May 19–25",phase:"specific",hours:"~21 hrs",
+context:"Hardest week of the plan. 58 km run, 340 km bike, 10 km swim. 8+ hrs sleep every night. Eat above maintenance.",
+flags:["58 km run — new territory. 5:30/km on ALL easy sessions","8+ hrs sleep every night — this is literally training","Eat more than feels necessary this week","HRV below 75 = downgrade that hard session to Z2"],
+totals:{swim:10,bike:340,run:58},
+days:[
+  {day:"MON",sessions:[
+    {tag:"strength",label:"Strength A — PEAK LOAD (before work)",target:"Box Jump 3×6, Trap Bar Deadlift 3×6 (heaviest of plan), Goblet Squat 3×10, Push-Up 3×15 (weighted), Dead Bug 3×12/side.",why:"Peak S&C session. After this week, loads start dropping toward taper."},
+    {tag:"swim",label:"Swim 3 km (after work)",target:"MAIN SET (after 1000m WU): 10×100m @ 1:29/100m — 15s rest. RACE PACE.",why:"Short reps at exact race pace with minimal rest."},
+  ]},
+  {day:"TUE",sessions:[
+    {tag:"bike",label:"Easy Ride 35 km (AM)",target:`Z2. ${f(0.56)}–${f(0.75)}W. 1 hr.`,why:""},
+    {tag:"run",label:"Track — Run to Track + Session (PM ~6:15)",target:"5 km to track @ 5:20/km | Choose option below | 3 km CD",why:"",trackKey:"w8"},
+  ]},
+  {day:"WED",sessions:[
+    {tag:"strength",label:"Strength B — PEAK LOAD (before work)",target:"All movements at peak loads. Quality first — if form breaks, reduce weight.",why:"Last full-load Strength B."},
+    {tag:"swim",label:"Swim 4 km (after work) ★ PEAK SWIM SESSION",target:"MAIN SET (after 1000m WU): 5×500m @ 1:29/100m — 25s rest. RACE PACE.",why:"5×500m at race pace — 2.5 km of race-pace work. Hardest swim session of the plan."},
+  ]},
+  {day:"THU",sessions:[
+    {tag:"run",label:"Easy Jog — 15 km (AM before work)",target:"~80 min @ 5:30/km. Extended — this is how we hit 58 km run week.",why:"Longer Thursday jog is deliberate peak-week volume."},
+    {tag:"bike",label:"Bike Intervals — 75 km (PM — outdoor, hills) ★ HARDEST BIKE SESSION",target:`20 min WU @ ${f(0.58)}W | 3×20 min @ ${f(0.92)}W (92% FTP*) — 4 min Z1 between | 15 min CD. Full aero. Hills. No sitting up.`,why:"3×20 min at 92% FTP is the peak bike stimulus. Almost exactly your 240W Cairns race target as interval efforts."},
+  ]},
+  {day:"FRI",sessions:[
+    {tag:"swim",label:"Swim 3 km (after office — EASY)",target:"MAIN SET (after 1000m WU): 8×200m @ 1:38/100m — 25s rest. Easy. Protect Saturday.",why:"Active recovery."},
+    {tag:"mob",label:"Mobility — 15 min (evening)",target:"Friday routine. See Mobility tab.",why:""},
+  ]},
+  {day:"SAT",sessions:[{tag:"bike",label:"Long Ride 160 km ★",target:`~5 hrs. Full race simulation. 3×20 min @ ${f(0.76)}W race effort. NUTRITION: 80–90g carbs/hr. Are you averaging 240W during race-effort blocks?`,why:"160 km — longest ride of the plan. Mental and physical toughness built here is irreplaceable."}]},
+  {day:"SUN",sessions:[
+    {tag:"brick",label:"Brick — Ride 65 km + Run 27 km",target:`Ride 65 km @ ${f(0.70)}–${f(0.77)}W, PERFECT nutrition every 20 min | T2 | Run 27 km — choose option below`,why:"Peak week brick. 27 km is the longest run of the plan.",isBrick:true,
+      brickOpts:[
+        {label:"Option A — Race Simulation Intervals",intensity:"hard",detail:"Run 27 km: 4 km easy | 5×10 min @ HM race effort (4:10–4:15/km) — 3 min easy jog between | easy km home. Gel at min 1, km 7, km 14, km 21. THIS is your proof-of-fitness session."},
+        {label:"Option B — Negative Split + Race Effort Finish",intensity:"moderate",detail:"Run 27 km: 10 km @ 5:05/km | 10 km building to 4:40/km | 7 km @ 4:30–4:40/km. Gel every 5 km."},
+        {label:"Option C — Long Easy + Late Surges",intensity:"easy",detail:"Run 27 km: 22 km easy @ 5:10/km | 3×3 min @ race effort at km 20, 22, 24 — 2 min easy between | finish easy. Pick if 160 km Saturday was brutal."},
+      ]},
+    {tag:"mob",label:"Mobility — 20 min (evening)",target:"Sunday routine. See Mobility tab.",why:""},
+  ]},
+]},
+// W9
+{id:9,label:"W9",name:"Sharpening — Final Race-Specific Block",dates:"May 26–Jun 1",phase:"sharpening",hours:"~19 hrs",
+context:"Third consecutive hard week — slightly lower volume than W8 but sharper. Quality over quantity. Strength ends this week.",
+flags:["Last full strength session Monday AM","Track: fastest session of the plan","Final race simulation Sunday","W10 will be 30% less than this week's volume"],
+totals:{swim:10,bike:305,run:54},
+days:[
+  {day:"MON",sessions:[
+    {tag:"strength",label:"Strength A — FINAL FULL SESSION (before work)",target:"40 min. Box Jump 3×5, KB Deadlift 3×8 (moderate), Goblet Squat 3×10, Push-Up 3×15, Dead Bug 3×12/side.",why:"Last full strength session. 9 weeks of S&C adaptation is built in."},
+    {tag:"swim",label:"Swim 3 km (after work)",target:"MAIN SET (after 1000m WU): 8×200m @ 1:29/100m — 15s rest. RACE PACE.",why:"Race pace across 8 reps. Final benchmark."},
+  ]},
+  {day:"TUE",sessions:[
+    {tag:"bike",label:"Easy Ride 30 km (AM)",target:`Z2. ${f(0.56)}–${f(0.75)}W. 55 min.`,why:""},
+    {tag:"run",label:"Track — SHARPEST SESSION OF THE PLAN (PM ~6:15)",target:"5 km to track @ 5:20/km | Choose option below | 2.5 km CD",why:"",trackKey:"w9"},
+  ]},
+  {day:"WED",sessions:[
+    {tag:"strength",label:"Strength B — FINAL SESSION (before work)",target:"All movements at moderate-heavy loads (85% of peak). Quality over weight.",why:"Last Strength B. After this session, S&C work stops."},
+    {tag:"swim",label:"Swim 4 km (after work) ★",target:"MAIN SET (after 1000m WU): 8×300m @ 1:29/100m — 20s rest",why:"Race pace sustained across 300m blocks."},
+  ]},
+  {day:"THU",sessions:[
+    {tag:"run",label:"Easy Jog — 14 km (AM before work)",target:"~75 min @ 5:30/km.",why:""},
+    {tag:"bike",label:"Bike Intervals — 72 km (PM — outdoor, hills) ★",target:`20 min WU | 3×15 min @ ${f(0.92)}W (92% FTP*) — 4 min Z1 between | 15 min CD. Outdoor. Hills. Full aero.`,why:"Same intensity as W8 but shorter reps — sharper, not bigger. Confidence session."},
+  ]},
+  {day:"FRI",sessions:[
+    {tag:"swim",label:"Swim 3 km (after office)",target:"MAIN SET (after 1000m WU): 4×400m @ 1:29/100m — 20s rest. Race pace.",why:"Final Friday race-pace swim."},
+    {tag:"mob",label:"Mobility — 15 min (evening)",target:"Friday routine. See Mobility tab.",why:""},
+  ]},
+  {day:"SAT",sessions:[{tag:"bike",label:"Long Ride 140 km ★",target:`~4.5 hrs. Z2 base + 2×20 min @ ${f(0.76)}W race effort. Final long ride of the block.`,why:"You've ridden 160 km. 140 km should feel controlled and familiar."}]},
+  {day:"SUN",sessions:[
+    {tag:"brick",label:"Brick — Ride 63 km + Run 22 km",target:`Ride 63 km @ ${f(0.70)}–${f(0.77)}W, PERFECT nutrition | T2 | Run 22 km — choose option below`,why:"Final dress rehearsal. Execute flawlessly.",isBrick:true,
+      brickOpts:[
+        {label:"Option A — Race Execution Rehearsal",intensity:"hard",detail:"Run 22 km: 3 km easy | 4×10 min @ race pace (4:10–4:15/km) — 3 min easy jog between | easy km finish. Gel at min 1, km 7, km 14, km 19. Execute perfectly."},
+        {label:"Option B — Negative Split Dress Rehearsal",intensity:"moderate",detail:"Run 22 km: start @ 5:00/km, build to 4:30–4:40/km over the final 8 km. Gel every 5 km."},
+        {label:"Option C — Easy + Race Surges",intensity:"easy",detail:"Run 22 km: 16 km easy @ 5:10/km | 4×3 min @ race effort at km 13, 15, 17, 19 — 2 min easy between | easy finish. Pick if three hard weeks accumulated more than expected."},
+      ]},
+    {tag:"mob",label:"Mobility — 20 min (evening)",target:"Sunday routine. See Mobility tab.",why:""},
+  ]},
+]},
+// W10
+{id:10,label:"W10",name:"Volume Reduction — 30% Less Than W9",dates:"Jun 2–8",phase:"taper",hours:"~13 hrs",
+context:"30% volume reduction from W9. Not a traditional taper — intensity stays sharp. If in Cairns from Saturday, ride the actual race course.",
+flags:["30% less volume — sessions are shorter, not easier","Intensity stays sharp","Final light strength Monday — activation only","In Cairns from Sat? Ride Captain Cook Highway. Swim Palm Cove. Run the esplanade."],
+totals:{swim:7,bike:215,run:38},
+days:[
+  {day:"MON",sessions:[
+    {tag:"strength",label:"Strength A — FINAL SESSION (before work)",target:"30 min. 50–60% of peak loads. Same movements. Activate only.",why:"Last S&C before race. Light loads keep neuromuscular system primed."},
+    {tag:"swim",label:"Swim 2.5 km (after work)",target:"MAIN SET (after 1000m WU): 5×200m @ 1:29/100m — 20s rest. Short and sharp.",why:""},
+  ]},
+  {day:"TUE",sessions:[
+    {tag:"bike",label:"Easy Ride 25 km (AM)",target:"Z2. 45 min.",why:""},
+    {tag:"run",label:"Track — Final Track Session (PM ~6:15)",target:"3 km easy to track | Choose option below | 2 km CD",why:"",trackKey:"w10"},
+  ]},
+  {day:"WED",sessions:[{tag:"swim",label:"Swim 2.5 km (after work)",target:"MAIN SET (after 1000m WU): 4×300m @ 1:29/100m — 20s rest. Feel fast, don't work for it.",why:"Race pace without effort. The taper working."}]},
+  {day:"THU",sessions:[
+    {tag:"run",label:"Easy Jog — 12 km (AM before work)",target:"~65 min @ 5:30/km.",why:""},
+    {tag:"bike",label:"Bike Sharpener — 52 km (PM) ★",target:`20 min WU | 3×12 min @ ${f(0.91)}W — 3 min easy between | 15 min CD. Sharp and done.`,why:"Last bike interval session. Feel powerful and fast throughout."},
+  ]},
+  {day:"FRI",sessions:[
+    {tag:"swim",label:"Swim 2 km (after office)",target:"MAIN SET (after 1000m WU): 3×200m @ 1:30/100m — 25s rest. Easy.",why:""},
+    {tag:"mob",label:"Mobility — 15 min (evening)",target:"Friday routine. If in Cairns: go to bed early.",why:""},
+  ]},
+  {day:"SAT",sessions:[{tag:"bike",label:"Ride 90 km (possibly on Cairns course)",target:`~2.75 hrs @ Z2 with 2×10 min @ ${f(0.76)}W race effort. If in Cairns: ride Captain Cook Highway. Sight Rex's Lookout.`,why:"Course familiarisation. Final nutrition rehearsal."}]},
+  {day:"SUN",sessions:[
+    {tag:"brick",label:"Brick — Ride 48 km + Run 14 km",target:`Ride 48 km @ ${f(0.70)}–${f(0.76)}W race effort | T2 | Run 14 km — choose option below`,why:"Final dress rehearsal before race week.",isBrick:true,
+      brickOpts:[
+        {label:"Option A — Race Pace Sharpener",intensity:"hard",detail:"Run 14 km: 3 km easy | 3×8 min @ race pace (4:10/km) — 3 min easy between | easy km finish."},
+        {label:"Option B — Easy + Race Effort Strides",intensity:"moderate",detail:"Run 14 km: 11 km easy @ 5:10/km | 5×1 min @ race effort — 2 min easy between | easy finish."},
+        {label:"Option C — Easy Only",intensity:"easy",detail:"Run 14 km easy @ 5:15/km. Gel every 5 km. If legs are flat — trust the process."},
+      ]},
+    {tag:"mob",label:"Mobility — 20 min (evening)",target:"Sunday routine. Final structured mobility session before race.",why:""},
+  ]},
+]},
+// W11
+{id:11,label:"W11",name:"Race Week — Cairns 70.3",dates:"Jun 9–14",phase:"raceweek",hours:"~6 hrs",
+context:"Nothing new. Nothing heroic. Sleep is training. Food is training. The work is done.",
+flags:["HRV above 95 by Wednesday = green light. You're primed.","No new foods, new gear, new decisions this week","Visualise km 14–20 of the run daily"],
+totals:{swim:3.5,bike:80,run:10},
+days:[
+  {day:"MON",sessions:[{tag:"swim",label:"Easy Swim 2 km (PM)",target:"MAIN SET (after 1000m WU): 4×150m easy — 30s rest.",why:"Keep the water feel."}]},
+  {day:"TUE",sessions:[{tag:"run",label:"Easy Run + Strides — 6 km",target:"20 min easy @ 5:30/km + 4×30 sec strides (fast turnover, not sprint).",why:"Strides fire fast-twitch fibres without fatigue cost."}]},
+  {day:"WED",sessions:[{tag:"swim",label:"Easy Swim 1.5 km (PM)",target:"MAIN SET (after 1000m WU): 3×100m easy — 30s rest.",why:""}]},
+  {day:"THU",sessions:[{tag:"brick",label:"Easy Brick — Ride 30 km + Run 4 km",target:"30 min easy Z1 ride + 10 min easy run. Legs awake. Done.",why:"Last transition practice."}]},
+  {day:"FRI",sessions:[{tag:"rest",label:"Travel / Gear Check / Full Rest",target:"Get to race venue. Rack bike. Check transitions. Eat well. Sleep early.",why:""}]},
+  {day:"SAT",sessions:[{tag:"swim",label:"Palm Cove Course Swim — 1 km",target:"15–20 min easy open water. Sight the buoys. Check current and entry/exit. Do NOT race this.",why:"Course familiarisation."}]},
+  {day:"SUN",sessions:[{tag:"race",label:"CAIRNS 70.3 — RACE DAY",target:"Swim 1:29/100m — settle | Bike 240W NP — surge Rex's, recover descents, gel every 20 min | Run: 5:00/km start, build, DRIVE km 14–20.",why:"Everything since March 24 was for this. Km 14–20 is your weapon."}]},
+]},
+    ]
+  };
+}
+
+// ============================================================================
+// ZONE CALCULATORS
+// ============================================================================
+const POWER_ZONE_DEFS=[
+  {zone:1,name:'Active Recovery',minPct:0,maxPct:0.55,color:'#a1a1aa'},
+  {zone:2,name:'Endurance',minPct:0.56,maxPct:0.75,color:'#38bdf8'},
+  {zone:3,name:'Tempo',minPct:0.76,maxPct:0.90,color:'#34d399'},
+  {zone:4,name:'Threshold',minPct:0.91,maxPct:1.05,color:'#facc15'},
+  {zone:5,name:'VO2max',minPct:1.06,maxPct:1.20,color:'#fb923c'},
+  {zone:6,name:'Anaerobic',minPct:1.21,maxPct:1.50,color:'#f87171'},
+  {zone:7,name:'Neuromuscular',minPct:1.51,maxPct:null,color:'#c084fc'},
+];
+function calcPowerZones(ftp){if(!ftp||ftp<=0)return[];return POWER_ZONE_DEFS.map(z=>({...z,minWatts:Math.round(ftp*z.minPct),maxWatts:z.maxPct?Math.round(ftp*z.maxPct):null}));}
+const PACE_ZONE_DEFS=[
+  {zone:1,name:'Easy / Recovery',minM:1.30,maxM:1.15,color:'#a1a1aa'},
+  {zone:2,name:'Aerobic / Endurance',minM:1.14,maxM:1.06,color:'#38bdf8'},
+  {zone:3,name:'Tempo',minM:1.05,maxM:0.99,color:'#34d399'},
+  {zone:4,name:'Threshold',minM:0.98,maxM:0.94,color:'#facc15'},
+  {zone:5,name:'VO2max / Speed',minM:0.93,maxM:0.85,color:'#f87171'},
+];
+function calcPaceZones(tp){if(!tp||tp<=0)return[];return PACE_ZONE_DEFS.map(z=>({...z,minPace:Math.round(tp*z.minM),maxPace:Math.round(tp*z.maxM)}));}
+function calcCSS(t400,t200){if(!t400||!t200||t400<=t200)return null;return((t400-t200)/2);}
+const SWIM_ZONE_DEFS=[
+  {zone:1,name:'Recovery',offMin:0.20,offMax:0.12,color:'#a1a1aa'},
+  {zone:2,name:'Endurance',offMin:0.11,offMax:0.05,color:'#38bdf8'},
+  {zone:3,name:'Threshold',offMin:0.04,offMax:-0.02,color:'#34d399'},
+  {zone:4,name:'VO2max',offMin:-0.03,offMax:-0.08,color:'#facc15'},
+  {zone:5,name:'Sprint',offMin:-0.09,offMax:-0.15,color:'#f87171'},
+];
+function calcSwimZones(t400,t200){const css=calcCSS(t400,t200);if(!css)return[];return SWIM_ZONE_DEFS.map(z=>({...z,css,minPace:Math.round(css*(1+z.offMin)),maxPace:Math.round(css*(1+z.offMax))}));}
+
+// ============================================================================
+// STATE
+// ============================================================================
+const STORE_VERSION = 4;
+const Store = {
+  _state:{_v:STORE_VERSION,athletes:[],activeAthleteId:null,plans:[],ui:{currentPage:'dashboard'},chatMessages:[],apiKey:'',brickSel:{},trackSel:{},feedback:{},_recording:null,connectedServices:{}},
+  _listeners:[],
+  init(){
+    const saved=localStorage.getItem('trainforge:state');
+    if(saved){
+      try{
+        const parsed=JSON.parse(saved);
+        // If version mismatch, keep only apiKey and chatMessages, reset everything else
+        if(parsed._v!==STORE_VERSION){
+          this._state.apiKey=parsed.apiKey||'';
+          this._state.chatMessages=parsed.chatMessages||[];
+        } else {
+          this._state={...this._state,...parsed};
+        }
+      }catch(e){/* corrupted — use defaults */}
+    }
+    if(this._state.athletes.length===0) this.createIgnacio();
+    if(!this._state.activeAthleteId&&this._state.athletes.length>0) this._state.activeAthleteId=this._state.athletes[0].id;
+    // Auto-recover: ensure every athlete has a plan
+    this._state.athletes.forEach(a=>{
+      if(!this._state.plans.find(p=>p.athleteId===a.id)){
+        this._state.plans.push(generateCairnsPlan(a));
+      }
+    });
+    this.save();
+  },
+  get state(){return this._state;},
+  update(partial){Object.assign(this._state,typeof partial==='function'?partial(this._state):partial);this.save();this._listeners.forEach(fn=>fn(this._state));},
+  subscribe(fn){this._listeners.push(fn);},
+  save(){this._state._v=STORE_VERSION;localStorage.setItem('trainforge:state',JSON.stringify(this._state));},
+  getActiveAthlete(){return this._state.athletes.find(a=>a.id===this._state.activeAthleteId)||this._state.athletes[0];},
+  getActivePlan(){
+    const a=this.getActiveAthlete();if(!a) return null;
+    let plan=this._state.plans.find(p=>p.athleteId===a.id);
+    if(!plan){plan=generateCairnsPlan(a);this._state.plans.push(plan);this.save();}
+    return plan;
+  },
+  createIgnacio(){
+    const athlete={id:uid(),name:'Ignacio',sport:'triathlon',ftp:278,thresholdPace:300,css400:360,css200:165,weight:75,maxHR:190,restHR:50,
+      preferences:{
+        longRide:'SAT',brick:'SUN',longRun:'SUN',trackDay:'TUE',hardRun:'TUE',hardBike:'THU',hardSwim:'WED',
+        strengthA:'MON',strengthB:'WED',easySwim:'FRI',mobility:'FRI,SUN'
+      },
+      createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()};
+    this._state.athletes.push(athlete);
+    this._state.activeAthleteId=athlete.id;
+    this._state.plans.push(generateCairnsPlan(athlete));
+  }
+};
+
+// ============================================================================
+// RENDERING
+// ============================================================================
+function navigate(page){Store.update({ui:{...Store.state.ui,currentPage:page}});renderPage();updateSidebarActive();}
+function updateSidebarActive(){document.querySelectorAll('.sidebar-item').forEach(el=>{el.classList.toggle('active',el.dataset.page===Store.state.ui.currentPage);});}
+function renderPage(){
+  const main=document.getElementById('main-content');
+  const page=Store.state.ui.currentPage;
+  const pages={dashboard:renderDashboard,plan:renderPlanView,overview:renderOverview,calendar:renderCalendar,profiles:renderProfiles,zones:renderZones,schedule:renderSchedule,raceday:renderRaceDay,mobility:renderMobility,integrations:renderIntegrations,'ai-coach':renderAICoach};
+  main.innerHTML=(pages[page]||renderDashboard)();
+  updateSidebarActive();
+}
+function updateAthleteSelect(){
+  const sel=document.getElementById('athlete-select');
+  sel.innerHTML=Store.state.athletes.map(a=>`<option value="${a.id}" ${a.id===Store.state.activeAthleteId?'selected':''}>${a.name}</option>`).join('');
+}
+function switchAthlete(id){Store.update({activeAthleteId:id});renderPage();}
+function showToast(msg){const t=document.getElementById('toast');if(t)t.remove();const el=document.createElement('div');el.id='toast';el.className='fixed bottom-6 right-6 bg-bg-tertiary border border-bg-border rounded-lg px-4 py-3 text-sm text-zinc-200 shadow-lg z-50 fade-in';el.textContent=msg;document.body.appendChild(el);setTimeout(()=>el.remove(),3000);}
+function closeModal(){document.getElementById('modal-container').innerHTML='';}
+
+// ============================================================================
+// DASHBOARD
+// ============================================================================
+function renderDashboard(){
+  const a=Store.getActiveAthlete();const plan=Store.getActivePlan();
+  if(!a||!plan) return '<div class="p-8 text-zinc-400">No athlete selected.</div>';
+  const totSwim=plan.weeks.slice(1).reduce((s,w)=>s+w.totals.swim,0);
+  const totBike=plan.weeks.slice(1).reduce((s,w)=>s+w.totals.bike,0);
+  const totRun=plan.weeks.slice(1).reduce((s,w)=>s+w.totals.run,0);
+  return `<div class="p-6 fade-in">
+    <div class="mb-6 flex items-start gap-4">
+      <svg class="w-12 h-12 tt-logo-glow flex-shrink-0 mt-1" viewBox="0 0 100 100" fill="none">
+        <defs><linearGradient id="birdD" x1="10%" y1="80%" x2="90%" y2="20%"><stop offset="0%" stop-color="#1565C0"/><stop offset="50%" stop-color="#2196F3"/><stop offset="100%" stop-color="#42a5f5"/></linearGradient></defs>
+        <path d="M12 68 Q22 38 48 32 Q40 46 46 54 Q52 28 72 18 Q58 40 53 50 Q68 28 88 22 Q63 48 43 68 Q28 78 12 68Z" fill="url(#birdD)"/>
+      </svg>
+      <div>
+        <div class="text-[10px] tracking-widest text-zinc-600 uppercase mb-1">TRIPLE TRI CLUB · ${a.name} · FTP ${a.ftp}W</div>
+        <h2 class="text-2xl font-bold text-white">${plan.name}</h2>
+        <div class="text-sm text-zinc-500 mt-1">${plan.raceDate ? 'Race: '+plan.raceDate : ''} ${plan.raceTarget ? '· '+plan.raceTarget.split('·')[0] : ''}</div>
+      </div>
+    </div>
+    <div class="p-3 rounded-lg border border-yellow-500/20 bg-yellow-500/5 text-sm text-zinc-400 mb-6">
+      <span class="text-yellow-400 font-bold">⚡ W1 Saturday:</span> FTP test on Trinity. All (*) watt targets recalibrate from that result. · <span class="text-blue-400 font-bold">Swim note:</span> 1000m WU always assumed — only main set shown.
+    </div>
+    <div class="flex gap-3 flex-wrap mb-6">
+      ${[{l:'Total Swim',v:totSwim+' km',c:'text-accent-swim'},{l:'Total Bike',v:totBike+' km',c:'text-accent-bike'},{l:'Total Run',v:totRun+' km',c:'text-accent-run'},{l:'Peak Bike',v:'340 km (W8)',c:'text-accent-bike'},{l:'Peak Run',v:'58 km (W8)',c:'text-accent-run'},{l:'Recovery',v:'W4 + W6',c:'text-zinc-400'},{l:'W10',v:'-30% vs W9',c:'text-purple-400'}].map(s=>`<div class="bg-bg-secondary border border-bg-border rounded-lg px-3 py-2"><span class="text-[10px] text-zinc-600">${s.l}: </span><span class="text-sm font-semibold ${s.c}">${s.v}</span></div>`).join('')}
+    </div>
+    <div class="grid grid-cols-4 gap-4 mb-6">
+      <div class="bg-bg-secondary rounded-lg p-4 border border-bg-border">
+        <p class="text-xs text-zinc-600 uppercase">FTP</p>
+        <p class="text-2xl font-bold text-white">${a.ftp}W</p>
+        <p class="text-xs text-zinc-500">${a.weight?(a.ftp/a.weight).toFixed(1)+' W/kg':''}</p>
+      </div>
+      <div class="bg-bg-secondary rounded-lg p-4 border border-bg-border">
+        <p class="text-xs text-zinc-600 uppercase">Threshold Pace</p>
+        <p class="text-2xl font-bold text-white">${formatPace(a.thresholdPace)}/km</p>
+      </div>
+      <div class="bg-bg-secondary rounded-lg p-4 border border-bg-border">
+        <p class="text-xs text-zinc-600 uppercase">Weeks</p>
+        <p class="text-2xl font-bold text-white">12</p>
+        <p class="text-xs text-zinc-500">W0–W11</p>
+      </div>
+      <div class="bg-bg-secondary rounded-lg p-4 border border-bg-border">
+        <p class="text-xs text-zinc-600 uppercase">Race Target</p>
+        <p class="text-lg font-bold text-yellow-400">~4:05–4:15</p>
+        <p class="text-xs text-zinc-500">Cairns 70.3</p>
+      </div>
+    </div>
+    <div class="flex gap-3">
+      <button onclick="navigate('plan')" class="px-4 py-2.5 bg-brand hover:bg-brand-dark text-white rounded text-sm transition">View Training Plan</button>
+      <button onclick="navigate('overview')" class="px-4 py-2.5 bg-bg-secondary hover:bg-bg-hover text-zinc-300 rounded text-sm border border-bg-border transition">Week Overview</button>
+      <button onclick="navigate('zones')" class="px-4 py-2.5 bg-bg-secondary hover:bg-bg-hover text-zinc-300 rounded text-sm border border-bg-border transition">Edit Zones</button>
+      <button onclick="navigate('ai-coach')" class="px-4 py-2.5 bg-purple-600/20 text-purple-300 hover:bg-purple-600/30 rounded text-sm border border-purple-500/20 transition">Ask AI Coach</button>
+    </div>
+  </div>`;
+}
+
+// ============================================================================
+// PLAN VIEW (Week-by-week detailed view)
+// ============================================================================
+function renderPlanView(){
+  const plan=Store.getActivePlan();const a=Store.getActiveAthlete();
+  if(!plan) return '<div class="p-8 text-zinc-400">No plan found.</div>';
+  const wkId=Store.state.ui.selectedWeek||0;
+  const week=plan.weeks.find(w=>w.id===wkId)||plan.weeks[0];
+  const ac=PC[week.phase]||'#00c9b1';
+
+  return `<div class="p-6 fade-in">
+    <!-- Week Pills -->
+    <div class="flex gap-1.5 flex-wrap mb-4">
+      ${plan.weeks.map(w=>{const bc=PC[w.phase]||'#64748b';const active=w.id===wkId;
+        return `<button onclick="selectWeek(${w.id})" class="pill px-3 py-1.5 rounded text-xs font-bold" style="border:1px solid ${active?bc:'#141c26'};background:${active?bc+'18':'transparent'};color:${active?bc:'#374151'}">${w.label}</button>`;
+      }).join('')}
+    </div>
+
+    <!-- Week Header -->
+    <div class="rounded-xl p-4 mb-4" style="background:${ac}0a;border:1px solid ${ac}22">
+      <div class="flex justify-between items-start flex-wrap gap-3">
+        <div>
+          <div class="text-[9px] font-bold tracking-widest uppercase mb-1" style="color:${ac}">${week.phase} · ${week.dates}</div>
+          <div class="text-lg font-bold text-white">${week.name}</div>
+          <div class="text-sm mono mt-1" style="color:#2dd4bf">${week.hours}</div>
+        </div>
+        <div class="flex gap-2">
+          ${[{l:'Swim',v:week.totals.swim,c:'#60a5fa'},{l:'Bike',v:week.totals.bike,c:'#fbbf24'},{l:'Run',v:week.totals.run,c:'#4ade80'}].map(t=>`<div class="bg-black/35 rounded-lg px-3 py-1.5 text-center"><div class="text-base font-bold" style="color:${t.c}">${t.v}</div><div class="text-[9px] text-zinc-600">${t.l} km</div></div>`).join('')}
+        </div>
+      </div>
+      <div class="mt-3 text-xs text-zinc-500 leading-relaxed">${week.context}</div>
+      ${week.flags?`<div class="mt-3 space-y-1">${week.flags.map(f=>`<div class="flex gap-2 text-xs text-zinc-500"><span style="color:${ac}">→</span><span>${f}</span></div>`).join('')}</div>`:''}
+    </div>
+
+    <!-- Days -->
+    <div class="space-y-2">
+      ${week.days.map(day=>`
+        <div class="bg-bg-secondary border border-bg-border rounded-lg overflow-hidden">
+          <div class="px-4 py-2 bg-bg-tertiary border-b border-bg-border">
+            <span class="text-[10px] font-bold tracking-widest text-zinc-600 mono">${day.day}</span>
+          </div>
+          ${day.sessions.map((s,si)=>renderSession(s,si,day.day,wkId,ac)).join('')}
+        </div>
+      `).join('')}
+    </div>
+  </div>`;
+}
+
+function renderSession(s,si,dayKey,wkId,ac){
+  const tc=TAG_COLORS[s.tag]||TAG_COLORS.rest;
+  const isKey=s.label&&(s.label.includes('★')||s.label.includes('PEAK')||s.label.includes('HARDEST'));
+  const expKey=`${wkId}-${dayKey}-${si}`;
+  const isOpen=Store.state.ui.expanded===expKey;
+
+  // Brick with options
+  if(s.isBrick && s.brickOpts){
+    const selKey=`${wkId}-${dayKey}`;
+    const selected=Store.state.brickSel[selKey];
+    return `<div class="p-3 ${si>0?'border-t border-bg-border':''}">
+      <div class="flex items-center gap-2 mb-2 flex-wrap">
+        <span class="text-[10px] font-semibold px-2 py-0.5 rounded" style="background:${TAG_COLORS.bike.bg};color:${TAG_COLORS.bike.text};border:1px solid ${TAG_COLORS.bike.border}">Bike</span>
+        <span class="text-[10px] font-semibold px-2 py-0.5 rounded" style="background:${TAG_COLORS.brick.bg};color:${TAG_COLORS.brick.text};border:1px solid ${TAG_COLORS.brick.border}">${s.label}</span>
+        ${isKey?'<span class="text-[8px] font-bold px-1.5 py-0.5 rounded bg-yellow-500/10 text-yellow-400 border border-yellow-500/20">KEY</span>':''}
+      </div>
+      <div class="text-xs mono text-zinc-600 leading-relaxed mb-3">${s.target}</div>
+      <div class="text-[9px] font-bold tracking-widest uppercase mb-2" style="color:${ac}">CHOOSE YOUR RUN OPTION</div>
+      ${s.brickOpts.map((opt,oi)=>{
+        const active=selected===oi;
+        const ic=opt.intensity==='hard'?'#e11d48':opt.intensity==='moderate'?'#f97316':'#00c9b1';
+        return `<div onclick="selectBrick('${selKey}',${oi})" class="option-card rounded-lg p-3 mb-1.5" style="background:${active?ic+'10':'rgba(255,255,255,0.015)'};border:1px solid ${active?ic:'#141c26'}">
+          <div class="flex justify-between items-center mb-1">
+            <span class="text-xs font-semibold" style="color:${active?ic:'#64748b'}">${opt.label}</span>
+            <span class="text-[9px] font-bold px-2 py-0.5 rounded uppercase tracking-wider" style="color:${ic};background:${ic}18">${opt.intensity}</span>
+          </div>
+          <div class="text-xs mono leading-relaxed" style="color:${active?'#94a3b8':'#374151'}">${opt.detail}</div>
+        </div>`;
+      }).join('')}
+      ${s.why?`<div onclick="toggleExpanded('${expKey}')" class="cursor-pointer mt-2">
+        <span class="text-[9px] font-bold tracking-wider uppercase" style="color:${ac}">WHY ${isOpen?'▲':'▼'}</span>
+        ${isOpen?`<div class="mt-2 p-3 rounded-lg text-xs text-zinc-400 leading-relaxed" style="background:rgba(255,255,255,0.02);border:1px solid ${ac}18">${s.why}</div>`:''}
+      </div>`:''}
+      <div class="mt-2 flex gap-1.5 flex-wrap">
+        <button onclick="event.stopPropagation();openEditSession(${wkId},'${dayKey}',${si})" class="text-[10px] px-2.5 py-1 rounded bg-brand/10 text-brand-light border border-brand/20 hover:bg-brand/20 transition">Edit Session</button>
+        <button onclick="event.stopPropagation();openFeedback('${expKey}')" class="text-[10px] px-2.5 py-1 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 transition">Add Feedback</button>
+        <button onclick="event.stopPropagation();toggleRecording('${expKey}')" class="text-[10px] px-2.5 py-1 rounded ${Store.state._recording===expKey?'bg-red-500/20 text-red-400 border border-red-500/30 rec-pulse':'bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20'} transition">${Store.state._recording===expKey?'Stop Recording':'Record Audio'}</button>
+      </div>
+    </div>`;
+  }
+
+  // Track session
+  if(s.trackKey){
+    const opts=TRACK[s.trackKey];
+    const tSelKey=`${wkId}-${dayKey}`;
+    const tSelected=Store.state.trackSel[tSelKey];
+    return `<div class="p-3 ${si>0?'border-t border-bg-border':''}">
+      <div class="flex items-center gap-2 mb-2 flex-wrap">
+        <span class="text-[10px] font-semibold px-2 py-0.5 rounded" style="background:${tc.bg};color:${tc.text};border:1px solid ${tc.border}">${s.label}</span>
+      </div>
+      <div class="text-xs mono text-zinc-600 leading-relaxed mb-3">${s.target}</div>
+      ${opts?`
+        <div class="text-[9px] font-bold tracking-widest uppercase mb-2" style="color:${ac}">CHOOSE YOUR MAIN SET (after warm-up)</div>
+        ${opts.map((opt,i)=>{
+          const active=tSelected===i;
+          const pc=opt.pace.includes('Faster')?'#e11d48':opt.pace.includes('5K')?'#f97316':opt.pace.includes('HM')?'#00c9b1':'#fbbf24';
+          return `<div onclick="selectTrack('${tSelKey}',${i})" class="option-card rounded-lg p-3 mb-1.5" style="background:${active?pc+'12':'rgba(255,255,255,0.02)'};border:1px solid ${active?pc:'#141c26'}">
+            <div class="flex justify-between items-center mb-1">
+              <span class="text-xs font-semibold" style="color:${active?pc:'#64748b'}">${opt.label}</span>
+              <span class="text-[9px] font-bold px-2 py-0.5 rounded tracking-wider" style="color:${pc};background:${pc}18">${opt.pace}</span>
+            </div>
+            <div class="text-xs mono leading-relaxed" style="color:${active?'#94a3b8':'#374151'}">${opt.set}</div>
+          </div>`;
+        }).join('')}
+      `:''}
+      ${s.why?`<div onclick="toggleExpanded('${expKey}')" class="cursor-pointer mt-2"><span class="text-[9px] font-bold tracking-wider uppercase" style="color:${ac}">WHY ${isOpen?'▲':'▼'}</span>${isOpen?`<div class="mt-2 p-3 rounded-lg text-xs text-zinc-400 leading-relaxed" style="background:rgba(255,255,255,0.02);border:1px solid ${ac}18">${s.why}</div>`:''}</div>`:''}
+      <div class="mt-2 flex gap-1.5 flex-wrap">
+        <button onclick="event.stopPropagation();openEditSession(${wkId},'${dayKey}',${si})" class="text-[10px] px-2.5 py-1 rounded bg-brand/10 text-brand-light border border-brand/20 hover:bg-brand/20 transition">Edit Session</button>
+        <button onclick="event.stopPropagation();openFeedback('${expKey}')" class="text-[10px] px-2.5 py-1 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 transition">Add Feedback</button>
+        <button onclick="event.stopPropagation();toggleRecording('${expKey}')" class="text-[10px] px-2.5 py-1 rounded ${Store.state._recording===expKey?'bg-red-500/20 text-red-400 border border-red-500/30 rec-pulse':'bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20'} transition">${Store.state._recording===expKey?'Stop Recording':'Record Audio'}</button>
+      </div>
+    </div>`;
+  }
+
+  // Session feedback key
+  const fbKey=`${wkId}-${dayKey}-${si}`;
+  const fb=Store.state.feedback&&Store.state.feedback[fbKey];
+  const hasAudio=fb&&fb.audioData;
+  const hasNote=fb&&fb.note;
+
+  // Normal session
+  return `<div class="sess p-3 ${si>0?'border-t border-bg-border':''}">
+    <div onclick="toggleExpanded('${expKey}')" class="cursor-pointer">
+      <div class="flex items-center gap-2 mb-1 flex-wrap">
+        <span class="text-[10px] font-semibold px-2 py-0.5 rounded" style="background:${tc.bg};color:${tc.text};border:1px solid ${tc.border}">${s.label}</span>
+        ${isKey?'<span class="text-[8px] font-bold px-1.5 py-0.5 rounded bg-yellow-500/10 text-yellow-400 border border-yellow-500/20">KEY</span>':''}
+        ${s.tag==='test'?'<span class="text-[8px] font-bold px-1.5 py-0.5 rounded bg-orange-500/10 text-orange-400 border border-orange-500/20">ACTION</span>':''}
+        ${hasAudio?'<span class="text-[8px] px-1.5 py-0.5 rounded bg-red-500/10 text-red-400 border border-red-500/20">AUDIO</span>':''}
+        ${hasNote?'<span class="text-[8px] px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20">NOTE</span>':''}
+        <span class="ml-auto text-zinc-700 text-xs">${isOpen?'▲':'▼'}</span>
+      </div>
+      <div class="text-xs mono text-zinc-600 leading-relaxed">${s.target}</div>
+    </div>
+    ${isOpen?`
+      ${s.why?`<div class="mt-2 p-3 rounded-lg text-xs text-zinc-400 leading-relaxed" style="background:rgba(255,255,255,0.02);border:1px solid ${ac}18"><span class="font-bold text-[10px] tracking-wider uppercase" style="color:${ac}">WHY → </span>${s.why}</div>`:''}
+      <div class="mt-2 flex gap-1.5 flex-wrap">
+        <button onclick="event.stopPropagation();openEditSession(${wkId},'${dayKey}',${si})" class="text-[10px] px-2.5 py-1 rounded bg-brand/10 text-brand-light border border-brand/20 hover:bg-brand/20 transition">Edit Session</button>
+        <button onclick="event.stopPropagation();openFeedback('${fbKey}')" class="text-[10px] px-2.5 py-1 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 transition">${hasNote||hasAudio?'View Feedback':'Add Feedback'}</button>
+        <button onclick="event.stopPropagation();toggleRecording('${fbKey}')" class="text-[10px] px-2.5 py-1 rounded ${Store.state._recording===fbKey?'bg-red-500/20 text-red-400 border border-red-500/30 rec-pulse':'bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20'} transition">${Store.state._recording===fbKey?'Stop Recording':'Record Audio'}</button>
+      </div>
+      ${hasAudio?`<div class="mt-2 flex items-center gap-2"><audio controls src="${fb.audioData}" class="h-8 flex-1" style="max-width:300px"></audio><span class="text-[9px] text-zinc-600">${fb.audioDate||''}</span></div>`:''}
+      ${hasNote?`<div class="mt-2 p-2 rounded text-xs text-zinc-400 italic" style="background:rgba(255,255,255,0.02)">"${escapeHtml(fb.note)}"</div>`:''}
+    `:''}
+  </div>`;
+}
+
+function selectWeek(id){Store.state.ui.selectedWeek=id;Store.state.ui.expanded=null;Store.save();renderPage();}
+function toggleExpanded(key){Store.state.ui.expanded=Store.state.ui.expanded===key?null:key;Store.save();renderPage();}
+function selectBrick(key,idx){Store.state.brickSel[key]=Store.state.brickSel[key]===idx?null:idx;Store.save();renderPage();}
+function selectTrack(key,idx){Store.state.trackSel[key]=Store.state.trackSel[key]===idx?null:idx;Store.save();renderPage();}
+
+// ============================================================================
+// OVERVIEW
+// ============================================================================
+function renderOverview(){
+  const plan=Store.getActivePlan();if(!plan) return '<div class="p-8 text-zinc-400">No plan.</div>';
+  return `<div class="p-6 fade-in">
+    <h2 class="text-2xl font-bold text-white mb-1">Plan Overview</h2>
+    <p class="text-sm text-zinc-500 mb-4">Click any week to open it in the Training Plan view.</p>
+    <div class="space-y-1.5">
+    ${plan.weeks.map(w=>{const bc=PC[w.phase]||'#64748b';
+      return `<div onclick="Store.state.ui.selectedWeek=${w.id};navigate('plan')" class="bg-bg-secondary border border-bg-border rounded-lg p-3 cursor-pointer hover:border-zinc-700 transition">
+        <div class="flex justify-between items-center flex-wrap gap-2 mb-2">
+          <div class="flex items-center gap-3 flex-wrap">
+            <span class="text-xs font-bold mono" style="color:${bc}">${w.label}</span>
+            <span class="text-xs text-zinc-600">${w.dates}</span>
+            <span class="text-[9px] font-bold px-2 py-0.5 rounded uppercase tracking-wider" style="color:${bc};background:${bc}18">${w.phase}</span>
+            <span class="text-[10px] mono" style="color:#2dd4bf">${w.hours}</span>
+          </div>
+          <div class="flex gap-3">
+            ${[{l:'Swim',v:w.totals.swim,c:'#60a5fa'},{l:'Bike',v:w.totals.bike,c:'#fbbf24'},{l:'Run',v:w.totals.run,c:'#4ade80'}].map(t=>`<div class="text-center"><div class="text-sm font-bold" style="color:${t.c}">${t.v}</div><div class="text-[9px] text-zinc-600">${t.l}</div></div>`).join('')}
+          </div>
+        </div>
+        <div class="flex gap-1 h-1">
+          ${[{val:w.totals.swim/11,c:'#60a5fa'},{val:w.totals.bike/340,c:'#fbbf24'},{val:w.totals.run/58,c:'#4ade80'}].map(b=>`<div class="flex-1 bg-bg-tertiary rounded overflow-hidden"><div class="h-full rounded" style="width:${Math.min(b.val*100,100)}%;background:${b.c}"></div></div>`).join('')}
+        </div>
+      </div>`;}).join('')}
+    </div>
+  </div>`;
+}
+
+// ============================================================================
+// CALENDAR VIEW
+// ============================================================================
+function renderCalendar(){
+  const plan=Store.getActivePlan();const a=Store.getActiveAthlete();
+  if(!plan) return '<div class="p-8 text-zinc-400">No plan found.</div>';
+  const calWeek=Store.state.ui.calendarWeek!=null?Store.state.ui.calendarWeek:0;
+  const DAYS=['MON','TUE','WED','THU','FRI','SAT','SUN'];
+  const DAYNAMES=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+
+  // Parse week start date for calendar headers
+  function getWeekDates(week){
+    if(!week.dates) return DAYNAMES.map((d,i)=>d);
+    // dates format: "Mar 24–30" or "Apr 7–13"
+    const months={Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
+    const m=week.dates.match(/([A-Z][a-z]+)\s+(\d+)/);
+    if(!m) return DAYNAMES;
+    const month=months[m[1]]; const day=parseInt(m[2]); const year=2026;
+    const start=new Date(year,month,day);
+    return DAYNAMES.map((_,i)=>{
+      const d=new Date(start);d.setDate(start.getDate()+i);
+      return d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+    });
+  }
+
+  const week=plan.weeks[calWeek]||plan.weeks[0];
+  const ac=PC[week.phase]||'#00c9b1';
+  const dates=getWeekDates(week);
+
+  // Build day→sessions map
+  const dayMap={};
+  DAYS.forEach(d=>dayMap[d]=[]);
+  week.days.forEach(d=>{dayMap[d.day]=d.sessions||[];});
+
+  // Find max sessions in any day for grid height
+  const maxSess=Math.max(...Object.values(dayMap).map(s=>s.length),1);
+
+  return `<div class="p-6 fade-in">
+    <div class="flex items-center justify-between mb-4 flex-wrap gap-3">
+      <div>
+        <h2 class="text-2xl font-bold text-white">Calendar</h2>
+        <p class="text-sm text-zinc-500">Week-by-week calendar grid — click any session for details</p>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="calNav(-1)" class="px-3 py-1.5 bg-bg-secondary border border-bg-border rounded hover:bg-bg-hover text-zinc-400 text-sm transition" ${calWeek<=0?'disabled style="opacity:0.3"':''}>← Prev</button>
+        <span class="text-sm mono font-bold px-3" style="color:${ac}">${week.label} — ${week.name}</span>
+        <button onclick="calNav(1)" class="px-3 py-1.5 bg-bg-secondary border border-bg-border rounded hover:bg-bg-hover text-zinc-400 text-sm transition" ${calWeek>=plan.weeks.length-1?'disabled style="opacity:0.3"':''}>Next →</button>
+      </div>
+    </div>
+
+    <!-- Week pills -->
+    <div class="flex gap-1 flex-wrap mb-4">
+      ${plan.weeks.map((w,i)=>{const bc=PC[w.phase]||'#64748b';const active=i===calWeek;
+        return `<button onclick="calGoTo(${i})" class="pill px-2.5 py-1 rounded text-[10px] font-bold" style="border:1px solid ${active?bc:'#141c26'};background:${active?bc+'18':'transparent'};color:${active?bc:'#374151'}">${w.label}</button>`;
+      }).join('')}
+    </div>
+
+    <!-- Phase & volume bar -->
+    <div class="rounded-lg p-3 mb-4 flex items-center justify-between flex-wrap gap-3" style="background:${ac}0a;border:1px solid ${ac}22">
+      <div class="flex items-center gap-3 flex-wrap">
+        <span class="text-[9px] font-bold tracking-widest uppercase" style="color:${ac}">${week.phase}</span>
+        <span class="text-xs text-zinc-500">${week.dates}</span>
+        <span class="text-xs mono" style="color:#2dd4bf">${week.hours}</span>
+      </div>
+      <div class="flex gap-3">
+        ${[{l:'Swim',v:week.totals.swim,c:'#60a5fa'},{l:'Bike',v:week.totals.bike,c:'#fbbf24'},{l:'Run',v:week.totals.run,c:'#4ade80'}].map(t=>`<div class="text-center"><span class="text-sm font-bold" style="color:${t.c}">${t.v}</span><span class="text-[9px] text-zinc-600 ml-1">${t.l} km</span></div>`).join('')}
+      </div>
+    </div>
+
+    <!-- Calendar grid -->
+    <div class="grid grid-cols-7 gap-1.5">
+      <!-- Day headers -->
+      ${DAYS.map((d,i)=>`<div class="text-center pb-2"><div class="text-[10px] font-bold tracking-wider text-zinc-500 uppercase">${d}</div><div class="text-[10px] text-zinc-600">${dates[i]}</div></div>`).join('')}
+
+      <!-- Day columns -->
+      ${DAYS.map(d=>{
+        const sessions=dayMap[d]||[];
+        const isEmpty=sessions.length===0||sessions.every(s=>s.tag==='rest');
+        return `<div class="bg-bg-secondary rounded-lg border border-bg-border min-h-[180px] p-1.5 flex flex-col gap-1 ${isEmpty?'opacity-60':''}">
+          ${sessions.length===0?'<div class="flex-1 flex items-center justify-center text-[10px] text-zinc-700">Rest</div>':''}
+          ${sessions.map((s,si)=>{
+            const tc=TAG_COLORS[s.tag]||TAG_COLORS.rest;
+            const isRest=s.tag==='rest';
+            const expKey='cal-'+calWeek+'-'+d+'-'+si;
+            const isOpen=Store.state.ui.calExpanded===expKey;
+            return `<div onclick="toggleCalExpand('${expKey}')" class="rounded p-1.5 cursor-pointer hover:brightness-110 transition" style="background:${tc.bg};border:1px solid ${tc.border}">
+              <div class="flex items-center gap-1">
+                <span class="text-[8px] font-bold uppercase tracking-wider" style="color:${tc.text}">${s.tag}</span>
+                ${s.label&&(s.label.includes('★')||s.label.includes('PEAK')||s.label.includes('HARDEST'))?'<span class="text-[7px] text-yellow-400">★</span>':''}
+                ${s.tag==='test'?'<span class="text-[7px] text-orange-400">⚡</span>':''}
+              </div>
+              <div class="text-[10px] text-zinc-300 leading-tight mt-0.5 line-clamp-2">${isRest?'Rest Day':s.label||''}</div>
+              ${isOpen?`<div class="mt-1.5 pt-1.5 border-t" style="border-color:${tc.border}">
+                <div class="text-[9px] mono text-zinc-400 leading-relaxed">${s.target||''}</div>
+                ${s.why?`<div class="text-[9px] text-zinc-500 mt-1 italic">${s.why}</div>`:''}
+                ${s.trackKey?`<div class="text-[8px] font-bold mt-1" style="color:${ac}">Has track options — see Training Plan view</div>`:''}
+                ${s.isBrick?`<div class="text-[8px] font-bold mt-1" style="color:${ac}">Has run options — see Training Plan view</div>`:''}
+              </div>`:''}
+            </div>`;
+          }).join('')}
+        </div>`;
+      }).join('')}
+    </div>
+
+    ${week.context?`<div class="mt-4 p-3 rounded-lg text-xs text-zinc-500 leading-relaxed" style="background:${ac}08;border:1px solid ${ac}15"><span class="font-bold uppercase tracking-wider text-[9px]" style="color:${ac}">WEEK CONTEXT → </span>${week.context}</div>`:''}
+    ${week.flags?`<div class="mt-2 space-y-1">${week.flags.map(f=>`<div class="flex gap-2 text-xs text-zinc-500"><span style="color:${ac}">→</span><span>${f}</span></div>`).join('')}</div>`:''}
+  </div>`;
+}
+function calNav(dir){
+  const plan=Store.getActivePlan();if(!plan)return;
+  const cur=Store.state.ui.calendarWeek||0;
+  const next=Math.max(0,Math.min(plan.weeks.length-1,cur+dir));
+  Store.state.ui.calendarWeek=next;Store.state.ui.calExpanded=null;Store.save();renderPage();
+}
+function calGoTo(idx){Store.state.ui.calendarWeek=idx;Store.state.ui.calExpanded=null;Store.save();renderPage();}
+function toggleCalExpand(key){Store.state.ui.calExpanded=Store.state.ui.calExpanded===key?null:key;Store.save();renderPage();}
+
+// ============================================================================
+// SCHEDULE / DAY PREFERENCES
+// ============================================================================
+function renderSchedule(){
+  const a=Store.getActiveAthlete();if(!a) return '<div class="p-8 text-zinc-400">No athlete.</div>';
+  const prefs=a.preferences||{};
+  const days=['MON','TUE','WED','THU','FRI','SAT','SUN'];
+  const sessionTypes=[
+    {key:'longRide',label:'Long Ride',color:'#fbbf24',icon:'bike'},
+    {key:'brick',label:'Brick Session',color:'#c084fc',icon:'brick'},
+    {key:'longRun',label:'Long Run',color:'#4ade80',icon:'run'},
+    {key:'trackDay',label:'Track Day',color:'#4ade80',icon:'run'},
+    {key:'hardRun',label:'Hard Run',color:'#f87171',icon:'run'},
+    {key:'hardBike',label:'Hard Bike',color:'#fbbf24',icon:'bike'},
+    {key:'hardSwim',label:'Hard Swim',color:'#60a5fa',icon:'swim'},
+    {key:'strengthA',label:'Strength A',color:'#f87171',icon:'strength'},
+    {key:'strengthB',label:'Strength B',color:'#f87171',icon:'strength'},
+    {key:'easySwim',label:'Easy Swim',color:'#60a5fa',icon:'swim'},
+    {key:'mobility',label:'Mobility',color:'#2dd4bf',icon:'mob'},
+  ];
+  return `<div class="p-6 fade-in">
+    <h2 class="text-2xl font-bold text-white mb-1">Preferred Training Days</h2>
+    <p class="text-sm text-zinc-500 mb-6">Set which day of the week you prefer for each type of session. Changes will reshape the training plan for <strong class="text-zinc-300">${a.name}</strong>.</p>
+    <div class="bg-bg-secondary rounded-lg border border-bg-border overflow-hidden">
+      <table class="w-full">
+        <thead>
+          <tr class="border-b border-bg-border">
+            <th class="text-left px-4 py-3 text-xs text-zinc-500 uppercase w-48">Session Type</th>
+            <th class="text-left px-4 py-3 text-xs text-zinc-500 uppercase">Preferred Day(s)</th>
+            <th class="text-left px-4 py-3 text-xs text-zinc-500 uppercase w-48">Current</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${sessionTypes.map(st=>{
+            const current=prefs[st.key]||'--';
+            const isMulti=st.key==='mobility';
+            return `<tr class="border-b border-bg-border/50 hover:bg-bg-tertiary/50">
+              <td class="px-4 py-3">
+                <div class="flex items-center gap-2">
+                  <span class="w-2 h-2 rounded-full" style="background:${st.color}"></span>
+                  <span class="text-sm text-zinc-300">${st.label}</span>
+                </div>
+              </td>
+              <td class="px-4 py-3">
+                ${isMulti?`<div class="flex gap-1.5">${days.map(d=>`<button onclick="togglePrefDay('${st.key}','${d}')" class="px-2 py-1 text-[10px] font-bold rounded transition ${(current||'').includes(d)?'text-white':'text-zinc-600 hover:text-zinc-400'}" style="${(current||'').includes(d)?`background:${st.color}30;border:1px solid ${st.color}50`:'border:1px solid #141c26'}">${d}</button>`).join('')}</div>`
+                :`<select onchange="updatePref('${st.key}',this.value)" class="bg-bg-tertiary border border-bg-border rounded px-3 py-1.5 text-sm text-zinc-300">
+                  ${days.map(d=>`<option value="${d}" ${current===d?'selected':''}>${d}</option>`).join('')}
+                </select>`}
+              </td>
+              <td class="px-4 py-3"><span class="text-sm mono font-bold" style="color:${st.color}">${current}</span></td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>
+    <div class="mt-4 p-3 rounded-lg border border-blue-500/20 bg-blue-500/5 text-xs text-zinc-400">
+      <strong class="text-blue-400">Note:</strong> Changing preferred days updates the profile preferences and will be used by the AI Coach when suggesting plan modifications. The current Cairns plan has a fixed proven structure — use the AI Coach to get a customized rearrangement.
+    </div>
+  </div>`;
+}
+function updatePref(key,val){const a=Store.getActiveAthlete();if(!a)return;a.preferences=a.preferences||{};a.preferences[key]=val;Store.save();renderPage();showToast('Preference updated!');}
+function togglePrefDay(key,day){
+  const a=Store.getActiveAthlete();if(!a)return;a.preferences=a.preferences||{};
+  let current=(a.preferences[key]||'').split(',').filter(Boolean);
+  if(current.includes(day)) current=current.filter(d=>d!==day); else current.push(day);
+  a.preferences[key]=current.join(',');Store.save();renderPage();
+}
+
+// ============================================================================
+// RACE DAY VIEW
+// ============================================================================
+function renderRaceDay(){
+  const a=Store.getActiveAthlete();
+  return `<div class="p-6 fade-in">
+    <h2 class="text-2xl font-bold text-white mb-1">Race Day Protocol</h2>
+    <p class="text-sm text-zinc-500 mb-4">Cairns 70.3 — June 14, 2026</p>
+    <div class="p-3 rounded-lg border border-yellow-500/20 bg-yellow-500/5 text-sm text-zinc-400 mb-4">
+      <span class="text-yellow-400 font-bold">Targets:</span> Swim ~27 min · Bike ~2:27–2:32 (240W NP) · Run ~1:27–1:32 (4:10–4:20/km) · Total ~4:05–4:15
+    </div>
+    <div class="space-y-1.5">
+      ${RACE_DAY.map(r=>`<div class="flex gap-3 bg-bg-secondary border border-bg-border rounded-lg p-3">
+        <div class="mono text-xs font-semibold min-w-[130px] flex-shrink-0" style="color:${r.col}">${r.phase}</div>
+        <div class="text-xs text-zinc-400 leading-relaxed">${r.detail}</div>
+      </div>`).join('')}
+    </div>
+    <div class="mt-4 p-3 rounded-lg border border-red-500/20 bg-red-500/5 text-sm text-zinc-400">
+      <span class="text-red-400 font-bold">Km 14–21 is your weapon.</span> 11 weeks of Sunday bricks targeting that exact zone. When it gets hard there — that's when you go.
+    </div>
+  </div>`;
+}
+
+// ============================================================================
+// MOBILITY VIEW
+// ============================================================================
+function renderMobility(){
+  return `<div class="p-6 fade-in">
+    <h2 class="text-2xl font-bold text-white mb-1">Mobility Routines</h2>
+    <p class="text-sm text-zinc-500 mb-4">Friday evenings (post-swim) + Sunday evenings (post-brick). Non-negotiable for ITB resilience and aero position recovery.</p>
+    ${Object.entries(MOB).map(([k,routine])=>`
+      <div class="mb-6">
+        <div class="p-3 rounded-t-lg" style="background:rgba(45,212,191,0.07);border:1px solid rgba(45,212,191,0.2)">
+          <div class="text-sm font-bold" style="color:#2dd4bf">${routine.title}</div>
+          <div class="text-xs text-zinc-600 mt-1">${routine.focus}</div>
+        </div>
+        ${routine.items.map((item,i)=>`
+          <div class="flex gap-4 p-3 bg-bg-secondary border border-bg-border border-t-0 ${i===routine.items.length-1?'rounded-b-lg':''}">
+            <div class="min-w-[200px] flex-shrink-0">
+              <div class="text-xs font-semibold text-zinc-200">${item.name}</div>
+              <div class="text-xs mono mt-1" style="color:#2dd4bf">${item.dose}</div>
+            </div>
+            <div class="text-xs text-zinc-500 leading-relaxed">${item.note}</div>
+          </div>
+        `).join('')}
+      </div>
+    `).join('')}
+  </div>`;
+}
+
+// ============================================================================
+// PROFILES
+// ============================================================================
+function renderProfiles(){
+  const athletes=Store.state.athletes;
+  return `<div class="p-6 fade-in">
+    <div class="flex items-center justify-between mb-6">
+      <div><h2 class="text-2xl font-bold text-white">Athlete Profiles</h2><p class="text-sm text-zinc-500">${athletes.length} profile${athletes.length!==1?'s':''}</p></div>
+      <button onclick="showProfileModal()" class="px-4 py-2 bg-brand hover:bg-brand-dark text-white rounded text-sm transition">Add Athlete</button>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      ${athletes.map(a=>`
+        <div class="bg-bg-secondary rounded-lg border border-bg-border p-5 ${a.id===Store.state.activeAthleteId?'ring-2 ring-brand':''}">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-12 h-12 rounded-full bg-brand/20 flex items-center justify-center text-brand-light text-lg font-bold">${a.name.charAt(0)}</div>
+            <div><h3 class="text-base font-semibold text-white">${a.name}</h3><span class="text-xs text-zinc-500 capitalize">${a.sport}</span></div>
+            ${a.id===Store.state.activeAthleteId?'<span class="ml-auto text-[10px] bg-brand/20 text-brand-light px-2 py-0.5 rounded-full">Active</span>':''}
+          </div>
+          <div class="grid grid-cols-2 gap-2 mb-4">
+            <div class="bg-bg-tertiary rounded p-2"><p class="text-[10px] text-zinc-600">FTP</p><p class="text-sm font-bold text-white">${a.ftp||'--'}W</p></div>
+            <div class="bg-bg-tertiary rounded p-2"><p class="text-[10px] text-zinc-600">Run Pace</p><p class="text-sm font-bold text-white">${formatPace(a.thresholdPace)}/km</p></div>
+            <div class="bg-bg-tertiary rounded p-2"><p class="text-[10px] text-zinc-600">Weight</p><p class="text-sm font-bold text-white">${a.weight||'--'}kg</p></div>
+            <div class="bg-bg-tertiary rounded p-2"><p class="text-[10px] text-zinc-600">W/kg</p><p class="text-sm font-bold text-white">${a.ftp&&a.weight?(a.ftp/a.weight).toFixed(1):'--'}</p></div>
+          </div>
+          <div class="flex gap-2">
+            ${a.id!==Store.state.activeAthleteId?`<button onclick="switchAthlete('${a.id}');renderPage();" class="flex-1 px-3 py-1.5 text-xs bg-brand/10 text-brand-light hover:bg-brand/20 rounded transition">Set Active</button>`:''}
+            <button onclick="showProfileModal('${a.id}')" class="flex-1 px-3 py-1.5 text-xs bg-bg-tertiary text-zinc-300 hover:bg-bg-hover rounded transition">Edit</button>
+            ${athletes.length>1?`<button onclick="deleteAthlete('${a.id}')" class="px-3 py-1.5 text-xs text-red-400 hover:bg-red-400/10 rounded transition">Delete</button>`:''}
+          </div>
+        </div>
+      `).join('')}
+    </div>
+  </div>`;
+}
+function showProfileModal(athleteId){
+  const a=athleteId?Store.state.athletes.find(x=>x.id===athleteId):null;const isNew=!a;
+  const d=a||{name:'',sport:'triathlon',ftp:200,thresholdPace:300,css400:360,css200:165,weight:70,maxHR:185,restHR:50};
+  document.getElementById('modal-container').innerHTML=`
+    <div class="modal-backdrop fixed inset-0 z-50 flex items-center justify-center" onclick="if(event.target===this)closeModal()">
+      <div class="bg-bg-secondary rounded-xl border border-zinc-700 w-[500px] shadow-2xl fade-in">
+        <div class="flex items-center justify-between p-4 border-b border-zinc-700"><h3 class="text-lg font-semibold text-white">${isNew?'Add Athlete':'Edit Athlete'}</h3><button onclick="closeModal()" class="text-zinc-400 hover:text-white text-xl">&times;</button></div>
+        <div class="p-4 space-y-4">
+          <div class="grid grid-cols-2 gap-4">
+            <div><label class="block text-xs text-zinc-400 mb-1">Name</label><input id="pf-name" type="text" value="${d.name}" class="w-full bg-bg-tertiary border border-bg-border rounded px-3 py-2 text-sm text-zinc-200"></div>
+            <div><label class="block text-xs text-zinc-400 mb-1">Sport</label><select id="pf-sport" class="w-full bg-bg-tertiary border border-bg-border rounded px-3 py-2 text-sm text-zinc-200">${['triathlon','cycling','running','swimming'].map(s=>`<option value="${s}" ${d.sport===s?'selected':''}>${s}</option>`).join('')}</select></div>
+          </div>
+          <div class="grid grid-cols-3 gap-4">
+            <div><label class="block text-xs text-zinc-400 mb-1">FTP (W)</label><input id="pf-ftp" type="number" value="${d.ftp||''}" class="w-full bg-bg-tertiary border border-bg-border rounded px-3 py-2 text-sm text-zinc-200"></div>
+            <div><label class="block text-xs text-zinc-400 mb-1">Weight (kg)</label><input id="pf-wt" type="number" value="${d.weight||''}" class="w-full bg-bg-tertiary border border-bg-border rounded px-3 py-2 text-sm text-zinc-200"></div>
+            <div><label class="block text-xs text-zinc-400 mb-1">Threshold Pace</label><input id="pf-pace" type="text" value="${formatPace(d.thresholdPace)}" class="w-full bg-bg-tertiary border border-bg-border rounded px-3 py-2 text-sm text-zinc-200" placeholder="5:00"></div>
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div><label class="block text-xs text-zinc-400 mb-1">400m TT (sec)</label><input id="pf-css4" type="number" value="${d.css400||''}" class="w-full bg-bg-tertiary border border-bg-border rounded px-3 py-2 text-sm text-zinc-200"></div>
+            <div><label class="block text-xs text-zinc-400 mb-1">200m TT (sec)</label><input id="pf-css2" type="number" value="${d.css200||''}" class="w-full bg-bg-tertiary border border-bg-border rounded px-3 py-2 text-sm text-zinc-200"></div>
+          </div>
+        </div>
+        <div class="p-4 border-t border-zinc-700 flex justify-end gap-2">
+          <button onclick="closeModal()" class="px-4 py-2 text-sm text-zinc-400">Cancel</button>
+          <button onclick="saveProfile('${athleteId||''}',${isNew})" class="px-4 py-2 text-sm bg-brand text-white rounded">Save</button>
+        </div>
+      </div>
+    </div>`;
+}
+function saveProfile(id,isNew){
+  const d={name:document.getElementById('pf-name').value||'Unnamed',sport:document.getElementById('pf-sport').value,ftp:parseInt(document.getElementById('pf-ftp').value)||null,weight:parseFloat(document.getElementById('pf-wt').value)||null,thresholdPace:parsePace(document.getElementById('pf-pace').value),css400:parseInt(document.getElementById('pf-css4').value)||null,css200:parseInt(document.getElementById('pf-css2').value)||null,updatedAt:new Date().toISOString()};
+  if(isNew){
+    const athlete={id:uid(),...d,preferences:{longRide:'SAT',brick:'SUN',trackDay:'TUE',hardBike:'THU',hardSwim:'WED',strengthA:'MON',strengthB:'WED',easySwim:'FRI',mobility:'FRI,SUN'},createdAt:new Date().toISOString()};
+    Store.state.athletes.push(athlete);
+    Store.state.plans.push(generateCairnsPlan(athlete));
+    Store.update({activeAthleteId:athlete.id});
+  } else {
+    const idx=Store.state.athletes.findIndex(a=>a.id===id);
+    if(idx>=0){
+      const old=Store.state.athletes[idx];const oldFtp=old.ftp;Object.assign(old,d);
+      if(d.ftp!==oldFtp){// Regenerate plan with new FTP
+        const plans=Store.state.plans.filter(p=>p.athleteId!==id);
+        plans.push(generateCairnsPlan(old));Store.state.plans=plans;
+      }
+    }
+    Store.save();
+  }
+  closeModal();renderPage();updateAthleteSelect();showToast(isNew?'Athlete added!':'Profile updated!');
+}
+function deleteAthlete(id){if(!confirm('Delete this athlete?'))return;Store.update(s=>({athletes:s.athletes.filter(a=>a.id!==id),plans:s.plans.filter(p=>p.athleteId!==id),activeAthleteId:s.activeAthleteId===id?(s.athletes.find(a=>a.id!==id)?.id||null):s.activeAthleteId}));renderPage();updateAthleteSelect();}
+
+// ============================================================================
+// ZONES
+// ============================================================================
+function renderZones(){
+  const a=Store.getActiveAthlete();if(!a)return'<div class="p-8 text-zinc-400">No athlete.</div>';
+  const pz=calcPowerZones(a.ftp);const rz=calcPaceZones(a.thresholdPace);const sz=calcSwimZones(a.css400,a.css200);const css=calcCSS(a.css400,a.css200);
+  const tab=Store.state.ui.zoneTab||'power';
+  return `<div class="p-6 fade-in">
+    <h2 class="text-2xl font-bold text-white mb-1">Training Zones</h2>
+    <p class="text-sm text-zinc-500 mb-4">${a.name} — Zones auto-calculate from your metrics. Changing FTP regenerates all watt targets in the plan.</p>
+    <div class="flex gap-4 border-b border-bg-border mb-6">
+      ${['power','pace','swim'].map(t=>`<button onclick="Store.state.ui.zoneTab='${t}';Store.save();renderPage()" class="pb-2 px-1 text-sm ${tab===t?'border-b-2 border-brand text-brand-light':'text-zinc-500 hover:text-zinc-300'} tab-btn">${t==='power'?'Power (Bike)':t==='pace'?'Pace (Run)':'Swim'}</button>`).join('')}
+    </div>
+    ${tab==='power'?`
+      <div class="bg-bg-secondary rounded-lg border border-bg-border p-4 mb-4">
+        <label class="block text-xs text-zinc-400 mb-1">FTP (Functional Threshold Power)</label>
+        <div class="flex items-center gap-3">
+          <input type="number" value="${a.ftp||''}" onchange="updateAthleteField('ftp',parseInt(this.value))" class="w-32 bg-bg-tertiary border border-bg-border rounded px-3 py-2 text-lg font-bold text-white">
+          <span class="text-zinc-400">watts</span>
+          <span class="ml-4 text-xs text-zinc-400">W/kg:</span>
+          <span class="text-xl font-bold text-brand-light">${a.ftp&&a.weight?(a.ftp/a.weight).toFixed(2):'--'}</span>
+        </div>
+      </div>
+      ${pz.length?`<div class="bg-bg-secondary rounded-lg border border-bg-border overflow-hidden"><table class="w-full"><thead><tr class="border-b border-bg-border"><th class="text-left px-4 py-3 text-xs text-zinc-500 uppercase">Zone</th><th class="text-left px-4 py-3 text-xs text-zinc-500 uppercase">Name</th><th class="text-left px-4 py-3 text-xs text-zinc-500 uppercase">Power</th><th class="text-left px-4 py-3 text-xs text-zinc-500 uppercase">% FTP</th><th class="px-4 py-3 w-1/4"></th></tr></thead><tbody>${pz.map(z=>`<tr class="border-b border-bg-border/50"><td class="px-4 py-2.5"><span class="inline-flex w-7 h-7 rounded-full items-center justify-center text-xs font-bold" style="background:${z.color}20;color:${z.color}">Z${z.zone}</span></td><td class="px-4 py-2.5 text-sm text-zinc-300">${z.name}</td><td class="px-4 py-2.5 text-sm mono text-white">${z.minWatts}–${z.maxWatts||'∞'}W</td><td class="px-4 py-2.5 text-sm text-zinc-400">${Math.round(z.minPct*100)}%–${z.maxPct?Math.round(z.maxPct*100)+'%':'∞'}</td><td class="px-4 py-2.5"><div class="h-3 rounded-full zone-bar" style="width:${Math.min(100,(z.maxPct||1.6)/1.6*100)}%;background:${z.color}"></div></td></tr>`).join('')}</tbody></table></div>`:'<p class="text-zinc-500 text-sm">Set your FTP above.</p>'}
+    `:''}
+    ${tab==='pace'?`
+      <div class="bg-bg-secondary rounded-lg border border-bg-border p-4 mb-4">
+        <label class="block text-xs text-zinc-400 mb-1">Threshold Pace (per km)</label>
+        <div class="flex items-center gap-3"><input type="text" value="${formatPace(a.thresholdPace)}" onchange="updateAthleteField('thresholdPace',parsePace(this.value))" class="w-32 bg-bg-tertiary border border-bg-border rounded px-3 py-2 text-lg font-bold text-white" placeholder="5:00"><span class="text-zinc-400">min/km</span></div>
+      </div>
+      ${rz.length?`<div class="bg-bg-secondary rounded-lg border border-bg-border overflow-hidden"><table class="w-full"><thead><tr class="border-b border-bg-border"><th class="text-left px-4 py-3 text-xs text-zinc-500 uppercase">Zone</th><th class="text-left px-4 py-3 text-xs text-zinc-500 uppercase">Name</th><th class="text-left px-4 py-3 text-xs text-zinc-500 uppercase">Pace Range</th><th class="px-4 py-3 w-1/4"></th></tr></thead><tbody>${rz.map(z=>`<tr class="border-b border-bg-border/50"><td class="px-4 py-2.5"><span class="inline-flex w-7 h-7 rounded-full items-center justify-center text-xs font-bold" style="background:${z.color}20;color:${z.color}">Z${z.zone}</span></td><td class="px-4 py-2.5 text-sm text-zinc-300">${z.name}</td><td class="px-4 py-2.5 text-sm mono text-white">${formatPace(z.minPace)}–${formatPace(z.maxPace)} /km</td><td class="px-4 py-2.5"><div class="h-3 rounded-full zone-bar" style="width:${Math.min(100,100-(z.zone-1)*15)}%;background:${z.color}"></div></td></tr>`).join('')}</tbody></table></div>`:''}
+    `:''}
+    ${tab==='swim'?`
+      <div class="bg-bg-secondary rounded-lg border border-bg-border p-4 mb-4">
+        <div class="flex items-center gap-6">
+          <div><label class="block text-xs text-zinc-400 mb-1">400m TT (sec)</label><input type="number" value="${a.css400||''}" onchange="updateAthleteField('css400',parseInt(this.value))" class="w-28 bg-bg-tertiary border border-bg-border rounded px-3 py-2 text-lg font-bold text-white"></div>
+          <div><label class="block text-xs text-zinc-400 mb-1">200m TT (sec)</label><input type="number" value="${a.css200||''}" onchange="updateAthleteField('css200',parseInt(this.value))" class="w-28 bg-bg-tertiary border border-bg-border rounded px-3 py-2 text-lg font-bold text-white"></div>
+          <div class="ml-4"><p class="text-xs text-zinc-400">CSS (per 100m)</p><p class="text-2xl font-bold text-accent-swim">${css?formatPace(css):'--:--'}</p></div>
+        </div>
+      </div>
+      ${sz.length?`<div class="bg-bg-secondary rounded-lg border border-bg-border overflow-hidden"><table class="w-full"><thead><tr class="border-b border-bg-border"><th class="text-left px-4 py-3 text-xs text-zinc-500 uppercase">Zone</th><th class="text-left px-4 py-3 text-xs text-zinc-500 uppercase">Name</th><th class="text-left px-4 py-3 text-xs text-zinc-500 uppercase">Pace /100m</th><th class="px-4 py-3 w-1/4"></th></tr></thead><tbody>${sz.map(z=>`<tr class="border-b border-bg-border/50"><td class="px-4 py-2.5"><span class="inline-flex w-7 h-7 rounded-full items-center justify-center text-xs font-bold" style="background:${z.color}20;color:${z.color}">Z${z.zone}</span></td><td class="px-4 py-2.5 text-sm text-zinc-300">${z.name}</td><td class="px-4 py-2.5 text-sm mono text-white">${formatPace(z.minPace)}–${formatPace(z.maxPace)}</td><td class="px-4 py-2.5"><div class="h-3 rounded-full zone-bar" style="width:${Math.min(100,100-(z.zone-1)*15)}%;background:${z.color}"></div></td></tr>`).join('')}</tbody></table></div>`:''}
+    `:''}
+  </div>`;
+}
+function updateAthleteField(field,value){
+  const a=Store.getActiveAthlete();if(!a)return;a[field]=value;a.updatedAt=new Date().toISOString();
+  if(field==='ftp'){// Regenerate plan with new FTP
+    const plans=Store.state.plans.filter(p=>p.athleteId!==a.id);
+    plans.push(generateCairnsPlan(a));Store.state.plans=plans;
+  }
+  Store.save();renderPage();showToast('Updated! Plan recalculated.');
+}
+
+// ============================================================================
+// AI COACH
+// ============================================================================
+function renderAICoach(){
+  const apiKey=Store.state.apiKey||'';const msgs=Store.state.chatMessages||[];
+  return `<div class="flex flex-col h-screen">
+    <div class="p-4 border-b border-bg-border bg-bg-secondary flex items-center justify-between flex-shrink-0">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-full bg-purple-600/20 flex items-center justify-center"><svg class="w-4 h-4 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714a2.25 2.25 0 00.659 1.591L19 14.5"/></svg></div>
+        <div><h2 class="text-lg font-semibold text-white">AI Coach</h2><p class="text-xs text-zinc-500">Powered by Claude — knows your plan, zones & preferences</p></div>
+      </div>
+      <button onclick="showAPIKeyModal()" class="px-3 py-1.5 text-xs bg-bg-tertiary hover:bg-bg-hover text-zinc-300 rounded border border-bg-border transition">${apiKey?'API Key Set ✓':'Set API Key'}</button>
+    </div>
+    <div class="p-3 border-b border-bg-border bg-bg-secondary/50 flex gap-2 flex-wrap flex-shrink-0">
+      ${['Analyze this week','Suggest recovery workout','I missed a session','Review my zones','Taper strategy','Rearrange my training days'].map(s=>`<button onclick="sendSuggestion('${s}')" class="px-3 py-1 text-xs bg-bg-tertiary hover:bg-bg-hover text-zinc-300 rounded-full border border-bg-border transition">${s}</button>`).join('')}
+    </div>
+    <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-4">
+      ${msgs.length===0?`<div class="text-center py-16"><div class="w-16 h-16 rounded-full bg-purple-600/10 flex items-center justify-center mx-auto mb-4"><svg class="w-8 h-8 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714a2.25 2.25 0 00.659 1.591L19 14.5"/></svg></div><h3 class="text-lg font-semibold text-zinc-300">Your AI Training Coach</h3><p class="text-sm text-zinc-500 max-w-md mx-auto mt-2">I have access to your full Cairns 70.3 plan, training zones, day preferences, and athlete profile.</p></div>`
+      :msgs.map(m=>`<div class="chat-msg flex ${m.role==='user'?'justify-end':'justify-start'}"><div class="max-w-[80%] ${m.role==='user'?'bg-brand/20 text-brand-light':'bg-bg-tertiary text-zinc-300'} rounded-lg px-4 py-3 text-sm"><div class="whitespace-pre-wrap">${escapeHtml(m.content)}</div></div></div>`).join('')}
+    </div>
+    <div class="p-4 border-t border-bg-border bg-bg-secondary flex-shrink-0"><div class="flex gap-2"><input id="chat-input" type="text" placeholder="Ask your AI coach..." class="flex-1 bg-bg-tertiary border border-bg-border rounded-lg px-4 py-2.5 text-sm text-zinc-200" onkeydown="if(event.key==='Enter')sendChat()"><button onclick="sendChat()" class="px-4 py-2.5 bg-brand hover:bg-brand-dark text-white rounded-lg transition">Send</button></div></div>
+  </div>`;
+}
+function showAPIKeyModal(){
+  document.getElementById('modal-container').innerHTML=`<div class="modal-backdrop fixed inset-0 z-50 flex items-center justify-center" onclick="if(event.target===this)closeModal()"><div class="bg-bg-secondary rounded-xl border border-zinc-700 w-[450px] shadow-2xl fade-in"><div class="p-4 border-b border-zinc-700"><h3 class="text-lg font-semibold text-white">Claude API Key</h3><p class="text-xs text-zinc-400 mt-1">Stored locally only.</p></div><div class="p-4"><input id="api-key-input" type="password" value="${Store.state.apiKey||''}" class="w-full bg-bg-tertiary border border-bg-border rounded px-3 py-2 text-sm text-zinc-200 mono" placeholder="sk-ant-..."></div><div class="p-4 border-t border-zinc-700 flex justify-end gap-2"><button onclick="closeModal()" class="px-4 py-2 text-sm text-zinc-400">Cancel</button><button onclick="Store.update({apiKey:document.getElementById('api-key-input').value.trim()});closeModal();renderPage();showToast('API key saved!')" class="px-4 py-2 text-sm bg-brand text-white rounded">Save</button></div></div></div>`;
+}
+function sendSuggestion(text){document.getElementById('chat-input').value=text;sendChat();}
+async function sendChat(){
+  const input=document.getElementById('chat-input');const text=input.value.trim();if(!text)return;
+  if(!Store.state.apiKey){showToast('Set your Claude API key first');showAPIKeyModal();return;}
+  const msgs=Store.state.chatMessages||[];msgs.push({role:'user',content:text});Store.update({chatMessages:msgs});input.value='';renderPage();
+  setTimeout(()=>{const el=document.getElementById('chat-messages');if(el)el.scrollTop=el.scrollHeight;},50);
+  const a=Store.getActiveAthlete();const plan=Store.getActivePlan();const pz=calcPowerZones(a?.ftp);const rz=calcPaceZones(a?.thresholdPace);
+  const prefs=a?.preferences||{};
+  const sys=`You are an expert triathlon coach integrated into Triple Tri Club. You have deep knowledge of periodization, training zones, and Cairns 70.3 race preparation.
+
+ATHLETE: ${a?.name} · FTP: ${a?.ftp}W (${a?.weight?(a.ftp/a.weight).toFixed(1):'?'} W/kg) · Threshold pace: ${formatPace(a?.thresholdPace)}/km · Weight: ${a?.weight}kg
+POWER ZONES: ${pz.map(z=>'Z'+z.zone+' '+z.minWatts+'-'+(z.maxWatts||'∞')+'W').join(' | ')}
+PACE ZONES: ${rz.map(z=>'Z'+z.zone+' '+formatPace(z.minPace)+'-'+formatPace(z.maxPace)+'/km').join(' | ')}
+RACE: Cairns 70.3, Jun 14 2026. Targets: Swim 1:29/100m, Bike 240W NP, Run 4:10-4:20/km
+PLAN: 12 weeks (W0-W11). Phases: W0 Recovery, W1-W3 Foundation, W4 Recovery, W5 Specific, W6 Recovery, W7-W9 Peak Block (3 consecutive hard weeks), W10 Taper (-30%), W11 Race Week.
+DAY PREFERENCES: Long Ride: ${prefs.longRide||'SAT'}, Brick: ${prefs.brick||'SUN'}, Track: ${prefs.trackDay||'TUE'}, Hard Bike: ${prefs.hardBike||'THU'}, Hard Swim: ${prefs.hardSwim||'WED'}, Strength A: ${prefs.strengthA||'MON'}, Strength B: ${prefs.strengthB||'WED'}, Easy Swim: ${prefs.easySwim||'FRI'}, Mobility: ${prefs.mobility||'FRI,SUN'}
+
+Respond as a knowledgeable, direct coach. Use actual watts, paces, and zone data. Be concise but actionable.`;
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':Store.state.apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1024,system:sys,messages:msgs.slice(-10).map(m=>({role:m.role==='user'?'user':'assistant',content:m.content}))})});
+    const data=await r.json();
+    if(data.content?.[0]) msgs.push({role:'assistant',content:data.content[0].text});
+    else if(data.error) msgs.push({role:'assistant',content:'Error: '+data.error.message});
+  }catch(e){msgs.push({role:'assistant',content:'Connection error: '+e.message});}
+  Store.update({chatMessages:msgs});renderPage();
+  setTimeout(()=>{const el=document.getElementById('chat-messages');if(el)el.scrollTop=el.scrollHeight;},50);
+}
+
+// ============================================================================
+// INTEGRATIONS — Full connection UI
+// ============================================================================
+const SERVICES=[
+  {key:'strava',name:'Strava',color:'#FC4C02',icon:'<svg viewBox="0 0 24 24" class="w-6 h-6" fill="#FC4C02"><path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169"/></svg>',
+    desc:'Sync completed activities automatically. Import GPS, power, HR, pace data and match to planned sessions.',
+    features:['Auto-sync completed activities','Import GPS tracks & power data','Match activities to planned sessions','Weekly TSS / volume tracking'],
+    authUrl:'https://www.strava.com/oauth/authorize',
+    scopes:'read,activity:read_all'},
+  {key:'garmin',name:'Garmin Connect',color:'#11A9ED',icon:'<svg viewBox="0 0 24 24" class="w-6 h-6" fill="#11A9ED"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>',
+    desc:'Push structured workouts directly to your Garmin device. Import completed activities with full metrics.',
+    features:['Push planned workouts to device','Import completed activities','Sync training load & recovery','Body Battery & HRV data'],
+    authUrl:'https://connect.garmin.com/oauthConfirm',
+    scopes:'read,write'},
+  {key:'trainingpeaks',name:'TrainingPeaks',color:'#E1251B',icon:'<svg viewBox="0 0 24 24" class="w-6 h-6" fill="#E1251B"><path d="M3 3v18h18V3H3zm16 16H5V5h14v14zM7 7h4v4H7V7zm6 0h4v4h-4V7zm-6 6h4v4H7v-4zm6 0h4v4h-4v-4z"/></svg>',
+    desc:'Full bi-directional sync with TrainingPeaks. Push planned workouts, pull completed TSS and performance data.',
+    features:['Push planned workouts','Pull completed TSS data','Sync Performance Management Chart','WKO metrics integration'],
+    authUrl:'https://oauth.trainingpeaks.com/OAuth/Authorize',
+    scopes:'workouts:read,workouts:write'},
+];
+function renderIntegrations(){
+  const conn=Store.state.connectedServices||{};
+  return `<div class="p-6 fade-in">
+    <h2 class="text-2xl font-bold text-white mb-1">Integrations</h2>
+    <p class="text-sm text-zinc-500 mb-6">Connect your training platforms to sync activities and push workouts</p>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      ${SERVICES.map(svc=>{
+        const isConn=conn[svc.key];
+        return `<div class="bg-bg-secondary rounded-lg border border-bg-border p-6 ${isConn?'ring-1':''}transition" style="${isConn?'ring-color:'+svc.color:''}">
+          <div class="flex items-center gap-3 mb-3">
+            <div class="w-12 h-12 rounded-lg flex items-center justify-center" style="background:${svc.color}15">${svc.icon}</div>
+            <div>
+              <h3 class="text-base font-semibold text-white">${svc.name}</h3>
+              ${isConn?`<span class="text-[10px] font-bold px-2 py-0.5 rounded-full" style="background:${svc.color}20;color:${svc.color}">Connected</span>`:'<span class="text-[10px] text-zinc-600">Not connected</span>'}
+            </div>
+          </div>
+          <p class="text-sm text-zinc-400 mb-3">${svc.desc}</p>
+          <ul class="space-y-1 mb-4">${svc.features.map(f=>`<li class="text-xs text-zinc-500 flex gap-2"><span style="color:${svc.color}">+</span>${f}</li>`).join('')}</ul>
+          ${isConn?`
+            <div class="flex gap-2">
+              <button onclick="syncService('${svc.key}')" class="flex-1 px-3 py-2 text-sm text-white rounded transition" style="background:${svc.color}">Sync Now</button>
+              <button onclick="disconnectService('${svc.key}')" class="px-3 py-2 text-sm text-zinc-400 rounded border border-bg-border hover:text-red-400 hover:border-red-400/30 transition">Disconnect</button>
+            </div>
+            <p class="text-[10px] text-zinc-600 mt-2">Last sync: ${conn[svc.key].lastSync||'Never'}</p>
+          `:`<button onclick="connectService('${svc.key}')" class="w-full px-3 py-2 text-sm text-white rounded transition" style="background:${svc.color}">Connect ${svc.name}</button>`}
+        </div>`;
+      }).join('')}
+    </div>
+    <div class="mt-8 p-4 bg-bg-secondary rounded-lg border border-bg-border">
+      <h3 class="text-sm font-semibold text-white mb-2">How integrations work</h3>
+      <p class="text-xs text-zinc-500 leading-relaxed">Connecting a service opens an OAuth window where you grant Triple Tri Club read/write access. Your tokens are stored locally. For real-time sync, a lightweight backend proxy is needed for token refresh — <a href="#" onclick="showToast('Deploy guide: see GitHub repo README')" class="text-brand-light hover:underline">see deployment guide</a>.</p>
+    </div>
+    <div class="mt-6"><h3 class="text-sm font-semibold text-white mb-3">Export Workouts</h3>
+      <div class="grid grid-cols-3 gap-4">
+        <button onclick="exportData()" class="bg-bg-secondary rounded-lg border border-bg-border p-4 hover:bg-bg-tertiary transition text-left"><p class="text-sm font-medium text-white">.JSON</p><p class="text-xs text-zinc-500 mt-1">Full plan backup</p></button>
+        <button onclick="showToast('.FIT export coming soon')" class="bg-bg-secondary rounded-lg border border-bg-border p-4 hover:bg-bg-tertiary transition text-left"><p class="text-sm font-medium text-white">.FIT</p><p class="text-xs text-zinc-500 mt-1">Garmin workouts</p></button>
+        <button onclick="showToast('.TCX export coming soon')" class="bg-bg-secondary rounded-lg border border-bg-border p-4 hover:bg-bg-tertiary transition text-left"><p class="text-sm font-medium text-white">.TCX</p><p class="text-xs text-zinc-500 mt-1">Training Center XML</p></button>
+      </div>
+    </div>
+  </div>`;
+}
+function connectService(key){
+  const svc=SERVICES.find(s=>s.key===key);if(!svc)return;
+  // In production: window.open(svc.authUrl+'?client_id=YOUR_ID&redirect_uri=...&scope='+svc.scopes)
+  // For now: simulate connection
+  const conn=Store.state.connectedServices||{};
+  conn[key]={connected:true,lastSync:new Date().toLocaleString(),token:'simulated'};
+  Store.update({connectedServices:conn});
+  renderPage();showToast(svc.name+' connected! In production, this opens the OAuth flow.');
+}
+function disconnectService(key){
+  if(!confirm('Disconnect this service?'))return;
+  const conn=Store.state.connectedServices||{};
+  delete conn[key];Store.update({connectedServices:conn});renderPage();showToast('Disconnected.');
+}
+function syncService(key){
+  const conn=Store.state.connectedServices||{};
+  if(conn[key])conn[key].lastSync=new Date().toLocaleString();
+  Store.update({connectedServices:conn});renderPage();showToast('Sync complete! (simulated — real sync requires backend proxy)');
+}
+
+// ============================================================================
+// IMPORT / EXPORT
+// ============================================================================
+function exportData(){
+  const blob=new Blob([JSON.stringify({version:'3.0',exportedAt:new Date().toISOString(),state:Store.state},null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=`tripleTriClub-backup-${new Date().toISOString().split('T')[0]}.json`;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);showToast('Data exported!');
+}
+function importData(event){
+  const file=event.target.files[0];if(!file)return;const reader=new FileReader();
+  reader.onload=function(e){try{const data=JSON.parse(e.target.result);if(data.state){Store._state={...Store._state,...data.state};Store.save();}renderPage();updateAthleteSelect();showToast('Data imported!');}catch(err){showToast('Invalid file');}};
+  reader.readAsText(file);event.target.value='';
+}
+
+// ============================================================================
+// TRAINING PLAN FILE PARSER (JSX / JSON / text)
+// ============================================================================
+function importPlanFile(event){
+  const file=event.target.files[0];if(!file)return;
+  const ext=file.name.split('.').pop().toLowerCase();
+  const reader=new FileReader();
+  reader.onload=function(e){
+    const text=e.target.result;
+    try{
+      let planData;
+      if(ext==='json'){
+        planData=JSON.parse(text);
+        // If it's a full backup, import normally
+        if(planData.state){importData(event);return;}
+        // If it has weeks array directly
+        if(planData.weeks){
+          showPlanImportModal(planData);return;
+        }
+      }
+      // JSX or text — parse the structure
+      planData=parseJSXPlan(text);
+      if(planData&&planData.weeks&&planData.weeks.length>0){
+        showPlanImportModal(planData);
+      } else {
+        showToast('Could not parse plan file. Supported: .jsx (cairns-v5 format), .json');
+      }
+    }catch(err){
+      console.error('Plan import error:',err);
+      showToast('Error parsing file: '+err.message);
+    }
+  };
+  reader.readAsText(file);event.target.value='';
+}
+
+function parseJSXPlan(text){
+  // Extract FTP
+  const ftpMatch=text.match(/const\s+FTP\s*=\s*(\d+)/);
+  const ftp=ftpMatch?parseInt(ftpMatch[1]):278;
+
+  // Extract athlete name from comments or plan name
+  const nameMatch=text.match(/name:\s*["']([^"']+)/);
+  const planName=nameMatch?nameMatch[1]:'Imported Plan';
+
+  // Extract WEEKS array — find the array start
+  const weeksStart=text.indexOf('const WEEKS');
+  if(weeksStart===-1){
+    // Try alternate: look for weeks: [ in generateCairnsPlan or similar
+    return parseJSXInline(text,ftp);
+  }
+
+  // Parse week blocks using regex patterns
+  const weeks=[];
+  const weekRegex=/\{\s*id\s*:\s*(\d+)\s*,\s*label\s*:\s*"([^"]+)"\s*,\s*name\s*:\s*"([^"]+)"\s*,\s*dates\s*:\s*"([^"]+)"\s*,\s*phase\s*:\s*"([^"]+)"\s*,\s*hours\s*:\s*"([^"]+)"/g;
+  let wm;
+  while((wm=weekRegex.exec(text))!==null){
+    const weekId=parseInt(wm[1]);
+    const weekBlock=extractBlock(text,wm.index);
+    const days=parseDays(weekBlock,ftp);
+    const totalsMatch=weekBlock.match(/totals\s*:\s*\{\s*swim\s*:\s*([\d.]+)\s*,\s*bike\s*:\s*([\d.]+)\s*,\s*run\s*:\s*([\d.]+)/);
+    const contextMatch=weekBlock.match(/context\s*:\s*"([^"]+)"/);
+    const flagsMatch=weekBlock.match(/flags\s*:\s*\[([^\]]+)\]/);
+    let flags=[];
+    if(flagsMatch){flags=flagsMatch[1].match(/"([^"]+)"/g)?.map(f=>f.replace(/"/g,''))||[];}
+    weeks.push({
+      id:weekId, label:wm[2], name:wm[3], dates:wm[4], phase:wm[5], hours:wm[6],
+      context:contextMatch?contextMatch[1]:'',
+      flags:flags,
+      totals:totalsMatch?{swim:parseFloat(totalsMatch[1]),bike:parseFloat(totalsMatch[2]),run:parseFloat(totalsMatch[3])}:{swim:0,bike:0,run:0},
+      days:days
+    });
+  }
+  return {planName,ftp,weeks};
+}
+
+function parseJSXInline(text,ftp){
+  // Fallback for inline plan structures
+  return {planName:'Imported Plan',ftp,weeks:[]};
+}
+
+function extractBlock(text,startIdx){
+  let depth=0;let start=-1;
+  for(let i=startIdx;i<text.length;i++){
+    if(text[i]==='{'){if(start===-1)start=i;depth++;}
+    if(text[i]==='}'){depth--;if(depth===0)return text.substring(start,i+1);}
+  }
+  return text.substring(startIdx,startIdx+5000);
+}
+
+function parseDays(block,ftp){
+  const days=[];
+  const dayRegex=/\{day:"([A-Z]+)"\s*,\s*sessions:\s*\[/g;
+  let dm;
+  while((dm=dayRegex.exec(block))!==null){
+    const sessBlock=extractArrayBlock(block,dm.index+dm[0].length-1);
+    const sessions=parseSessions(sessBlock,ftp);
+    days.push({day:dm[1],sessions});
+  }
+  return days;
+}
+
+function extractArrayBlock(text,startIdx){
+  let depth=0;
+  for(let i=startIdx;i<text.length;i++){
+    if(text[i]==='[')depth++;
+    if(text[i]===']'){depth--;if(depth===0)return text.substring(startIdx,i+1);}
+  }
+  return text.substring(startIdx,startIdx+2000);
+}
+
+function parseSessions(block,ftp){
+  const sessions=[];
+  const sessRegex=/\{tag:"([^"]+)"\s*,\s*label:"([^"]+)"\s*,/g;
+  let sm;
+  while((sm=sessRegex.exec(block))!==null){
+    const sessStr=extractBlock(block,sm.index);
+    const targetMatch=sessStr.match(/target:\s*(?:`([^`]*)`|"([^"]*)")/);
+    const whyMatch=sessStr.match(/why:\s*"([^"]*)"/);
+    const trackMatch=sessStr.match(/trackKey:\s*"([^"]+)"/);
+    const isBrickMatch=sessStr.match(/isBrick\s*:\s*true/);
+    let target=targetMatch?(targetMatch[1]||targetMatch[2]||''):'';
+    // Resolve template literals: ${p(0.XX)} → actual watts
+    target=target.replace(/\$\{p\(([\d.]+)\)\}/g,(_,pct)=>Math.round(ftp*parseFloat(pct)));
+    const sess={tag:sm[1],label:sm[2],target:target,why:whyMatch?whyMatch[1]:''};
+    if(trackMatch)sess.trackKey=trackMatch[1];
+    if(isBrickMatch){
+      sess.isBrick=true;
+      sess.brickOpts=parseBrickOpts(sessStr);
+    }
+    sessions.push(sess);
+  }
+  return sessions;
+}
+
+function parseBrickOpts(block){
+  const opts=[];
+  const optRegex=/\{label:"([^"]+)"\s*,\s*intensity:"([^"]+)"\s*,\s*detail:\s*(?:`([^`]*)`|"([^"]*)")/g;
+  let om;
+  while((om=optRegex.exec(block))!==null){
+    opts.push({label:om[1],intensity:om[2],detail:om[3]||om[4]||''});
+  }
+  return opts.length?opts:undefined;
+}
+
+function showPlanImportModal(planData){
+  const modal=document.getElementById('modal-container');
+  modal.innerHTML=`<div class="modal-backdrop fixed inset-0 z-50 flex items-center justify-center" onclick="if(event.target===this)closeModal()">
+    <div class="bg-bg-secondary rounded-xl border border-zinc-700 w-[550px] max-h-[80vh] overflow-y-auto shadow-2xl fade-in">
+      <div class="p-4 border-b border-zinc-700">
+        <h3 class="text-lg font-semibold text-white">Import Training Plan</h3>
+        <p class="text-xs text-zinc-400 mt-1">Parsed ${planData.weeks.length} weeks from the file</p>
+      </div>
+      <div class="p-4 space-y-3">
+        <div><label class="block text-xs text-zinc-400 mb-1">Athlete Name</label><input id="imp-name" class="w-full bg-bg-tertiary border border-bg-border rounded px-3 py-2 text-sm text-zinc-200" value="${planData.athleteName||'New Athlete'}"></div>
+        <div><label class="block text-xs text-zinc-400 mb-1">Plan Name</label><input id="imp-plan" class="w-full bg-bg-tertiary border border-bg-border rounded px-3 py-2 text-sm text-zinc-200" value="${planData.planName||'Imported Plan'}"></div>
+        <div class="grid grid-cols-3 gap-3">
+          <div><label class="block text-xs text-zinc-400 mb-1">FTP (watts)</label><input id="imp-ftp" type="number" class="w-full bg-bg-tertiary border border-bg-border rounded px-3 py-2 text-sm text-zinc-200" value="${planData.ftp||278}"></div>
+          <div><label class="block text-xs text-zinc-400 mb-1">Weight (kg)</label><input id="imp-weight" type="number" class="w-full bg-bg-tertiary border border-bg-border rounded px-3 py-2 text-sm text-zinc-200" value="75"></div>
+          <div><label class="block text-xs text-zinc-400 mb-1">Threshold Pace</label><input id="imp-pace" class="w-full bg-bg-tertiary border border-bg-border rounded px-3 py-2 text-sm text-zinc-200" value="5:00" placeholder="5:00"></div>
+        </div>
+        <div class="p-3 rounded-lg bg-brand/5 border border-brand/15">
+          <p class="text-xs text-zinc-400">This will create a new athlete profile and import all ${planData.weeks.length} weeks of training. Each session will be fully editable after import.</p>
+        </div>
+        <div class="max-h-48 overflow-y-auto space-y-1">
+          ${planData.weeks.map(w=>`<div class="flex items-center gap-2 text-xs p-2 rounded bg-bg-tertiary"><span class="font-bold mono" style="color:${PC[w.phase]||'#64748b'}">${w.label}</span><span class="text-zinc-400 flex-1">${w.name}</span><span class="text-zinc-600">${w.days.length} days</span></div>`).join('')}
+        </div>
+      </div>
+      <div class="p-4 border-t border-zinc-700 flex justify-end gap-2">
+        <button onclick="closeModal()" class="px-4 py-2 text-sm text-zinc-400">Cancel</button>
+        <button onclick="executePlanImport()" class="px-4 py-2 text-sm bg-brand text-white rounded">Import Plan</button>
+      </div>
+    </div>
+  </div>`;
+  // Stash parsed data
+  window._pendingPlanImport=planData;
+}
+
+function executePlanImport(){
+  const pd=window._pendingPlanImport;if(!pd)return;
+  const name=document.getElementById('imp-name').value.trim()||'Imported';
+  const planName=document.getElementById('imp-plan').value.trim()||'Imported Plan';
+  const ftp=parseInt(document.getElementById('imp-ftp').value)||278;
+  const weight=parseInt(document.getElementById('imp-weight').value)||75;
+  const pace=parsePace(document.getElementById('imp-pace').value)||300;
+  const athlete={id:uid(),name:name,sport:'triathlon',ftp:ftp,thresholdPace:pace,css400:360,css200:165,weight:weight,maxHR:190,restHR:50,
+    preferences:{longRide:'SAT',brick:'SUN',longRun:'SUN',trackDay:'TUE',hardRun:'TUE',hardBike:'THU',hardSwim:'WED',strengthA:'MON',strengthB:'WED',easySwim:'FRI',mobility:'FRI,SUN'},
+    createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()};
+  const plan={id:uid(),athleteId:athlete.id,name:planName,raceDate:'',raceTarget:'',weeks:pd.weeks};
+  Store.state.athletes.push(athlete);
+  Store.state.plans.push(plan);
+  Store.update({activeAthleteId:athlete.id});
+  closeModal();renderPage();updateAthleteSelect();
+  showToast('Plan imported! '+pd.weeks.length+' weeks loaded for '+name);
+  window._pendingPlanImport=null;
+}
+
+// ============================================================================
+// SESSION EDITOR
+// ============================================================================
+function openEditSession(weekId,dayKey,sessionIdx){
+  const plan=Store.getActivePlan();if(!plan)return;
+  const week=plan.weeks.find(w=>w.id===weekId);if(!week)return;
+  const day=week.days.find(d=>d.day===dayKey);if(!day)return;
+  const s=day.sessions[sessionIdx];if(!s)return;
+  const tags=['swim','bike','run','strength','brick','mob','test','rest','race'];
+  document.getElementById('modal-container').innerHTML=`<div class="modal-backdrop fixed inset-0 z-50 flex items-center justify-center" onclick="if(event.target===this)closeModal()">
+    <div class="bg-bg-secondary rounded-xl border border-zinc-700 w-[600px] max-h-[85vh] overflow-y-auto shadow-2xl fade-in">
+      <div class="p-4 border-b border-zinc-700 flex justify-between items-center">
+        <div>
+          <h3 class="text-lg font-semibold text-white">Edit Session</h3>
+          <p class="text-xs text-zinc-400 mt-0.5">W${weekId} ${dayKey} — Session ${sessionIdx+1}</p>
+        </div>
+        <button onclick="deleteSession(${weekId},'${dayKey}',${sessionIdx})" class="text-xs text-red-400 hover:text-red-300 px-2 py-1 rounded border border-red-500/20 hover:border-red-400/30 transition">Delete Session</button>
+      </div>
+      <div class="p-4 space-y-3">
+        <div class="grid grid-cols-4 gap-3">
+          <div class="col-span-1">
+            <label class="block text-xs text-zinc-400 mb-1">Type</label>
+            <select id="edit-tag" class="w-full bg-bg-tertiary border border-bg-border rounded px-3 py-2 text-sm text-zinc-200">
+              ${tags.map(t=>`<option value="${t}" ${t===s.tag?'selected':''}>${t}</option>`).join('')}
+            </select>
+          </div>
+          <div class="col-span-3">
+            <label class="block text-xs text-zinc-400 mb-1">Label</label>
+            <input id="edit-label" class="w-full bg-bg-tertiary border border-bg-border rounded px-3 py-2 text-sm text-zinc-200" value="${escapeHtml(s.label||'')}">
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs text-zinc-400 mb-1">Target / Workout Details</label>
+          <textarea id="edit-target" rows="4" class="w-full bg-bg-tertiary border border-bg-border rounded px-3 py-2 text-sm text-zinc-200 mono leading-relaxed">${escapeHtml(s.target||'')}</textarea>
+        </div>
+        <div>
+          <label class="block text-xs text-zinc-400 mb-1">Why (coaching rationale)</label>
+          <textarea id="edit-why" rows="3" class="w-full bg-bg-tertiary border border-bg-border rounded px-3 py-2 text-sm text-zinc-200 leading-relaxed">${escapeHtml(s.why||'')}</textarea>
+        </div>
+        ${s.trackKey?`<div class="p-3 rounded-lg bg-yellow-500/5 border border-yellow-500/15"><p class="text-xs text-yellow-400">This session has track options (${s.trackKey}). Track options are managed globally.</p></div>`:''}
+        ${s.isBrick?`<div class="p-3 rounded-lg bg-purple-500/5 border border-purple-500/15"><p class="text-xs text-purple-400">This session has brick run options. Edit the main target above; run options are displayed separately.</p></div>`:''}
+      </div>
+      <div class="p-4 border-t border-zinc-700 flex justify-between">
+        <button onclick="addSessionToDay(${weekId},'${dayKey}')" class="text-xs text-brand-light hover:text-white px-3 py-1.5 rounded border border-brand/20 hover:border-brand/30 transition">+ Add Session to ${dayKey}</button>
+        <div class="flex gap-2">
+          <button onclick="closeModal()" class="px-4 py-2 text-sm text-zinc-400">Cancel</button>
+          <button onclick="saveEditSession(${weekId},'${dayKey}',${sessionIdx})" class="px-4 py-2 text-sm bg-brand text-white rounded">Save Changes</button>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function saveEditSession(weekId,dayKey,sessionIdx){
+  const plan=Store.getActivePlan();if(!plan)return;
+  const week=plan.weeks.find(w=>w.id===weekId);if(!week)return;
+  const day=week.days.find(d=>d.day===dayKey);if(!day)return;
+  const s=day.sessions[sessionIdx];if(!s)return;
+  s.tag=document.getElementById('edit-tag').value;
+  s.label=document.getElementById('edit-label').value;
+  s.target=document.getElementById('edit-target').value;
+  s.why=document.getElementById('edit-why').value;
+  Store.save();closeModal();renderPage();showToast('Session updated!');
+}
+
+function deleteSession(weekId,dayKey,sessionIdx){
+  if(!confirm('Delete this session?'))return;
+  const plan=Store.getActivePlan();if(!plan)return;
+  const week=plan.weeks.find(w=>w.id===weekId);if(!week)return;
+  const day=week.days.find(d=>d.day===dayKey);if(!day)return;
+  day.sessions.splice(sessionIdx,1);
+  if(day.sessions.length===0) day.sessions.push({tag:'rest',label:'Rest',target:'',why:''});
+  Store.save();closeModal();renderPage();showToast('Session deleted.');
+}
+
+function addSessionToDay(weekId,dayKey){
+  const plan=Store.getActivePlan();if(!plan)return;
+  const week=plan.weeks.find(w=>w.id===weekId);if(!week)return;
+  const day=week.days.find(d=>d.day===dayKey);if(!day)return;
+  day.sessions.push({tag:'run',label:'New Session',target:'Edit this session...',why:''});
+  Store.save();closeModal();renderPage();showToast('Session added to '+dayKey+'!');
+}
+
+// ============================================================================
+// AUDIO FEEDBACK & NOTES
+// ============================================================================
+let _mediaRecorder=null;
+let _audioChunks=[];
+
+function openFeedback(fbKey){
+  const fb=(Store.state.feedback||{})[fbKey]||{};
+  document.getElementById('modal-container').innerHTML=`<div class="modal-backdrop fixed inset-0 z-50 flex items-center justify-center" onclick="if(event.target===this)closeModal()">
+    <div class="bg-bg-secondary rounded-xl border border-zinc-700 w-[500px] shadow-2xl fade-in">
+      <div class="p-4 border-b border-zinc-700">
+        <h3 class="text-lg font-semibold text-white">Session Feedback</h3>
+        <p class="text-xs text-zinc-400 mt-1">Record how the session felt — review it after the block</p>
+      </div>
+      <div class="p-4 space-y-4">
+        <div>
+          <label class="block text-xs text-zinc-400 mb-1">How did it feel? (1-10)</label>
+          <div class="flex gap-1">${[1,2,3,4,5,6,7,8,9,10].map(n=>`<button onclick="document.getElementById('fb-rpe').value=${n};document.querySelectorAll('.rpe-btn').forEach(b=>b.style.background='');this.style.background='#2196F320'" class="rpe-btn w-8 h-8 rounded text-xs font-bold border border-bg-border hover:border-brand/30 transition ${fb.rpe===n?'bg-brand/20 text-brand-light':'text-zinc-400'}">${n}</button>`).join('')}</div>
+          <input id="fb-rpe" type="hidden" value="${fb.rpe||''}">
+        </div>
+        <div>
+          <label class="block text-xs text-zinc-400 mb-1">Written Notes</label>
+          <textarea id="fb-note" rows="3" class="w-full bg-bg-tertiary border border-bg-border rounded px-3 py-2 text-sm text-zinc-200" placeholder="How did it go? Any observations...">${escapeHtml(fb.note||'')}</textarea>
+        </div>
+        <div>
+          <label class="block text-xs text-zinc-400 mb-2">Audio Recording</label>
+          ${fb.audioData?`
+            <audio controls src="${fb.audioData}" class="w-full h-10 mb-2"></audio>
+            <div class="flex gap-2">
+              <button onclick="deleteFeedbackAudio('${fbKey}')" class="text-xs text-red-400 hover:text-red-300 px-2 py-1 rounded border border-red-500/20 transition">Delete Recording</button>
+              <span class="text-[10px] text-zinc-600 self-center">Recorded: ${fb.audioDate||'unknown'}</span>
+            </div>
+          `:`
+            <div class="flex items-center gap-3">
+              <button onclick="toggleRecordingInModal('${fbKey}')" id="modal-rec-btn" class="px-4 py-2 text-sm rounded border transition ${Store.state._recording===fbKey?'bg-red-500/20 text-red-400 border-red-500/30 rec-pulse':'bg-bg-tertiary text-zinc-300 border-bg-border hover:border-brand/30'}">
+                ${Store.state._recording===fbKey?'Stop Recording':'Start Recording'}
+              </button>
+              <span class="text-[10px] text-zinc-600">Uses your microphone. Stored locally only.</span>
+            </div>
+          `}
+        </div>
+      </div>
+      <div class="p-4 border-t border-zinc-700 flex justify-end gap-2">
+        <button onclick="closeModal()" class="px-4 py-2 text-sm text-zinc-400">Cancel</button>
+        <button onclick="saveFeedback('${fbKey}')" class="px-4 py-2 text-sm bg-brand text-white rounded">Save Feedback</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function saveFeedback(fbKey){
+  if(!Store.state.feedback) Store.state.feedback={};
+  const existing=Store.state.feedback[fbKey]||{};
+  const rpe=parseInt(document.getElementById('fb-rpe').value)||null;
+  const note=document.getElementById('fb-note').value.trim();
+  Store.state.feedback[fbKey]={...existing,rpe,note,date:new Date().toISOString()};
+  Store.save();closeModal();renderPage();showToast('Feedback saved!');
+}
+
+function deleteFeedbackAudio(fbKey){
+  if(!confirm('Delete this recording?'))return;
+  if(Store.state.feedback&&Store.state.feedback[fbKey]){
+    delete Store.state.feedback[fbKey].audioData;
+    delete Store.state.feedback[fbKey].audioDate;
+    Store.save();
+  }
+  openFeedback(fbKey);showToast('Recording deleted.');
+}
+
+async function toggleRecording(fbKey){
+  if(Store.state._recording===fbKey){
+    // Stop recording
+    if(_mediaRecorder&&_mediaRecorder.state==='recording') _mediaRecorder.stop();
+    return;
+  }
+  // Start recording
+  try{
+    const stream=await navigator.mediaDevices.getUserMedia({audio:true});
+    _audioChunks=[];
+    _mediaRecorder=new MediaRecorder(stream);
+    _mediaRecorder.ondataavailable=e=>{if(e.data.size>0)_audioChunks.push(e.data);};
+    _mediaRecorder.onstop=()=>{
+      stream.getTracks().forEach(t=>t.stop());
+      const blob=new Blob(_audioChunks,{type:'audio/webm'});
+      const reader=new FileReader();
+      reader.onload=()=>{
+        if(!Store.state.feedback) Store.state.feedback={};
+        if(!Store.state.feedback[fbKey]) Store.state.feedback[fbKey]={};
+        Store.state.feedback[fbKey].audioData=reader.result;
+        Store.state.feedback[fbKey].audioDate=new Date().toLocaleString();
+        Store.state._recording=null;
+        Store.save();renderPage();showToast('Audio saved!');
+      };
+      reader.readAsDataURL(blob);
+    };
+    _mediaRecorder.start();
+    Store.state._recording=fbKey;
+    renderPage();showToast('Recording... click again to stop');
+  }catch(err){
+    showToast('Microphone access denied. Please allow microphone in browser settings.');
+  }
+}
+
+async function toggleRecordingInModal(fbKey){
+  await toggleRecording(fbKey);
+  // Re-render the modal button
+  const btn=document.getElementById('modal-rec-btn');
+  if(btn){
+    const isRec=Store.state._recording===fbKey;
+    btn.textContent=isRec?'Stop Recording':'Start Recording';
+    btn.className=`px-4 py-2 text-sm rounded border transition ${isRec?'bg-red-500/20 text-red-400 border-red-500/30 rec-pulse':'bg-bg-tertiary text-zinc-300 border-bg-border hover:border-brand/30'}`;
+  }
+}
+
+// ============================================================================
+// INIT
+// ============================================================================
+function init(){
+  Store.init();updateAthleteSelect();navigate('dashboard');
+  // Register service worker for offline/PWA support
+  if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{});}
+}
+init();
+</script>
+</body>
+</html>
