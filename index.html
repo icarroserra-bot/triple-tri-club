@@ -934,6 +934,30 @@ function renderPage(){
   const pages={today:renderToday,dashboard:renderDashboard,plan:renderPlanView,overview:renderOverview,calendar:renderCalendar,profiles:renderProfiles,zones:renderZones,raceday:renderRaceDay,mobility:renderMobility,integrations:renderIntegrations,'ai-coach':renderAICoach};
   main.innerHTML=(pages[page]||renderToday)();
   updateSidebarActive();
+  loadAudioPlayers();
+}
+
+// Finds all elements with data-audio-key and loads audio from IndexedDB into them
+function loadAudioPlayers(){
+  setTimeout(()=>{
+    document.querySelectorAll('[data-audio-key]').forEach(async el=>{
+      const key=el.dataset.audioKey;
+      if(!key||el.dataset.loaded) return;
+      el.dataset.loaded='1';
+      try{
+        const url=await getAudioUrl(key);
+        if(url){
+          const isModal=el.id.startsWith('audio-player-');
+          const isInline=el.id.startsWith('inline-audio-');
+          if(isModal) el.innerHTML=`<audio controls src="${url}" class="w-full h-10 mb-2"></audio>`;
+          else if(isInline) el.innerHTML=`<audio controls src="${url}" class="h-8 w-full max-w-xs"></audio>`;
+          else el.innerHTML=`<audio controls src="${url}" class="h-8 flex-1" style="max-width:300px"></audio>`;
+        } else {
+          el.innerHTML='';
+        }
+      }catch(e){ el.innerHTML=''; }
+    });
+  },50);
 }
 function updateAthleteSelect(){
   const opts=Store.state.athletes.map(a=>`<option value="${a.id}" ${a.id===Store.state.activeAthleteId?'selected':''}>${a.name}</option>`).join('');
@@ -1322,7 +1346,7 @@ function renderToday(){
               <button onclick="openFeedback('${fbKey}')" class="text-[10px] px-2 py-1 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">${fb?'View Feedback':'Add Feedback'}</button>
               <button onclick="toggleRecording('${fbKey}')" class="text-[10px] px-2 py-1 rounded ${Store.state._recording===fbKey?'bg-red-500/20 text-red-400 rec-pulse':'bg-red-500/10 text-red-400'} border border-red-500/20">${Store.state._recording===fbKey?'Stop':'Record'}</button>
             </div>
-            ${(fb&&(fb.audioRef||fb.audioData))?`<div id="inline-audio-${fbKey}" class="mt-2"><span class="text-[9px] text-zinc-600">Loading audio...</span></div><script>(async()=>{const u=await getAudioUrl('${fbKey}');const el=document.getElementById('inline-audio-${fbKey}');if(el&&u)el.innerHTML='<audio controls src="'+u+'" class="h-8 w-full max-w-xs"></audio>';else if(el)el.innerHTML='';})();</script>`:''}
+            ${(fb&&(fb.audioRef||fb.audioData))?`<div id="inline-audio-${fbKey}" class="mt-2" data-audio-key="${fbKey}"><span class="text-[9px] text-zinc-600">Loading audio...</span></div>`:''}
             ${fb&&fb.audioTranscription?`<div class="mt-1 text-[10px] text-zinc-500 italic bg-bg-tertiary rounded px-2 py-1">"${escapeHtml(fb.audioTranscription)}"</div>`:''}
             ${fb&&fb.note?`<div class="mt-2 text-xs text-zinc-500 italic">"${escapeHtml(fb.note)}"</div>`:''}
           </div>`;
@@ -1338,7 +1362,7 @@ function renderToday(){
         <button onclick="openFeedback('${dayFbKey}')" class="text-xs px-3 py-1.5 rounded bg-brand/10 text-brand-light border border-brand/20 hover:bg-brand/20 transition">${dayFb?'View Day Notes':'Write Day Notes'}</button>
         <button onclick="toggleRecording('${dayFbKey}')" class="text-xs px-3 py-1.5 rounded ${Store.state._recording===dayFbKey?'bg-red-500/20 text-red-400 rec-pulse':'bg-red-500/10 text-red-400'} border border-red-500/20 transition">${Store.state._recording===dayFbKey?'Stop Recording':'Record Day Audio'}</button>
       </div>
-      ${(dayFb&&(dayFb.audioRef||dayFb.audioData))?`<div id="inline-audio-${dayFbKey}" class="mt-2"><span class="text-[9px] text-zinc-600">Loading audio...</span></div><script>(async()=>{const u=await getAudioUrl('${dayFbKey}');const el=document.getElementById('inline-audio-${dayFbKey}');if(el&&u)el.innerHTML='<audio controls src="'+u+'" class="h-8 w-full max-w-xs"></audio>';else if(el)el.innerHTML='';})();</script>`:''}
+      ${(dayFb&&(dayFb.audioRef||dayFb.audioData))?`<div id="inline-audio-${dayFbKey}" class="mt-2" data-audio-key="${dayFbKey}"><span class="text-[9px] text-zinc-600">Loading audio...</span></div>`:''}
       ${dayFb&&dayFb.audioTranscription?`<div class="mt-1 text-[10px] text-zinc-500 italic bg-bg-tertiary rounded px-2 py-1">"${escapeHtml(dayFb.audioTranscription)}"</div>`:''}
       ${dayFb&&dayFb.note?`<div class="mt-2 text-xs text-zinc-500 italic">"${escapeHtml(dayFb.note)}"</div>`:''}
     </div>
@@ -1585,7 +1609,7 @@ function renderSession(s,si,dayKey,wkId,ac){
         <button onclick="event.stopPropagation();openFeedback('${fbKey}')" class="text-[10px] px-2.5 py-1 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 transition">${hasNote||hasAudio?'View Feedback':'Add Feedback'}</button>
         <button onclick="event.stopPropagation();toggleRecording('${fbKey}')" class="text-[10px] px-2.5 py-1 rounded ${Store.state._recording===fbKey?'bg-red-500/20 text-red-400 border border-red-500/30 rec-pulse':'bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20'} transition">${Store.state._recording===fbKey?'Stop Recording':'Record Audio'}</button>
       </div>
-      ${hasAudio?`<div id="plan-audio-${fbKey}" class="mt-2 flex items-center gap-2"><span class="text-[9px] text-zinc-600">Loading...</span></div><script>(async()=>{const u=await getAudioUrl('${fbKey}');const el=document.getElementById('plan-audio-${fbKey}');if(el&&u)el.innerHTML='<audio controls src="'+u+'" class="h-8 flex-1" style="max-width:300px"></audio><span class="text-[9px] text-zinc-600">${fb.audioDate||''}</span>';else if(el)el.innerHTML='';})();</script>`:''}
+      ${hasAudio?`<div id="plan-audio-${fbKey}" class="mt-2 flex items-center gap-2" data-audio-key="${fbKey}"><span class="text-[9px] text-zinc-600">Loading...</span></div>`:''}
       ${fb&&fb.audioTranscription?`<div class="mt-1 text-[10px] text-zinc-500 italic bg-bg-tertiary rounded px-2 py-1">"${escapeHtml(fb.audioTranscription)}"</div>`:''}
       ${hasNote?`<div class="mt-2 p-2 rounded text-xs text-zinc-400 italic" style="background:rgba(255,255,255,0.02)">"${escapeHtml(fb.note)}"</div>`:''}
     `:''}
@@ -2662,15 +2686,7 @@ function openFeedback(fbKey){
         <div>
           <label class="block text-xs text-zinc-400 mb-2">Audio Recording</label>
           ${(fb.audioRef||fb.audioData)?`
-            <div id="audio-player-${fbKey}"><div class="text-[10px] text-zinc-500">Loading audio...</div></div>
-            <script>
-              (async()=>{
-                const url=await getAudioUrl('${fbKey}');
-                const el=document.getElementById('audio-player-${fbKey}');
-                if(el&&url) el.innerHTML='<audio controls src="'+url+'" class="w-full h-10 mb-2"></audio>';
-                else if(el) el.innerHTML='<div class="text-[10px] text-red-400">Audio not found</div>';
-              })();
-            </script>
+            <div id="audio-player-${fbKey}" data-audio-key="${fbKey}"><div class="text-[10px] text-zinc-500">Loading audio...</div></div>
             ${fb.audioTranscription?`
               <div class="mb-2 p-2 bg-bg-tertiary rounded border border-bg-border">
                 <label class="text-[10px] text-zinc-500 uppercase tracking-wider">Transcription</label>
@@ -2700,6 +2716,7 @@ function openFeedback(fbKey){
       </div>
     </div>
   </div>`;
+  loadAudioPlayers();
 }
 
 function saveFeedback(fbKey){
