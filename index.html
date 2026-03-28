@@ -182,7 +182,7 @@
       <button onclick="document.getElementById('import-file').click()" class="w-full text-xs text-zinc-500 hover:text-zinc-300 py-1.5 flex items-center gap-2 justify-center">Import Backup</button>
       <input type="file" id="import-file" accept=".json" onchange="importData(event)" class="hidden">
       <button onclick="forceRefresh()" class="w-full text-[10px] text-zinc-600 hover:text-zinc-400 py-1 flex items-center gap-1 justify-center">Clear Cache & Reload</button>
-      <div class="text-[9px] text-zinc-700 text-center">v3.1</div>
+      <div class="text-[9px] text-zinc-700 text-center">v3.2</div>
     </div>
   </aside>
 
@@ -330,7 +330,10 @@ const Transcriber = {
     };
 
     this._recognition.onend = () => {
-      this._isListening = false;
+      // Auto-restart if still supposed to be listening (Chrome stops after ~60s silence)
+      if (this._isListening) {
+        try { this._recognition.start(); } catch (e) { this._isListening = false; }
+      }
     };
 
     try { this._recognition.start(); } catch (e) { console.warn('SR start failed', e); }
@@ -817,6 +820,519 @@ days:[
   };
 }
 
+function generateBrendonPlan(athlete) {
+  const ftp = athlete.ftp || 250;
+  const f = (pct) => Math.round(ftp * pct);
+
+  const weekDates = [
+    "Mar 23–29","Mar 30–Apr 5","Apr 6–12","Apr 13–19","Apr 20–26","Apr 27–May 3",
+    "May 4–10","May 11–17","May 18–24","May 25–31","Jun 1–7","Jun 8–14",
+    "Jun 15–21","Jun 22–28","Jun 29–Jul 5","Jul 6–12","Jul 13–19","Jul 20–26",
+    "Jul 27–Aug 2","Aug 3–9","Aug 10–16","Aug 17–23","Aug 24–30","Aug 31–Sep 6",
+    "Sep 7–13"
+  ];
+
+  const hardWeeks = [
+// W1
+{id:1,label:"W1",name:"Foundation — Base Rebuild + FTP Test",dates:weekDates[0],phase:"foundation",hours:"~12 hrs",
+context:"First week back. FTP test Saturday. All watt targets are placeholders until Saturday's result. Keep everything easy before the test.",
+flags:["FTP TEST: Saturday — mandatory. Avg power x 0.95 = FTP.","Thursday: light intervals only — protect legs for Saturday test","All watt targets (*) recalibrate after Saturday","Strength A: before work. Swim: after work."],
+totals:{swim:8,bike:170,run:28},
+days:[
+  {day:"MON",sessions:[
+    {tag:"strength",label:"Strength A — 40 min (before work)",target:"Goblet Squat 3x10 (light), RDL 3x10 (3s eccentric), Push-Up 3x12, Dead Bug 3x10/side, KB Swing 3x12. 90s rest.",why:"Foundation movement quality. Slow eccentric RDL builds hamstring-glute chain."},
+    {tag:"swim",label:"Swim 2.5 km (after work)",target:"MAIN SET (after 800m WU): 6x200m @ 1:35/100m — 20s rest",why:"Re-establishes water feel below race pace."},
+  ]},
+  {day:"TUE",sessions:[
+    {tag:"bike",label:"Easy Ride 25 km (AM)",target:`Z2 only. ${f(0.56)}–${f(0.75)}W. 45 min. Legs loose before track.`,why:"Pre-track activation."},
+    {tag:"run",label:"Track — Run to Track + Session (PM)",target:"4 km run to track @ 4:40/km (warm-up) | 6x400m @ 3:30/km — 90s rest | 2 km CD",why:"Short sharp reps. First speed work of the block.",trackKey:"w1"},
+  ]},
+  {day:"WED",sessions:[
+    {tag:"strength",label:"Strength A — 40 min (before work)",target:"Same as Monday. Second session in W1 only if you felt good Monday. Otherwise skip.",why:"W1 — keep it to Session A only while you establish the routine."},
+    {tag:"swim",label:"Swim 2.5 km (after work)",target:"MAIN SET (after 800m WU): 6x200m @ 1:30/100m — 20s rest",why:"Slightly faster than Monday. Progressive pace through the week."},
+  ]},
+  {day:"THU",sessions:[
+    {tag:"run",label:"Easy Jog — 7 km (AM before work)",target:"~30 min @ 4:30/km.",why:"Easy aerobic volume."},
+    {tag:"bike",label:"Light Bike Intervals — 50 km (PM)",target:`20 min WU @ ${f(0.58)}W | 4x8 min @ ${f(0.83)}W (83% FTP*) — 3 min Z1 between | 15 min CD. Light only — protecting Saturday.`,why:"Light stimulus only. Won't pre-fatigue your legs for Saturday."},
+  ]},
+  {day:"FRI",sessions:[
+    {tag:"swim",label:"Swim 3 km (after work)",target:"MAIN SET (after 800m WU): 4x400m @ 1:32/100m — 25s rest",why:"Easy Friday swim. Blood flow, not training."},
+    {tag:"mob",label:"Mobility — 15 min (evening)",target:"Friday routine. See Mobility tab.",why:"Thoracic + hip flexor release before FTP test."},
+  ]},
+  {day:"SAT",sessions:[
+    {tag:"test",label:"FTP TEST — ~65 km total",target:"20 min WU building to Z2 | 20-min ALL-OUT effort → avg power x 0.95 = FTP | Easy riding remainder to ~65 km total. Record exact result.",why:"CRITICAL. Recalibrate ALL watt targets from this result."},
+  ]},
+  {day:"SUN",sessions:[
+    {tag:"brick",label:"Brick — Ride 40 km + Run 10 km (EASY)",target:`Ride 40 km @ Z2 (${f(0.56)}–${f(0.75)}W), gel every 25 min | T2 | Run 10 km @ 4:20–4:30/km EASY.`,why:"Foundation brick — fuelling habit + neuromuscular T2 transition."},
+    {tag:"mob",label:"Mobility — 20 min (evening)",target:"Sunday routine. See Mobility tab.",why:"Full recovery after brick."},
+  ]},
+]},
+// W2
+{id:2,label:"W2",name:"Foundation — Build All Disciplines",dates:weekDates[1],phase:"foundation",hours:"~13 hrs",
+context:"All watt targets now use your tested FTP. Bike volume steps up. Strength B introduced Wednesday AM. Long ride grows to 85 km.",
+flags:["Use tested FTP for all bike targets from now on","Strength B: Wednesday AM","Long ride Saturday: nutrition every 25 min"],
+totals:{swim:8,bike:210,run:34},
+days:[
+  {day:"MON",sessions:[
+    {tag:"strength",label:"Strength A — 40 min (before work)",target:"Goblet Squat 3x10 (+5-10% vs W1), RDL 3x10 (slow eccentric), Push-Up 3x12, Dead Bug 3x10/side, KB Swing 3x12.",why:"Progressive load in small steps."},
+    {tag:"swim",label:"Swim 2.5 km (after work)",target:"MAIN SET (after 800m WU): 6x200m @ 1:28/100m — 20s rest",why:"Faster than W1. Small weekly progressions compound toward race pace (1:25)."},
+  ]},
+  {day:"TUE",sessions:[
+    {tag:"bike",label:"Easy Ride 25 km (AM)",target:`Z2. ${f(0.56)}–${f(0.75)}W. 45 min.`,why:"Pre-track activation."},
+    {tag:"run",label:"Track — Run to Track + Session (PM)",target:"4 km to track @ 4:30/km | 5x800m @ 3:25/km — 2 min rest | 2 km CD",why:"800m reps — building sustained speed.",trackKey:"w2"},
+  ]},
+  {day:"WED",sessions:[
+    {tag:"strength",label:"Strength B — 40 min (before work)",target:"Bulgarian Split Squat 3x10/side, Single-Leg RDL 3x10/side, Step-Up weighted 3x10/side, Lat Pulldown 3x10, Copenhagen Plank 3x20s/side, Calf Raise 3x15/side.",why:"Single-leg dominant — most important S&C pattern for triathletes."},
+    {tag:"swim",label:"Swim 3 km (after work)",target:"MAIN SET (after 800m WU): 4x500m @ 1:28/100m — 30s rest",why:"500m blocks — first sustained open-water simulation set."},
+  ]},
+  {day:"THU",sessions:[
+    {tag:"run",label:"Easy Jog — 8 km (AM before work)",target:"~35 min @ 4:25/km.",why:""},
+    {tag:"bike",label:"Bike Intervals — 60 km (PM) ★",target:`20 min WU @ ${f(0.58)}W | 3x12 min @ ${f(0.88)}W (88% FTP) — 4 min Z1 between | 15 min CD. FULL AERO.`,why:"88% FTP = sweetspot. Most efficient zone for raising FTP."},
+  ]},
+  {day:"FRI",sessions:[
+    {tag:"swim",label:"Swim 2.5 km (after work)",target:"MAIN SET (after 800m WU): 5x250m @ 1:30/100m — 20s rest",why:"Friday recovery swim."},
+    {tag:"mob",label:"Mobility — 15 min (evening)",target:"Friday routine. See Mobility tab.",why:""},
+  ]},
+  {day:"SAT",sessions:[
+    {tag:"bike",label:"Long Ride 85 km ★",target:`~2.5 hrs @ Z2 (${f(0.56)}–${f(0.76)}W). Include 2x10 min @ ${f(0.76)}W race effort at km 40 and km 70. NUTRITION: 70g carbs/hr.`,why:"Race-effort blocks late in the ride simulate Nice course hills."},
+  ]},
+  {day:"SUN",sessions:[
+    {tag:"brick",label:"Brick — Ride 50 km + Run 12 km (EASY)",target:`Ride 50 km @ Z2, gel every 20 min | T2 | Run 12 km @ 4:15–4:25/km EASY.`,why:"Foundation brick — unstructured. Run easy, fuel on board."},
+    {tag:"mob",label:"Mobility — 20 min (evening)",target:"Sunday routine. See Mobility tab.",why:""},
+  ]},
+]},
+// W3
+{id:3,label:"W3",name:"Foundation — First 100+ km Ride",dates:weekDates[2],phase:"foundation",hours:"~14 hrs",
+context:"Long ride hits 105 km for the first time. Brick run extends to 15 km with a light challenge at km 12.",
+flags:["Long ride: first time above 100 km — mental milestone","Nutrition every 25 min on the long ride — make it automatic","Brick: still unstructured but challenge km 12–15 to hold effort"],
+totals:{swim:8,bike:240,run:38},
+days:[
+  {day:"MON",sessions:[
+    {tag:"strength",label:"Strength A — 45 min (before work)",target:"Goblet Squat 3x12 (heavier), RDL 3x12 (slow eccentric), Push-Up 3x15 (band/weight), Dead Bug 3x12/side, KB Swing 3x15.",why:"Load steps up. Each week slightly harder."},
+    {tag:"swim",label:"Swim 2.5 km (after work)",target:"MAIN SET (after 800m WU): 3x(4x200m @ 1:27/100m, 15s rest) — 45s between sets",why:"Set structure with partial reset between groups."},
+  ]},
+  {day:"TUE",sessions:[
+    {tag:"bike",label:"Easy Ride 30 km (AM)",target:`Z2. ${f(0.56)}–${f(0.75)}W. 55 min.`,why:""},
+    {tag:"run",label:"Track — Run to Track + Session (PM)",target:"4 km to track @ 4:25/km | 4x1000m @ 3:25/km — 2.5 min rest | 2 km CD",why:"1 km reps — building sustained race-pace fitness.",trackKey:"w3"},
+  ]},
+  {day:"WED",sessions:[
+    {tag:"strength",label:"Strength B — 45 min (before work)",target:"Bulgarian Split Squat 3x10/side (+load), Single-Leg RDL 3x10/side, Step-Up 3x10/side, Lat Pulldown 3x10, Copenhagen Plank 3x20s/side, Calf Raise 3x15/side.",why:"Load increases across all movements."},
+    {tag:"swim",label:"Swim 3 km (after work)",target:"MAIN SET (after 800m WU): 4x500m @ 1:26/100m — 30s rest",why:"Approaching race-pace 500m blocks. 1:26 is just outside race pace."},
+  ]},
+  {day:"THU",sessions:[
+    {tag:"run",label:"Easy Jog — 9 km (AM before work)",target:"~40 min @ 4:25/km.",why:""},
+    {tag:"bike",label:"Bike Intervals — 65 km (PM — hills) ★",target:`20 min WU @ ${f(0.58)}W | 4x10 min @ ${f(0.90)}W (90% FTP) — 4 min Z1 between | 15 min CD. On climbs: surge ${f(0.93)}–${f(0.95)}W. Full aero.`,why:"4 reps at 90% FTP — one more than W2. Hills are critical for Nice prep."},
+  ]},
+  {day:"FRI",sessions:[
+    {tag:"swim",label:"Swim 2.5 km (after work)",target:"MAIN SET (after 800m WU): 4x400m @ 1:28/100m — 25s rest",why:"Friday recovery swim."},
+    {tag:"mob",label:"Mobility — 15 min (evening)",target:"Friday routine. See Mobility tab.",why:""},
+  ]},
+  {day:"SAT",sessions:[
+    {tag:"bike",label:"Long Ride 105 km ★",target:`~3.25 hrs @ Z2. Include 2x15 min @ ${f(0.76)}W race effort at km 40 and km 75. NUTRITION: 75g carbs/hr.`,why:"First 100+ km ride — mental and physical landmark."},
+  ]},
+  {day:"SUN",sessions:[
+    {tag:"brick",label:"Brick — Ride 50 km + Run 15 km",target:`Ride 50 km @ Z2, gel every 20 min | T2 | Run 15 km @ 4:10–4:20/km easy. CHALLENGE: km 12–15 — hold effort, don't back off.`,why:"Light challenge at km 12–15. Building the habit of pushing through."},
+    {tag:"mob",label:"Mobility — 20 min (evening)",target:"Sunday routine. See Mobility tab.",why:""},
+  ]},
+]},
+// W4
+{id:4,label:"W4",name:"Recovery — Foundation Absorption",dates:weekDates[3],phase:"recovery",hours:"~9 hrs",
+context:"Three weeks of foundation load needs consolidation. Volume drops ~25%. Fitness appears during recovery weeks.",
+flags:["Volume: ~25% reduction across all disciplines","One strength session only — Monday","HRV should trend upward by Thursday"],
+totals:{swim:5,bike:165,run:22},
+days:[
+  {day:"MON",sessions:[
+    {tag:"strength",label:"Strength A — 30 min (before work)",target:"Same movements. 80% of W3 load. Quality only.",why:"Maintain pattern without new stress."},
+    {tag:"swim",label:"Swim 2 km (after work)",target:"MAIN SET (after 800m WU): 4x200m @ 1:30/100m — 25s rest",why:"Maintenance volume."},
+  ]},
+  {day:"TUE",sessions:[
+    {tag:"bike",label:"Easy Ride 25 km (AM)",target:"Z2. 45 min.",why:""},
+    {tag:"run",label:"Track — Light Session (PM)",target:"3 km easy to track | 4x400m @ 3:30/km — 2 min rest | 2 km CD",why:"Reduced track volume.",trackKey:"w4"},
+  ]},
+  {day:"WED",sessions:[{tag:"swim",label:"Swim 1.5 km (after work)",target:"MAIN SET (after 800m WU): 3x200m @ 1:30/100m — 25s rest. Easy.",why:"Shorter Wednesday in recovery week."}]},
+  {day:"THU",sessions:[
+    {tag:"run",label:"Easy Jog — 6 km (AM before work)",target:"~27 min @ 4:30/km.",why:""},
+    {tag:"bike",label:"Bike Intervals — 45 km (PM) ★",target:`20 min WU | 2x12 min @ ${f(0.83)}W (83% FTP) — 5 min easy between | 15 min CD.`,why:"Two reps at reduced intensity. Keeps adaptations alive."},
+  ]},
+  {day:"FRI",sessions:[
+    {tag:"swim",label:"Swim 1.5 km (after work)",target:"MAIN SET (after 800m WU): 3x100m @ 1:30/100m — 30s rest. Truly easy.",why:"Recovery week. Shortest swim of the plan."},
+    {tag:"mob",label:"Mobility — 15 min (evening)",target:"Friday routine. See Mobility tab.",why:""},
+  ]},
+  {day:"SAT",sessions:[{tag:"bike",label:"Long Ride 70 km",target:`~2 hrs @ Z2 (${f(0.56)}–${f(0.74)}W). No race efforts. Nutrition practice continues.`,why:"Short long ride. Recovery priority."}]},
+  {day:"SUN",sessions:[
+    {tag:"brick",label:"Brick — Ride 45 km + Run 8 km (EASY)",target:"Ride 45 km Z2, nutrition | T2 | Run 8 km @ 4:20–4:30/km. Note: does this feel better than W3?",why:"Reduced brick. Should feel noticeably better than W3."},
+    {tag:"mob",label:"Mobility — 20 min (evening)",target:"Sunday routine. See Mobility tab.",why:""},
+  ]},
+]},
+// W5
+{id:5,label:"W5",name:"Race Specific — Block 2 Begins",dates:weekDates[4],phase:"specific",hours:"~15 hrs",
+context:"Block 2 starts. Every session has a direct Nice 70.3 context. Brick runs now have three options. Strength A adds Box Jumps.",
+flags:["Brick runs: pick your option Sunday morning based on Saturday legs + HRV","Strength A adds Box Jumps this week — power phase begins","Wednesday swim grows to 3.5 km"],
+totals:{swim:9,bike:255,run:42},
+days:[
+  {day:"MON",sessions:[
+    {tag:"strength",label:"Strength A — Power Phase (before work)",target:"Box Jump 3x6 (NEW), Heavy Goblet Squat 3x10, RDL 3x10 (slow eccentric), Push-Up 3x15 (weighted), Dead Bug 3x12/side, KB Swing 3x15.",why:"Box jumps introduce power. Explosive work activates fast-twitch fibres."},
+    {tag:"swim",label:"Swim 2.5 km (after work)",target:"MAIN SET (after 800m WU): 3x(4x200m @ 1:26/100m, 10s rest) — 45s between sets",why:"10s rest is very tight — forces pace maintenance under fatigue."},
+  ]},
+  {day:"TUE",sessions:[
+    {tag:"bike",label:"Easy Ride 30 km (AM)",target:`Z2. ${f(0.56)}–${f(0.75)}W. 55 min.`,why:""},
+    {tag:"run",label:"Track — Run to Track + Session (PM)",target:"4 km to track @ 4:20/km | 3x1600m @ 3:30/km — 3 min rest | 2 km CD",why:"1600m reps — race-specific sustained speed.",trackKey:"w5"},
+  ]},
+  {day:"WED",sessions:[
+    {tag:"strength",label:"Strength B — Power Phase (before work)",target:"Bulgarian Split Squat 3x8/side (heavier), Single-Leg RDL 3x8/side, Hip Thrust 3x12 (NEW), Ring Row 3x10, Pallof Press 3x10/side, Copenhagen Plank 3x25s/side.",why:"Hip Thrust added — effective for cycling power and run propulsion."},
+    {tag:"swim",label:"Swim 3.5 km (after work) ★",target:"MAIN SET (after 800m WU): 5x500m @ 1:25/100m — 30s rest",why:"1:25/100m is race pace. 5x500m = 2.5 km of race-pace work."},
+  ]},
+  {day:"THU",sessions:[
+    {tag:"run",label:"Easy Jog — 10 km (AM before work)",target:"~44 min @ 4:25/km.",why:""},
+    {tag:"bike",label:"Bike Intervals — 65 km (PM — hills) ★",target:`20 min WU @ ${f(0.58)}W | 3x15 min @ ${f(0.91)}W (91% FTP) — 4 min Z1 between | 15 min CD. On climbs: surge ${f(0.95)}–${f(1.00)}W. Full aero.`,why:"91% FTP for 15 min blocks — genuine threshold work."},
+  ]},
+  {day:"FRI",sessions:[
+    {tag:"swim",label:"Swim 3 km (after work)",target:"MAIN SET (after 800m WU): 4x400m @ 1:26/100m — 25s rest",why:"Recovery swim. Aerobic before big weekend."},
+    {tag:"mob",label:"Mobility — 15 min (evening)",target:"Friday routine. See Mobility tab.",why:""},
+  ]},
+  {day:"SAT",sessions:[{tag:"bike",label:"Long Ride 115 km ★",target:`~3.5 hrs. Z2 base (${f(0.56)}–${f(0.76)}W) + 2x20 min @ ${f(0.76)}W race effort at km 45 and km 85. NUTRITION: 80g carbs/hr.`,why:"First 115 km ride. 20 min race-effort blocks late in the ride."}]},
+  {day:"SUN",sessions:[
+    {tag:"brick",label:"Brick — Ride 55 km + Run 18 km",target:`Ride 55 km @ ${f(0.70)}–${f(0.76)}W, gel every 20 min | T2 | Run 18 km — choose option below`,why:"First structured brick. Pick based on how Saturday felt.",isBrick:true,
+      brickOpts:[
+        {label:"Option A — Race Effort Intervals",intensity:"hard",detail:"Run 18 km: 3 km easy @ 4:20/km | 4x6 min @ HM race effort (3:38–3:42/km) — 3 min easy jog between | easy km home. Gel at min 1, km 6, km 12."},
+        {label:"Option B — Progressive Build",intensity:"moderate",detail:"Run 18 km: 5 km @ 4:15/km | 8 km building every 3 km to 3:55/km | 5 km @ 3:55–4:05/km. Gel at min 1, km 6, km 12."},
+        {label:"Option C — Easy + Surges",intensity:"easy",detail:"Run 18 km: 14 km easy @ 4:15/km | 5x2 min @ race effort (3:38/km) scattered through km 10–16 — 3 min easy between | finish easy. Gel every 5 km."},
+      ]},
+    {tag:"mob",label:"Mobility — 20 min (evening)",target:"Sunday routine. See Mobility tab.",why:""},
+  ]},
+]},
+// W6
+{id:6,label:"W6",name:"Recovery — Mid-Block Reset",dates:weekDates[5],phase:"recovery",hours:"~10 hrs",
+context:"Recovery week mid-block. W7–W9 are three consecutive hard weeks — arriving at W7 fresh is the entire point of this week.",
+flags:["One strength session only — Monday","HRV target: 95+ by Thursday = green light for W7","Sunday brick: Option C only — no exceptions"],
+totals:{swim:6,bike:175,run:26},
+days:[
+  {day:"MON",sessions:[
+    {tag:"strength",label:"Strength A — 30 min (before work)",target:"80% of W5 loads. Box Jump 3x5 (light). Same movements.",why:"One session this week. Maintain pattern."},
+    {tag:"swim",label:"Swim 2 km (after work)",target:"MAIN SET (after 800m WU): 4x300m @ 1:30/100m — 25s rest",why:""},
+  ]},
+  {day:"TUE",sessions:[
+    {tag:"bike",label:"Easy Ride 25 km (AM)",target:"Z2. 45 min.",why:""},
+    {tag:"run",label:"Track — Light Session (PM)",target:"3 km easy to track | 4x400m @ 3:30/km — 2 min rest | 2 km CD",why:"",trackKey:"w6"},
+  ]},
+  {day:"WED",sessions:[{tag:"swim",label:"Swim 2 km (after work)",target:"MAIN SET (after 800m WU): 4x300m @ 1:30/100m — 25s rest. Easy.",why:"Maintenance swim. Recovery week."}]},
+  {day:"THU",sessions:[
+    {tag:"run",label:"Easy Jog — 7 km (AM before work)",target:"~31 min @ 4:30/km.",why:""},
+    {tag:"bike",label:"Bike Intervals — 48 km (PM)",target:`20 min WU | 2x12 min @ ${f(0.84)}W — 5 min between | 15 min CD.`,why:"Half the reps of W5. Remind the body of the threshold stimulus."},
+  ]},
+  {day:"FRI",sessions:[
+    {tag:"swim",label:"Swim 2 km (after work)",target:"MAIN SET (after 800m WU): 3x200m @ 1:32/100m — 30s rest. Easy.",why:""},
+    {tag:"mob",label:"Mobility — 15 min (evening)",target:"Friday routine. See Mobility tab.",why:""},
+  ]},
+  {day:"SAT",sessions:[{tag:"bike",label:"Long Ride 68 km",target:"~2 hrs @ Z2. No race efforts. Just ride and recover.",why:"Short long ride. Recovery priority."}]},
+  {day:"SUN",sessions:[
+    {tag:"brick",label:"Brick — Ride 40 km + Run 12 km (EASY)",target:"Ride 40 km Z2, nutrition | T2 | Run 12 km — Option C only this week",why:"Recovery week brick — Option C only. No exceptions.",isBrick:true,
+      brickOpts:[{label:"Option C only — Easy + Light Surges",intensity:"easy",detail:"Run 12 km: 9 km easy @ 4:15–4:25/km | 3x2 min @ 3:45/km at km 8–11 — 2 min easy between. Gel at min 1, every 5 km."}]},
+    {tag:"mob",label:"Mobility — 20 min (evening)",target:"Sunday routine. See Mobility tab.",why:""},
+  ]},
+]},
+// W7
+{id:7,label:"W7",name:"Race Specific — Peak Block Week 1 of 3",dates:weekDates[6],phase:"specific",hours:"~16 hrs",
+context:"First of three consecutive hard weeks. No recovery week until taper. Eat more and sleep 8+ hrs every night.",
+flags:["THREE consecutive hard weeks: W7, W8, W9 — no recovery between","Eat above maintenance","Sleep 8+ hrs every night — this is training","HRV below 78 = downgrade that session to Z2"],
+totals:{swim:9,bike:275,run:46},
+days:[
+  {day:"MON",sessions:[
+    {tag:"strength",label:"Strength A — 45 min (before work)",target:"Box Jump 3x6, KB or Trap Bar Deadlift 3x8 (heavier than KB Swing), Goblet Squat 3x10, Push-Up 3x15, Dead Bug 3x12/side.",why:"Deadlift replaces swing — greater posterior chain load."},
+    {tag:"swim",label:"Swim 2.5 km (after work)",target:"MAIN SET (after 800m WU): 3x(6x100m @ 1:25/100m, 10s rest) — 45s between sets",why:"Short reps at race pace with 10s rest."},
+  ]},
+  {day:"TUE",sessions:[
+    {tag:"bike",label:"Easy Ride 30 km (AM)",target:`Z2. ${f(0.56)}–${f(0.75)}W. 55 min.`,why:""},
+    {tag:"run",label:"Track — Run to Track + Session (PM)",target:"4 km to track @ 4:15/km | 5x1000m @ 3:28/km — 2.5 min rest | 2 km CD",why:"",trackKey:"w7"},
+  ]},
+  {day:"WED",sessions:[
+    {tag:"strength",label:"Strength B — 45 min (before work)",target:"Bulgarian Split Squat heavy 3x8/side, Hip Thrust heavy 3x10, Ring Row 3x10, Pallof Press 3x10/side, Copenhagen Plank 3x25s/side.",why:"All loads heavier than W5. Progressive overload continues."},
+    {tag:"swim",label:"Swim 3.5 km (after work) ★",target:"MAIN SET (after 800m WU): 4x600m @ 1:25/100m — 35s rest",why:"600m blocks at race pace — each rep ~8.5 min. 2.4 km of race-pace work."},
+  ]},
+  {day:"THU",sessions:[
+    {tag:"run",label:"Easy Jog — 10 km (AM before work)",target:"~44 min @ 4:25/km.",why:""},
+    {tag:"bike",label:"Bike Intervals — 68 km (PM — hills) ★",target:`20 min WU @ ${f(0.58)}W | 2x25 min @ ${f(0.90)}W (90% FTP) — 5 min Z1 between | 15 min CD. On climbs: ${f(0.95)}W. Full aero.`,why:"25 min threshold blocks — the longest sustained intervals so far."},
+  ]},
+  {day:"FRI",sessions:[
+    {tag:"swim",label:"Swim 3 km (after work)",target:"MAIN SET (after 800m WU): 4x400m @ 1:26/100m — 20s rest",why:"Recovery swim. Controlled before the biggest weekend so far."},
+    {tag:"mob",label:"Mobility — 15 min (evening)",target:"Friday routine. See Mobility tab.",why:""},
+  ]},
+  {day:"SAT",sessions:[{tag:"bike",label:"Long Ride 130 km ★",target:`~4 hrs. Z2 base + 3x15 min @ ${f(0.76)}W race effort at km 35, km 75, km 110. NUTRITION: 80–90g carbs/hr.`,why:"130 km is your new longest ride. Three race-effort blocks spread progressively."}]},
+  {day:"SUN",sessions:[
+    {tag:"brick",label:"Brick — Ride 55 km + Run 22 km",target:`Ride 55 km @ ${f(0.70)}–${f(0.76)}W, full nutrition every 20 min | T2 | Run 22 km — choose option below`,why:"First big brick of the 3-week hard block.",isBrick:true,
+      brickOpts:[
+        {label:"Option A — Race Effort Intervals",intensity:"hard",detail:"Run 22 km: 3 km easy | 5x8 min @ HM race effort (3:38–3:42/km) — 3 min easy jog between | easy km to finish. Gel at min 1, km 7, km 14, km 20."},
+        {label:"Option B — Progressive Negative Split",intensity:"moderate",detail:"Run 22 km: 7 km @ 4:10/km | 8 km building to 3:50/km | 7 km @ 3:45–3:55/km. Gel at min 1, km 7, km 14, km 20."},
+        {label:"Option C — Easy + Race Surges",intensity:"easy",detail:"Run 22 km: 17 km easy @ 4:10/km | 4x3 min @ race effort (3:38/km) at km 12, 14, 16, 18 — 2 min easy between | easy finish. Gel every 5 km."},
+      ]},
+    {tag:"mob",label:"Mobility — 20 min (evening)",target:"Sunday routine. See Mobility tab.",why:""},
+  ]},
+]},
+// W8
+{id:8,label:"W8",name:"PEAK WEEK — Maximum Load",dates:weekDates[7],phase:"specific",hours:"~18 hrs",
+context:"Hardest week of the plan. 50 km run, 310 km bike, 9 km swim. 8+ hrs sleep every night. Eat above maintenance.",
+flags:["50 km run — new territory. 4:25/km on ALL easy sessions","8+ hrs sleep every night — this is literally training","Eat more than feels necessary this week","HRV below 75 = downgrade that hard session to Z2"],
+totals:{swim:9,bike:310,run:50},
+days:[
+  {day:"MON",sessions:[
+    {tag:"strength",label:"Strength A — PEAK LOAD (before work)",target:"Box Jump 3x6, Trap Bar Deadlift 3x6 (heaviest of plan), Goblet Squat 3x10, Push-Up 3x15 (weighted), Dead Bug 3x12/side.",why:"Peak S&C session. After this week, loads start dropping toward taper."},
+    {tag:"swim",label:"Swim 2.5 km (after work)",target:"MAIN SET (after 800m WU): 10x100m @ 1:25/100m — 15s rest. RACE PACE.",why:"Short reps at exact race pace with minimal rest."},
+  ]},
+  {day:"TUE",sessions:[
+    {tag:"bike",label:"Easy Ride 30 km (AM)",target:`Z2. ${f(0.56)}–${f(0.75)}W. 55 min.`,why:""},
+    {tag:"run",label:"Track — Run to Track + Session (PM)",target:"4 km to track @ 4:15/km | 4x1200m @ 3:25/km — 3 min rest | 2 km CD",why:"",trackKey:"w8"},
+  ]},
+  {day:"WED",sessions:[
+    {tag:"strength",label:"Strength B — PEAK LOAD (before work)",target:"All movements at peak loads. Quality first — if form breaks, reduce weight.",why:"Last full-load Strength B."},
+    {tag:"swim",label:"Swim 3.5 km (after work) ★ PEAK SWIM SESSION",target:"MAIN SET (after 800m WU): 5x500m @ 1:25/100m — 25s rest. RACE PACE.",why:"5x500m at race pace — 2.5 km of race-pace work. Hardest swim session of the plan."},
+  ]},
+  {day:"THU",sessions:[
+    {tag:"run",label:"Easy Jog — 13 km (AM before work)",target:"~57 min @ 4:25/km. Extended — this is how we hit 50 km run week.",why:"Longer Thursday jog is deliberate peak-week volume."},
+    {tag:"bike",label:"Bike Intervals — 70 km (PM — hills) ★ HARDEST BIKE SESSION",target:`20 min WU @ ${f(0.58)}W | 3x20 min @ ${f(0.92)}W (92% FTP) — 4 min Z1 between | 15 min CD. Full aero. Hills. No sitting up.`,why:"3x20 min at 92% FTP is the peak bike stimulus. Simulates Nice Col de Vence demands."},
+  ]},
+  {day:"FRI",sessions:[
+    {tag:"swim",label:"Swim 3 km (after work)",target:"MAIN SET (after 800m WU): 4x400m @ 1:25/100m — 20s rest. Race pace.",why:"Final race-pace Friday swim before tapering."},
+    {tag:"mob",label:"Mobility — 15 min (evening)",target:"Friday routine. See Mobility tab.",why:""},
+  ]},
+  {day:"SAT",sessions:[{tag:"bike",label:"Long Ride 150 km ★",target:`~4.75 hrs. Full race simulation. 3x20 min @ ${f(0.76)}W race effort. NUTRITION: 80–90g carbs/hr. Are you averaging race effort during blocks?`,why:"150 km — longest ride of the plan. Mental and physical toughness built here is irreplaceable."}]},
+  {day:"SUN",sessions:[
+    {tag:"brick",label:"Brick — Ride 60 km + Run 24 km",target:`Ride 60 km @ ${f(0.70)}–${f(0.77)}W, PERFECT nutrition every 20 min | T2 | Run 24 km — choose option below`,why:"Peak week brick. 24 km is the longest run of the plan.",isBrick:true,
+      brickOpts:[
+        {label:"Option A — Race Simulation Intervals",intensity:"hard",detail:"Run 24 km: 4 km easy | 5x10 min @ HM race effort (3:38–3:42/km) — 3 min easy jog between | easy km home. Gel at min 1, km 7, km 14, km 21. THIS is your proof-of-fitness session."},
+        {label:"Option B — Negative Split + Race Effort Finish",intensity:"moderate",detail:"Run 24 km: 8 km @ 4:10/km | 9 km building to 3:50/km | 7 km @ 3:40–3:50/km. Gel every 5 km."},
+        {label:"Option C — Long Easy + Late Surges",intensity:"easy",detail:"Run 24 km: 19 km easy @ 4:10/km | 3x3 min @ race effort at km 17, 19, 21 — 2 min easy between | finish easy. Pick if 150 km Saturday was brutal."},
+      ]},
+    {tag:"mob",label:"Mobility — 20 min (evening)",target:"Sunday routine. See Mobility tab.",why:""},
+  ]},
+]},
+// W9
+{id:9,label:"W9",name:"Sharpening — Final Race-Specific Block",dates:weekDates[8],phase:"sharpening",hours:"~16 hrs",
+context:"Third consecutive hard week — slightly lower volume than W8 but sharper. Quality over quantity. Strength ends this week.",
+flags:["Last full strength session Monday AM","Track: fastest session of the plan","Final race simulation Sunday","W10 will be 30% less than this week's volume"],
+totals:{swim:9,bike:280,run:46},
+days:[
+  {day:"MON",sessions:[
+    {tag:"strength",label:"Strength A — FINAL FULL SESSION (before work)",target:"40 min. Box Jump 3x5, KB Deadlift 3x8 (moderate), Goblet Squat 3x10, Push-Up 3x15, Dead Bug 3x12/side.",why:"Last full strength session. Weeks of S&C adaptation is built in."},
+    {tag:"swim",label:"Swim 2.5 km (after work)",target:"MAIN SET (after 800m WU): 8x200m @ 1:25/100m — 15s rest. RACE PACE.",why:"Race pace across 8 reps. Final benchmark."},
+  ]},
+  {day:"TUE",sessions:[
+    {tag:"bike",label:"Easy Ride 30 km (AM)",target:`Z2. ${f(0.56)}–${f(0.75)}W. 55 min.`,why:""},
+    {tag:"run",label:"Track — SHARPEST SESSION OF THE PLAN (PM)",target:"4 km to track @ 4:10/km | 6x800m @ 3:22/km — 2 min rest | 2 km CD",why:"",trackKey:"w9"},
+  ]},
+  {day:"WED",sessions:[
+    {tag:"strength",label:"Strength B — FINAL SESSION (before work)",target:"All movements at moderate-heavy loads (85% of peak). Quality over weight.",why:"Last Strength B. After this session, S&C work stops."},
+    {tag:"swim",label:"Swim 3.5 km (after work) ★",target:"MAIN SET (after 800m WU): 8x300m @ 1:25/100m — 20s rest",why:"Race pace sustained across 300m blocks."},
+  ]},
+  {day:"THU",sessions:[
+    {tag:"run",label:"Easy Jog — 12 km (AM before work)",target:"~53 min @ 4:25/km.",why:""},
+    {tag:"bike",label:"Bike Intervals — 68 km (PM — hills) ★",target:`20 min WU | 3x15 min @ ${f(0.92)}W (92% FTP) — 4 min Z1 between | 15 min CD. Full aero.`,why:"Same intensity as W8 but shorter reps — sharper, not bigger. Confidence session."},
+  ]},
+  {day:"FRI",sessions:[
+    {tag:"swim",label:"Swim 3 km (after work)",target:"MAIN SET (after 800m WU): 4x400m @ 1:25/100m — 20s rest. Race pace.",why:"Final Friday race-pace swim."},
+    {tag:"mob",label:"Mobility — 15 min (evening)",target:"Friday routine. See Mobility tab.",why:""},
+  ]},
+  {day:"SAT",sessions:[{tag:"bike",label:"Long Ride 130 km ★",target:`~4 hrs. Z2 base + 2x20 min @ ${f(0.76)}W race effort. Final long ride of the block.`,why:"You've ridden 150 km. 130 km should feel controlled and familiar."}]},
+  {day:"SUN",sessions:[
+    {tag:"brick",label:"Brick — Ride 55 km + Run 20 km",target:`Ride 55 km @ ${f(0.70)}–${f(0.77)}W, PERFECT nutrition | T2 | Run 20 km — choose option below`,why:"Final dress rehearsal. Execute flawlessly.",isBrick:true,
+      brickOpts:[
+        {label:"Option A — Race Execution Rehearsal",intensity:"hard",detail:"Run 20 km: 3 km easy | 4x10 min @ race pace (3:38–3:42/km) — 3 min easy jog between | easy km finish. Gel at min 1, km 7, km 14, km 18. Execute perfectly."},
+        {label:"Option B — Negative Split Dress Rehearsal",intensity:"moderate",detail:"Run 20 km: start @ 4:10/km, build to 3:45–3:55/km over the final 8 km. Gel every 5 km."},
+        {label:"Option C — Easy + Race Surges",intensity:"easy",detail:"Run 20 km: 15 km easy @ 4:10/km | 4x3 min @ race effort at km 12, 14, 16, 18 — 2 min easy between | easy finish. Pick if three hard weeks accumulated more than expected."},
+      ]},
+    {tag:"mob",label:"Mobility — 20 min (evening)",target:"Sunday routine. See Mobility tab.",why:""},
+  ]},
+]},
+// W10
+{id:10,label:"W10",name:"Volume Reduction — 30% Less Than W9",dates:weekDates[9],phase:"taper",hours:"~11 hrs",
+context:"30% volume reduction from W9. Not a traditional taper — intensity stays sharp.",
+flags:["30% less volume — sessions are shorter, not easier","Intensity stays sharp","Final light strength Monday — activation only"],
+totals:{swim:6,bike:195,run:32},
+days:[
+  {day:"MON",sessions:[
+    {tag:"strength",label:"Strength A — FINAL SESSION (before work)",target:"30 min. 50–60% of peak loads. Same movements. Activate only.",why:"Last S&C. Light loads keep neuromuscular system primed."},
+    {tag:"swim",label:"Swim 2 km (after work)",target:"MAIN SET (after 800m WU): 5x200m @ 1:25/100m — 20s rest. Short and sharp.",why:""},
+  ]},
+  {day:"TUE",sessions:[
+    {tag:"bike",label:"Easy Ride 25 km (AM)",target:"Z2. 45 min.",why:""},
+    {tag:"run",label:"Track — Final Track Session (PM)",target:"3 km easy to track | 4x800m @ 3:25/km — 2 min rest | 2 km CD",why:"",trackKey:"w10"},
+  ]},
+  {day:"WED",sessions:[{tag:"swim",label:"Swim 2 km (after work)",target:"MAIN SET (after 800m WU): 4x300m @ 1:25/100m — 20s rest. Feel fast, don't work for it.",why:"Race pace without effort. The taper working."}]},
+  {day:"THU",sessions:[
+    {tag:"run",label:"Easy Jog — 10 km (AM before work)",target:"~44 min @ 4:25/km.",why:""},
+    {tag:"bike",label:"Bike Sharpener — 50 km (PM) ★",target:`20 min WU | 3x12 min @ ${f(0.91)}W — 3 min easy between | 15 min CD. Sharp and done.`,why:"Last bike interval session. Feel powerful and fast throughout."},
+  ]},
+  {day:"FRI",sessions:[
+    {tag:"swim",label:"Swim 2 km (after work)",target:"MAIN SET (after 800m WU): 3x200m @ 1:26/100m — 25s rest. Easy.",why:""},
+    {tag:"mob",label:"Mobility — 15 min (evening)",target:"Friday routine. See Mobility tab.",why:""},
+  ]},
+  {day:"SAT",sessions:[{tag:"bike",label:"Ride 85 km",target:`~2.5 hrs @ Z2 with 2x10 min @ ${f(0.76)}W race effort. Final nutrition rehearsal.`,why:"Final long-ish ride. Nutrition rehearsal."}]},
+  {day:"SUN",sessions:[
+    {tag:"brick",label:"Brick — Ride 45 km + Run 12 km",target:`Ride 45 km @ ${f(0.70)}–${f(0.76)}W race effort | T2 | Run 12 km — choose option below`,why:"Final dress rehearsal before moving into sustained training.",isBrick:true,
+      brickOpts:[
+        {label:"Option A — Race Pace Sharpener",intensity:"hard",detail:"Run 12 km: 3 km easy | 3x8 min @ race pace (3:38/km) — 3 min easy between | easy km finish."},
+        {label:"Option B — Easy + Race Effort Strides",intensity:"moderate",detail:"Run 12 km: 9 km easy @ 4:10/km | 5x1 min @ race effort — 2 min easy between | easy finish."},
+        {label:"Option C — Easy Only",intensity:"easy",detail:"Run 12 km easy @ 4:15/km. Gel every 5 km. If legs are flat — trust the process."},
+      ]},
+    {tag:"mob",label:"Mobility — 20 min (evening)",target:"Sunday routine. Final structured mobility session of Block 2.",why:""},
+  ]},
+]},
+// W11
+{id:11,label:"W11",name:"Specific — Sustained Build",dates:weekDates[10],phase:"specific",hours:"~15 hrs",
+context:"Back to building. Sustained specific work with Nice course demands in mind. Volume rebuilds progressively.",
+flags:["Volume rebuilds after taper absorption","All sessions race-specific from here","Nice course = hills + heat — train accordingly"],
+totals:{swim:8,bike:260,run:42},
+days:[
+  {day:"MON",sessions:[
+    {tag:"strength",label:"Strength A — Maintenance (before work)",target:"30 min. Box Jump 3x5, Goblet Squat 3x8, RDL 3x8, Push-Up 3x12, Dead Bug 3x10/side.",why:"Maintenance strength. Enough to retain, not enough to fatigue."},
+    {tag:"swim",label:"Swim 2.5 km (after work)",target:"MAIN SET (after 800m WU): 6x200m @ 1:25/100m — 15s rest. RACE PACE.",why:"Race pace. Build consistency."},
+  ]},
+  {day:"TUE",sessions:[
+    {tag:"bike",label:"Easy Ride 30 km (AM)",target:`Z2. ${f(0.56)}–${f(0.75)}W. 55 min.`,why:""},
+    {tag:"run",label:"Track — Sustained Speed Session (PM)",target:"4 km to track @ 4:15/km | 3x1600m @ 3:28/km — 3 min rest | 2 km CD",why:"Sustained race-pace reps.",trackKey:"w11"},
+  ]},
+  {day:"WED",sessions:[
+    {tag:"swim",label:"Swim 3 km (after work) ★",target:"MAIN SET (after 800m WU): 3x800m @ 1:25/100m — 40s rest",why:"800m blocks at race pace. Open water simulation."},
+  ]},
+  {day:"THU",sessions:[
+    {tag:"run",label:"Easy Jog — 10 km (AM before work)",target:"~44 min @ 4:25/km.",why:""},
+    {tag:"bike",label:"Bike Intervals — 65 km (PM — hills) ★",target:`20 min WU | 3x15 min @ ${f(0.91)}W — 4 min Z1 between | 15 min CD. Hills. Full aero.`,why:"Race-specific threshold work. Nice demands climbing power."},
+  ]},
+  {day:"FRI",sessions:[
+    {tag:"swim",label:"Swim 2.5 km (after work)",target:"MAIN SET (after 800m WU): 4x300m @ 1:26/100m — 20s rest.",why:"Recovery swim."},
+    {tag:"mob",label:"Mobility — 15 min (evening)",target:"Friday routine. See Mobility tab.",why:""},
+  ]},
+  {day:"SAT",sessions:[{tag:"bike",label:"Long Ride 120 km ★",target:`~3.75 hrs. Z2 + 2x20 min @ ${f(0.76)}W race effort. NUTRITION: 80g carbs/hr.`,why:"Sustained long ride. Building back after taper."}]},
+  {day:"SUN",sessions:[
+    {tag:"brick",label:"Brick — Ride 55 km + Run 18 km",target:`Ride 55 km @ ${f(0.70)}–${f(0.76)}W, gel every 20 min | T2 | Run 18 km — choose option below`,why:"Race-specific brick.",isBrick:true,
+      brickOpts:[
+        {label:"Option A — Race Effort Intervals",intensity:"hard",detail:"Run 18 km: 3 km easy | 4x8 min @ 3:38–3:42/km — 3 min jog between | easy finish. Gel at min 1, km 6, km 12."},
+        {label:"Option B — Progressive Build",intensity:"moderate",detail:"Run 18 km: 6 km @ 4:10/km | 8 km building to 3:50/km | 4 km @ 3:50/km. Gel every 5 km."},
+        {label:"Option C — Easy + Surges",intensity:"easy",detail:"Run 18 km: 14 km easy @ 4:10/km | 4x2 min @ race effort — easy between | finish easy. Gel every 5 km."},
+      ]},
+    {tag:"mob",label:"Mobility — 20 min (evening)",target:"Sunday routine. See Mobility tab.",why:""},
+  ]},
+]},
+// W12
+{id:12,label:"W12",name:"Recovery — Mid-Plan Reset",dates:weekDates[11],phase:"recovery",hours:"~9 hrs",
+context:"Mid-plan recovery. The next 12 weeks will be auto-generated with progressive overload toward race day.",
+flags:["Volume: ~25% reduction","One strength session only","Absorb the first 11 weeks before the final push"],
+totals:{swim:5,bike:170,run:24},
+days:[
+  {day:"MON",sessions:[
+    {tag:"strength",label:"Strength A — 30 min (before work)",target:"Same movements. 75% of peak load. Quality only.",why:"Maintain pattern without new stress."},
+    {tag:"swim",label:"Swim 2 km (after work)",target:"MAIN SET (after 800m WU): 4x200m @ 1:28/100m — 25s rest",why:"Maintenance volume."},
+  ]},
+  {day:"TUE",sessions:[
+    {tag:"bike",label:"Easy Ride 25 km (AM)",target:"Z2. 45 min.",why:""},
+    {tag:"run",label:"Easy Run + Strides — 7 km (PM)",target:"6 km easy @ 4:20/km + 4x30s strides.",why:"Light neuromuscular stimulus.",trackKey:"w12"},
+  ]},
+  {day:"WED",sessions:[{tag:"swim",label:"Swim 1.5 km (after work)",target:"MAIN SET (after 800m WU): 3x200m @ 1:30/100m — 25s rest. Easy.",why:"Short recovery swim."}]},
+  {day:"THU",sessions:[
+    {tag:"run",label:"Easy Jog — 6 km (AM before work)",target:"~27 min @ 4:30/km.",why:""},
+    {tag:"bike",label:"Bike Intervals — 45 km (PM)",target:`20 min WU | 2x10 min @ ${f(0.85)}W — 5 min between | 15 min CD.`,why:"Reduced intensity. Keep the engine ticking."},
+  ]},
+  {day:"FRI",sessions:[
+    {tag:"swim",label:"Swim 1.5 km (after work)",target:"MAIN SET (after 800m WU): 3x100m @ 1:30/100m — 30s rest.",why:"Easy. Recovery week."},
+    {tag:"mob",label:"Mobility — 15 min (evening)",target:"Friday routine. See Mobility tab.",why:""},
+  ]},
+  {day:"SAT",sessions:[{tag:"bike",label:"Long Ride 70 km",target:`~2 hrs @ Z2 (${f(0.56)}–${f(0.74)}W). No race efforts.`,why:"Short long ride. Recovery priority."}]},
+  {day:"SUN",sessions:[
+    {tag:"brick",label:"Brick — Ride 40 km + Run 8 km (EASY)",target:"Ride 40 km Z2 | T2 | Run 8 km @ 4:20–4:30/km. Easy.",why:"Reduced brick. Absorb the block."},
+    {tag:"mob",label:"Mobility — 20 min (evening)",target:"Sunday routine. See Mobility tab.",why:""},
+  ]},
+]},
+  ];
+
+  // Auto-generate W13–W24
+  const autoWeeks = [];
+  for (let i = 0; i < 12; i++) {
+    const wNum = i + 13;
+    const phase = wNum <= 18 ? "specific" : wNum <= 22 ? "sharpening" : "taper";
+    const isRecovery = (wNum === 16 || wNum === 20);
+    const volMult = isRecovery ? 0.7 : (wNum >= 23 ? 0.6 : (wNum >= 21 ? 0.8 : 1.0));
+    const swimKm = Math.round((8 + (wNum <= 18 ? (wNum - 13) * 0.3 : 7 - (wNum - 19) * 0.8)) * volMult);
+    const bikeKm = Math.round((260 + (wNum <= 18 ? (wNum - 13) * 10 : 300 - (wNum - 19) * 25)) * volMult);
+    const runKm = Math.round((40 + (wNum <= 18 ? (wNum - 13) * 2 : 48 - (wNum - 19) * 5)) * volMult);
+    const hrs = isRecovery ? "~9 hrs" : (wNum >= 23 ? "~8 hrs" : (wNum >= 21 ? "~12 hrs" : "~15 hrs"));
+    const phaseName = isRecovery ? "Recovery" : phase.charAt(0).toUpperCase() + phase.slice(1);
+    const weekName = isRecovery ? `Recovery — Absorption` :
+      wNum <= 18 ? `${phaseName} — Progressive Build W${wNum}` :
+      wNum <= 22 ? `${phaseName} — Race Sharpening` :
+      `${phaseName} — Volume Reduction`;
+    const bikeIntPct = wNum >= 21 ? 0.90 : (wNum >= 17 ? 0.92 : 0.90);
+    const swimPace = wNum >= 19 ? "1:25" : "1:26";
+    const runPace = wNum >= 19 ? "3:35–3:40" : "3:38–3:42";
+
+    autoWeeks.push({
+      id: wNum, label: "W" + wNum, name: weekName, dates: weekDates[wNum - 1], phase: isRecovery ? "recovery" : phase,
+      hours: hrs,
+      context: isRecovery ? "Recovery week. Absorb the training. Volume drops 30%." :
+        wNum <= 18 ? "Progressive build toward race-specific fitness. Every session targets Nice 70.3 demands." :
+        wNum <= 22 ? "Sharpening phase. Intensity stays high, volume decreases. Quality over quantity." :
+        "Taper. Trust the process. Sessions are short and sharp.",
+      flags: isRecovery ? ["30% volume reduction","One strength session only","HRV should trend upward by Thursday"] :
+        wNum >= 23 ? ["Volume reducing toward race","Keep intensity sharp but brief","Sleep 8+ hrs"] :
+        ["All sessions race-specific","Eat above maintenance on hard days","HRV below 78 = downgrade to Z2"],
+      totals: {swim: swimKm, bike: bikeKm, run: runKm},
+      days: [
+        {day:"MON",sessions:[
+          ...(wNum <= 20 ? [{tag:"strength",label:"Strength — Maintenance (before work)",target:"30 min. Light loads. Maintain pattern.",why:""}] : []),
+          {tag:"swim",label:`Swim ${isRecovery ? 1.5 : 2.5} km (after work)`,target:`MAIN SET (after 800m WU): ${isRecovery ? '3x200m' : '6x200m'} @ ${swimPace}/100m — ${isRecovery ? '25' : '15'}s rest.`,why:""},
+        ]},
+        {day:"TUE",sessions:[
+          {tag:"bike",label:`Easy Ride ${isRecovery ? 20 : 25} km (AM)`,target:`Z2. ${f(0.56)}–${f(0.75)}W.`,why:""},
+          {tag:"run",label:`Track — ${isRecovery ? 'Light' : 'Race-Specific'} Session (PM)`,target:`3 km to track | ${isRecovery ? '4x400m @ 3:35/km — 2 min rest' : '4x1000m @ 3:28/km — 2.5 min rest'} | 2 km CD`,why:"",trackKey:"w"+wNum},
+        ]},
+        {day:"WED",sessions:[{tag:"swim",label:`Swim ${isRecovery ? 1.5 : 3} km (after work)`,target:`MAIN SET (after 800m WU): ${isRecovery ? '3x200m' : '4x500m'} @ ${swimPace}/100m — ${isRecovery ? '25' : '25'}s rest.`,why:""}]},
+        {day:"THU",sessions:[
+          {tag:"run",label:`Easy Jog — ${isRecovery ? 6 : Math.min(12, 8 + wNum - 13)} km (AM)`,target:`~${isRecovery ? 27 : Math.round((8 + wNum - 13) * 4.4)} min @ 4:25/km.`,why:""},
+          {tag:"bike",label:`Bike Intervals — ${isRecovery ? 40 : Math.min(70, 55 + wNum - 13)} km (PM) ★`,target:`20 min WU | ${isRecovery ? '2x10 min' : '3x15 min'} @ ${f(bikeIntPct)}W — ${isRecovery ? '5' : '4'} min between | 15 min CD.`,why:""},
+        ]},
+        {day:"FRI",sessions:[
+          {tag:"swim",label:`Swim ${isRecovery ? 1.5 : 2.5} km (after work)`,target:`MAIN SET: ${isRecovery ? '3x100m' : '4x300m'} @ ${swimPace}/100m — 25s rest.`,why:""},
+          {tag:"mob",label:"Mobility — 15 min (evening)",target:"Friday routine. See Mobility tab.",why:""},
+        ]},
+        {day:"SAT",sessions:[{tag:"bike",label:`Long Ride ${isRecovery ? 65 : Math.min(140, bikeKm * 0.45)} km`,target:`Z2${isRecovery ? '' : ` + 2x${wNum >= 21 ? 10 : 15} min @ ${f(0.76)}W race effort`}. NUTRITION: 80g carbs/hr.`,why:""}]},
+        {day:"SUN",sessions:[
+          {tag:"brick",label:`Brick — Ride ${isRecovery ? 35 : Math.min(60, 45 + (wNum - 13) * 2)} km + Run ${isRecovery ? 8 : Math.min(22, runKm * 0.45)} km`,
+            target:`Ride @ ${f(0.70)}–${f(0.76)}W, gel every 20 min | T2 | Run — ${isRecovery ? 'easy' : 'choose option below'}`,
+            why:"",isBrick:!isRecovery,
+            ...(isRecovery ? {} : {brickOpts:[
+              {label:"Option A — Race Effort Intervals",intensity:"hard",detail:`Run: 3 km easy | 4x8 min @ ${runPace}/km — 3 min jog between | easy finish.`},
+              {label:"Option B — Progressive Build",intensity:"moderate",detail:`Run: first half @ 4:10/km, build to ${runPace}/km in second half.`},
+              {label:"Option C — Easy + Surges",intensity:"easy",detail:`Run easy @ 4:10/km with 4x2 min @ race effort in final third.`},
+            ]})},
+          {tag:"mob",label:"Mobility — 20 min (evening)",target:"Sunday routine. See Mobility tab.",why:""},
+        ]},
+      ]
+    });
+  }
+
+  // W25 — Race Week
+  const raceWeek = {
+    id:25, label:"W25", name:"Race Week — Nice 70.3 World Championships", dates:weekDates[24], phase:"raceweek", hours:"~5 hrs",
+    context:"Nothing new. Nothing heroic. Sleep is training. Food is training. The work is done.",
+    flags:["HRV above 95 by Wednesday = green light. You're primed.","No new foods, new gear, new decisions this week","Visualise the Nice run course daily"],
+    totals:{swim:3,bike:70,run:8},
+    days:[
+      {day:"MON",sessions:[{tag:"swim",label:"Easy Swim 1.5 km (PM)",target:"MAIN SET (after 800m WU): 4x150m easy — 30s rest.",why:"Keep the water feel."}]},
+      {day:"TUE",sessions:[{tag:"run",label:"Easy Run + Strides — 5 km",target:"15 min easy @ 4:30/km + 4x30 sec strides (fast turnover, not sprint).",why:"Strides fire fast-twitch fibres without fatigue cost."}]},
+      {day:"WED",sessions:[{tag:"swim",label:"Easy Swim 1 km (PM)",target:"MAIN SET (after 600m WU): 3x100m easy — 30s rest.",why:""}]},
+      {day:"THU",sessions:[{tag:"brick",label:"Easy Brick — Ride 25 km + Run 3 km",target:"25 min easy Z1 ride + 10 min easy run. Legs awake. Done.",why:"Last transition practice."}]},
+      {day:"FRI",sessions:[{tag:"rest",label:"Travel / Gear Check / Full Rest",target:"Get to race venue. Rack bike. Check transitions. Eat well. Sleep early.",why:""}]},
+      {day:"SAT",sessions:[{tag:"swim",label:"Nice Course Swim — 0.5 km",target:"10–15 min easy open water. Sight the buoys. Check current and entry/exit. Do NOT race this.",why:"Course familiarisation."}]},
+      {day:"SUN",sessions:[{tag:"race",label:"NICE 70.3 WORLD CHAMPIONSHIPS — RACE DAY",target:"Swim 1:25/100m — settle in the pack | Bike race effort — manage Col de Vence, recover descents, gel every 20 min | Run: 3:45/km start, build, DRIVE the Promenade des Anglais.",why:"Everything since March 23 was for this. Execute the plan."}]},
+    ]
+  };
+
+  const allWeeks = hardWeeks.concat(autoWeeks).concat([raceWeek]);
+  return {
+    id: uid(), athleteId: athlete.id, name: 'Nice 70.3 World Championships — 25-Week Plan',
+    raceDate: '2026-09-13', raceTarget: 'Swim ~28:30 · Bike 35-41.5kph · Run 3:38/km → 1:16:38 · Total ~4:00-4:26',
+    weeks: allWeeks
+  };
+}
+
 // ============================================================================
 // ZONE CALCULATORS
 // ============================================================================
@@ -878,7 +1394,14 @@ const Store = {
         }
       }catch(e){/* corrupted — use defaults */}
     }
-    // Do NOT auto-create athletes — show profile picker instead
+    // Seed default profiles on fresh install
+    if(this._state.athletes.length===0){
+      const ignacio={id:'athlete-ignacio',name:'Ignacio',sport:'triathlon',ftp:278,thresholdPace:280,css400:360,css200:165,weight:75,maxHR:190,restHR:50,raceName:'Ironman 70.3 Cairns',raceDate:'2026-06-14',raceDistance:'70.3',preferences:{longRide:'SAT',brick:'SUN',longRun:'SUN',trackDay:'TUE',hardBike:'THU',hardSwim:'WED',strengthA:'MON',strengthB:'WED',easySwim:'FRI',mobility:'FRI,SUN'},createdAt:new Date().toISOString()};
+      const brendon={id:'athlete-brendon',name:'Brendon',sport:'triathlon',ftp:250,thresholdPace:218,css400:340,css200:155,weight:72,maxHR:185,restHR:48,raceName:'Ironman 70.3 World Championships Nice',raceDate:'2026-09-13',raceDistance:'70.3',preferences:{longRide:'SAT',brick:'SUN',longRun:'SUN',trackDay:'TUE',hardBike:'THU',hardSwim:'WED',strengthA:'MON',strengthB:'WED',easySwim:'FRI',mobility:'FRI,SUN'},createdAt:new Date().toISOString()};
+      this._state.athletes=[ignacio,brendon];
+      this._state.plans=[generateCairnsPlan(ignacio),generateBrendonPlan(brendon)];
+      // Don't auto-select — show profile picker
+    }
     if(!this._state.activeAthleteId&&this._state.athletes.length>0) this._state.activeAthleteId=this._state.athletes[0].id;
     // Auto-recover: ensure every athlete has a plan
     this._state.athletes.forEach(a=>{
@@ -1694,6 +2217,16 @@ function renderCalendar(){
   const ac=PC[week.phase]||'#00c9b1';
   const dates=getWeekDates(week);
 
+  // Compute actual Date objects for each day in this week (for today detection)
+  const todayDate=new Date();todayDate.setHours(0,0,0,0);
+  const weekDateObjs=[];
+  if(week.dates){
+    const months={Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
+    const m=week.dates.match(/([A-Z][a-z]+)\s+(\d+)/);
+    if(m){const mo=months[m[1]];const dy=parseInt(m[2]);const yr=2026;const st=new Date(yr,mo,dy);for(let i=0;i<7;i++){const dd=new Date(st);dd.setDate(st.getDate()+i);weekDateObjs.push(dd);}}
+  }
+  const isToday=(idx)=>weekDateObjs[idx]&&weekDateObjs[idx].getTime()===todayDate.getTime();
+
   // Build day→sessions map
   const dayMap={};
   DAYS.forEach(d=>dayMap[d]=[]);
@@ -1737,13 +2270,14 @@ function renderCalendar(){
     <!-- Calendar grid -->
     <div class="grid grid-cols-7 gap-1.5">
       <!-- Day headers -->
-      ${DAYS.map((d,i)=>`<div class="text-center pb-2"><div class="text-[10px] font-bold tracking-wider text-zinc-500 uppercase">${d}</div><div class="text-[10px] text-zinc-600">${dates[i]}</div></div>`).join('')}
+      ${DAYS.map((d,i)=>`<div class="text-center pb-2"><div class="text-[10px] font-bold tracking-wider ${isToday(i)?'text-brand':'text-zinc-500'} uppercase">${d}</div><div class="text-[10px] ${isToday(i)?'text-brand font-bold':'text-zinc-600'}">${dates[i]}${isToday(i)?' — Today':''}</div></div>`).join('')}
 
       <!-- Day columns -->
-      ${DAYS.map(d=>{
+      ${DAYS.map((d,di)=>{
         const sessions=dayMap[d]||[];
         const isEmpty=sessions.length===0||sessions.every(s=>s.tag==='rest');
-        return `<div class="bg-bg-secondary rounded-lg border border-bg-border min-h-[180px] p-1.5 flex flex-col gap-1 ${isEmpty?'opacity-60':''}">
+        const todayRing=isToday(di)?'ring-2 ring-brand':'';
+        return `<div class="bg-bg-secondary rounded-lg border border-bg-border min-h-[180px] p-1.5 flex flex-col gap-1 ${isEmpty?'opacity-60':''} ${todayRing}">`;
           ${sessions.length===0?'<div class="flex-1 flex items-center justify-center text-[10px] text-zinc-700">Rest</div>':''}
           ${sessions.map((s,si)=>{
             const tc=TAG_COLORS[s.tag]||TAG_COLORS.rest;
