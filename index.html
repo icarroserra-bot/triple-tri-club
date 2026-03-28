@@ -182,7 +182,7 @@
       <button onclick="document.getElementById('import-file').click()" class="w-full text-xs text-zinc-500 hover:text-zinc-300 py-1.5 flex items-center gap-2 justify-center">Import Backup</button>
       <input type="file" id="import-file" accept=".json" onchange="importData(event)" class="hidden">
       <button onclick="forceRefresh()" class="w-full text-[10px] text-zinc-600 hover:text-zinc-400 py-1 flex items-center gap-1 justify-center">Clear Cache & Reload</button>
-      <div class="text-[9px] text-zinc-700 text-center">v3.2</div>
+      <div class="text-[9px] text-zinc-700 text-center">v4.0</div>
     </div>
   </aside>
 
@@ -1545,12 +1545,12 @@ function renderProfilePicker(){
           <p class="text-[11px] text-zinc-500 leading-relaxed">I already have a training plan file (.jsx, .json, .txt, .csv)</p>
         </button>
 
-        <button onclick="startOnboarding('wizard')" class="bg-bg-secondary border border-bg-border rounded-lg p-5 hover:border-brand/40 transition text-left group">
+        <button onclick="startOnboarding('chat')" class="bg-bg-secondary border border-bg-border rounded-lg p-5 hover:border-brand/40 transition text-left group">
           <div class="w-10 h-10 rounded-lg bg-emerald-500/10 flex items-center justify-center mb-3 group-hover:bg-emerald-500/20 transition">
             <svg class="w-5 h-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
           </div>
-          <h3 class="text-sm font-semibold text-white mb-1">Build My Plan</h3>
-          <p class="text-[11px] text-zinc-500 leading-relaxed">Answer questions about my fitness and goals to generate a plan</p>
+          <h3 class="text-sm font-semibold text-white mb-1">Chat with Coach</h3>
+          <p class="text-[11px] text-zinc-500 leading-relaxed">Talk to our AI coach who'll build your personalized plan</p>
         </button>
       </div>
 
@@ -1566,11 +1566,217 @@ function renderProfilePicker(){
 function startOnboarding(mode){
   if(mode==='upload'){
     document.getElementById('main-content').innerHTML=renderUploadOnboarding();
+  } else if(mode==='chat'){
+    Store.state._onboardChat=[];
+    Store.state._onboardData={};
+    document.getElementById('main-content').innerHTML=renderOnboardChat();
+    // Auto-start the conversation
+    setTimeout(()=>sendOnboardMessage(null, true),300);
   } else {
     Store.state._wizardStep=1;
     Store.state._wizardData={};
     document.getElementById('main-content').innerHTML=renderWizard();
   }
+}
+
+function renderOnboardChat(){
+  const msgs=Store.state._onboardChat||[];
+  return `<div class="flex flex-col h-screen max-w-2xl mx-auto">
+    <div class="p-4 border-b border-bg-border bg-bg-secondary flex items-center gap-3 flex-shrink-0">
+      <button onclick="navigate('profiles')" class="text-zinc-500 hover:text-white transition">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+      </button>
+      <div class="w-8 h-8 rounded-full bg-brand/20 flex items-center justify-center">
+        <svg class="w-4 h-4 text-brand-light" viewBox="0 0 100 100" fill="currentColor"><path d="M12 68 Q22 38 48 32 Q40 46 46 54 Q52 28 72 18 Q58 40 53 50 Q68 28 88 22 Q63 48 43 68 Q28 78 12 68Z"/></svg>
+      </div>
+      <div>
+        <h2 class="text-sm font-semibold text-white">Triple Tri Coach</h2>
+        <p class="text-[10px] text-zinc-500">Building your personalized training plan</p>
+      </div>
+    </div>
+    <div id="onboard-messages" class="flex-1 overflow-y-auto p-4 space-y-3">
+      ${msgs.map(m=>`
+        <div class="chat-msg flex ${m.role==='user'?'justify-end':'justify-start'}">
+          <div class="max-w-[85%] ${m.role==='user'?'bg-brand/20 text-brand-light':'bg-bg-tertiary text-zinc-300'} rounded-lg px-4 py-3 text-sm">
+            <div class="whitespace-pre-wrap">${escapeHtml(m.content)}</div>
+          </div>
+        </div>
+      `).join('')}
+      ${Store.state._onboardLoading?'<div class="flex justify-start"><div class="bg-bg-tertiary rounded-lg px-4 py-3 text-sm text-zinc-500"><span class="pulse-dot">●</span> Thinking...</div></div>':''}
+    </div>
+    <div class="p-4 border-t border-bg-border bg-bg-secondary flex-shrink-0">
+      <div class="flex gap-2">
+        <input id="onboard-input" type="text" placeholder="Type your answer..." class="flex-1 bg-bg-tertiary border border-bg-border rounded-lg px-4 py-2.5 text-sm text-zinc-200" onkeydown="if(event.key==='Enter')sendOnboardMessage()">
+        <button onclick="sendOnboardMessage()" class="px-4 py-2.5 bg-brand hover:bg-brand-dark text-white rounded-lg transition">Send</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+async function sendOnboardMessage(customText, isAutoStart){
+  if(!Store.state.apiKey&&!isAutoStart){
+    // If no API key, fall back to scripted conversation
+    const input=document.getElementById('onboard-input');
+    const text=customText||(input?input.value.trim():'')||'';
+    if(!text) return;
+    const msgs=Store.state._onboardChat||[];
+    msgs.push({role:'user',content:text});
+    Store.state._onboardChat=msgs;
+    if(input) input.value='';
+    Store.state._onboardLoading=true;
+    document.getElementById('main-content').innerHTML=renderOnboardChat();
+    setTimeout(()=>{const el=document.getElementById('onboard-messages');if(el)el.scrollTop=el.scrollHeight;},50);
+    await scriptedOnboardStep(msgs);
+    return;
+  }
+
+  const input=document.getElementById('onboard-input');
+  const text=customText||(input?input.value.trim():'')||'';
+
+  if(!isAutoStart&&!text) return;
+
+  const msgs=Store.state._onboardChat||[];
+  if(text&&!isAutoStart){
+    msgs.push({role:'user',content:text});
+  }
+  Store.state._onboardChat=msgs;
+  Store.state._onboardLoading=true;
+  if(input) input.value='';
+  document.getElementById('main-content').innerHTML=renderOnboardChat();
+  setTimeout(()=>{const el=document.getElementById('onboard-messages');if(el)el.scrollTop=el.scrollHeight;},50);
+
+  // If no API key, use a scripted conversation
+  if(!Store.state.apiKey){
+    await scriptedOnboardStep(msgs);
+    return;
+  }
+
+  const collectedSoFar=JSON.stringify(Store.state._onboardData||{});
+
+  const sys=`You are Triple Tri Club's onboarding coach. Your job is to gather information about a new athlete through a friendly, natural conversation to build their training plan.
+
+You need to collect these data points (track what you've already gathered):
+COLLECTED SO FAR: ${collectedSoFar}
+
+REQUIRED INFO:
+1. Name
+2. Age, gender, weight (kg), height (cm)
+3. Primary sport (triathlon, running, cycling, swimming)
+4. Experience level (beginner, intermediate, advanced)
+5. Target race name and date
+6. Race distance (sprint, olympic, 70.3, full ironman)
+7. FTP (bike watts) — if they don't know, help estimate from typical riding
+8. Run threshold pace — if they don't know, ask about recent 5k/10k time
+9. Swim CSS pace — if they don't know, that's fine
+10. Weekly training hours available
+11. Days available to train and preferred rest days
+12. Current injuries or limitations
+13. Key goals (finish time, just finish, podium, etc.)
+
+RULES:
+- Ask 2-3 questions at a time max, in a conversational way
+- If they don't know a technical metric (FTP, CSS), help estimate or skip it
+- When you have enough info (at least name, weight, race, and a few metrics), say EXACTLY on its own line: [READY_TO_CREATE]
+- After [READY_TO_CREATE], output a JSON block with all collected data in this exact format:
+\`\`\`json
+{"name":"...","age":..,"gender":"...","weight":..,"height":..,"sport":"triathlon","experience":"...","raceName":"...","raceDate":"YYYY-MM-DD","raceDistance":"...","ftp":..,"thresholdPace":...,"css400":...,"css200":...,"weeklyHours":"...","restDays":"...","injuries":"...","goals":"..."}
+\`\`\`
+(thresholdPace should be seconds per km, e.g. 300 for 5:00/km)
+
+Be warm, encouraging, and expert. Use triathlon knowledge to make smart suggestions.`;
+
+  try{
+    const apiMsgs=msgs.map(m=>({role:m.role==='user'?'user':'assistant',content:m.content}));
+    if(isAutoStart) apiMsgs.push({role:'user',content:'Hi, I want to create a new training plan.'});
+
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':Store.state.apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1024,system:sys,messages:apiMsgs})});
+    const data=await r.json();
+    if(data.content?.[0]){
+      const reply=data.content[0].text;
+      msgs.push({role:'assistant',content:reply});
+
+      // Check if ready to create profile
+      if(reply.includes('[READY_TO_CREATE]')){
+        const jsonMatch=reply.match(/```json\s*([\s\S]*?)```/);
+        if(jsonMatch){
+          try{
+            const profileData=JSON.parse(jsonMatch[1]);
+            Store.state._onboardData=profileData;
+            // Auto-create the profile
+            setTimeout(()=>createProfileFromChat(profileData),1500);
+          }catch(e){console.warn('JSON parse error in onboard:',e);}
+        }
+      }
+    } else if(data.error){
+      msgs.push({role:'assistant',content:'Sorry, I had a connection issue. Could you try again? (Error: '+data.error.message+')'});
+    }
+  }catch(e){
+    msgs.push({role:'assistant',content:'Connection error. Please check your internet and try again.'});
+  }
+
+  Store.state._onboardChat=msgs;
+  Store.state._onboardLoading=false;
+  document.getElementById('main-content').innerHTML=renderOnboardChat();
+  setTimeout(()=>{const el=document.getElementById('onboard-messages');if(el)el.scrollTop=el.scrollHeight;},50);
+}
+
+async function scriptedOnboardStep(msgs){
+  // Fallback scripted conversation when no API key
+  const step=msgs.filter(m=>m.role==='user').length;
+  let reply='';
+  const data=Store.state._onboardData||{};
+
+  if(step===0){
+    reply="Hey! I'm your Triple Tri coach. Let's build your training plan together. What's your name, and what race are you training for?";
+  } else if(step===1){
+    // Parse name from first answer
+    const words=msgs[msgs.length-1].content.split(' ');
+    data.name=words[0]||'Athlete';
+    reply=`Great to meet you, ${data.name}! A few quick questions:\n\n1. How old are you and what do you weigh (kg)?\n2. What distance is your race? (Sprint / Olympic / 70.3 / Full Ironman)\n3. When is race day? (approximate date)`;
+  } else if(step===2){
+    reply="Perfect! Now the technical stuff — don't worry if you don't know these:\n\n1. Do you know your FTP (bike power in watts)? If not, what power do you typically ride at?\n2. What's your comfortable running pace per km?\n3. How many hours per week can you train?";
+  } else if(step===3){
+    reply="Last couple of questions:\n\n1. Any current injuries or things I should know about?\n2. What's your main goal — a finish time target, or just completing the race?\n3. Which days can't you train? (rest days)";
+  } else {
+    // Enough info — create with defaults
+    data.sport='triathlon';data.ftp=data.ftp||200;data.thresholdPace=data.thresholdPace||300;
+    data.weight=data.weight||75;data.raceName=data.raceName||'My Race';
+    data.raceDate=data.raceDate||'2026-09-01';data.raceDistance=data.raceDistance||'70.3';
+    Store.state._onboardData=data;
+    reply=`Excellent, ${data.name||'there'}! I have everything I need. Creating your personalized training plan now...`;
+    setTimeout(()=>createProfileFromChat(data),1500);
+  }
+
+  Store.state._onboardData=data;
+  msgs.push({role:'assistant',content:reply});
+  Store.state._onboardChat=msgs;
+  Store.state._onboardLoading=false;
+  document.getElementById('main-content').innerHTML=renderOnboardChat();
+  setTimeout(()=>{const el=document.getElementById('onboard-messages');if(el)el.scrollTop=el.scrollHeight;},50);
+}
+
+function createProfileFromChat(data){
+  const athlete={
+    id:uid(), name:data.name||'Athlete', sport:(data.sport||'triathlon').toLowerCase(),
+    age:parseInt(data.age)||null, gender:data.gender||null, height:parseInt(data.height)||null,
+    weight:parseInt(data.weight)||75, ftp:parseInt(data.ftp)||200,
+    thresholdPace:parseInt(data.thresholdPace)||300,
+    css400:parseInt(data.css400)||360, css200:parseInt(data.css200)||165,
+    maxHR:parseInt(data.maxHR)||190, restHR:parseInt(data.restHR)||50,
+    raceName:data.raceName||null, raceDate:data.raceDate||null, raceDistance:data.raceDistance||null,
+    raceGoal:data.goals||null, injuries:data.injuries||null,
+    weeklyHours:data.weeklyHours||null,
+    experience:data.experience||null,
+    preferences:{longRide:'SAT',brick:'SUN',longRun:'SUN',trackDay:'TUE',hardBike:'THU',hardSwim:'WED',strengthA:'MON',strengthB:'WED',easySwim:'FRI',mobility:'FRI,SUN',restDays:data.restDays||''},
+    createdAt:new Date().toISOString(), updatedAt:new Date().toISOString()
+  };
+
+  Store.state.athletes.push(athlete);
+  Store.state.plans.push(generateCairnsPlan(athlete));
+  Store.update({activeAthleteId:athlete.id});
+  Store.state._onboardChat=null;Store.state._onboardData=null;Store.state._onboardLoading=null;
+  updateAthleteSelect();navigate('today');
+  showToast('Welcome, '+athlete.name+'! Your training plan is ready.');
 }
 
 // ── Upload Onboarding ──
@@ -1851,6 +2057,29 @@ function renderToday(){
       </div>
     </div>
     <button onclick="openHealthInput('${todayKey}')" class="text-[10px] text-brand-light hover:text-white mb-4 inline-block">+ Log today's health data manually</button>
+
+    <!-- AI Coach Insights -->
+    <div class="bg-bg-secondary rounded-lg border border-bg-border p-3 md:p-4 mb-4">
+      <div class="flex items-center justify-between mb-2">
+        <div class="flex items-center gap-2">
+          <div class="w-7 h-7 rounded-full bg-purple-600/20 flex items-center justify-center"><svg class="w-3.5 h-3.5 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714a2.25 2.25 0 00.659 1.591L19 14.5"/></svg></div>
+          <h3 class="text-sm font-semibold text-white">Coach's Take</h3>
+        </div>
+        <button onclick="getCoachInsight()" id="insight-btn" class="text-[10px] px-3 py-1 rounded bg-purple-600/20 text-purple-300 border border-purple-500/20 hover:bg-purple-600/30 transition">${Store.state._todayInsight?'Refresh':'Get Today\'s Analysis'}</button>
+      </div>
+      ${Store.state._todayInsight?`
+        <div class="text-sm text-zinc-300 leading-relaxed whitespace-pre-wrap">${escapeHtml(Store.state._todayInsight)}</div>
+        <div class="flex gap-2 mt-3 flex-wrap">
+          <button onclick="askCoachQuick('I\\'m feeling tired today, should I adjust?')" class="text-[10px] px-2.5 py-1 rounded bg-bg-tertiary text-zinc-400 border border-bg-border hover:border-brand/30 transition">I'm tired today</button>
+          <button onclick="askCoachQuick('Can I push harder today?')" class="text-[10px] px-2.5 py-1 rounded bg-bg-tertiary text-zinc-400 border border-bg-border hover:border-brand/30 transition">Can I do more?</button>
+          <button onclick="askCoachQuick('Suggest an alternative workout')" class="text-[10px] px-2.5 py-1 rounded bg-bg-tertiary text-zinc-400 border border-bg-border hover:border-brand/30 transition">Alternative workout</button>
+          <button onclick="navigate('ai-coach')" class="text-[10px] px-2.5 py-1 rounded bg-purple-600/10 text-purple-300 border border-purple-500/20 hover:bg-purple-600/20 transition">Full AI Coach →</button>
+        </div>
+      `:`
+        <p class="text-xs text-zinc-600">AI will analyze your health data, recent feedback, and today's sessions to give you personalized guidance.</p>
+        ${!Store.state.apiKey?'<p class="text-[10px] text-yellow-500/70 mt-1">Set your Claude API key in AI Coach to enable insights.</p>':''}
+      `}
+    </div>
 
     ${currentWeek?`
       <!-- Week context -->
@@ -2604,18 +2833,12 @@ async function sendChat(){
   if(!Store.state.apiKey){showToast('Set your Claude API key first');showAPIKeyModal();return;}
   const msgs=Store.state.chatMessages||[];msgs.push({role:'user',content:text});Store.update({chatMessages:msgs});input.value='';renderPage();
   setTimeout(()=>{const el=document.getElementById('chat-messages');if(el)el.scrollTop=el.scrollHeight;},50);
-  const a=Store.getActiveAthlete();const plan=Store.getActivePlan();const pz=calcPowerZones(a?.ftp);const rz=calcPaceZones(a?.thresholdPace);
-  const prefs=a?.preferences||{};
-  const sys=`You are an expert triathlon coach integrated into Triple Tri Club. You have deep knowledge of periodization, training zones, and Cairns 70.3 race preparation.
+  const context=gatherCoachContext();
+  const sys=`You are an expert triathlon coach integrated into Triple Tri Club. You have deep knowledge of periodization, training zones, and race preparation.
 
-ATHLETE: ${a?.name} · FTP: ${a?.ftp}W (${a?.weight?(a.ftp/a.weight).toFixed(1):'?'} W/kg) · Threshold pace: ${formatPace(a?.thresholdPace)}/km · Weight: ${a?.weight}kg
-POWER ZONES: ${pz.map(z=>'Z'+z.zone+' '+z.minWatts+'-'+(z.maxWatts||'∞')+'W').join(' | ')}
-PACE ZONES: ${rz.map(z=>'Z'+z.zone+' '+formatPace(z.minPace)+'-'+formatPace(z.maxPace)+'/km').join(' | ')}
-RACE: Cairns 70.3, Jun 14 2026. Targets: Swim 1:29/100m, Bike 240W NP, Run 4:10-4:20/km
-PLAN: 12 weeks (W0-W11). Phases: W0 Recovery, W1-W3 Foundation, W4 Recovery, W5 Specific, W6 Recovery, W7-W9 Peak Block (3 consecutive hard weeks), W10 Taper (-30%), W11 Race Week.
-DAY PREFERENCES: Long Ride: ${prefs.longRide||'SAT'}, Brick: ${prefs.brick||'SUN'}, Track: ${prefs.trackDay||'TUE'}, Hard Bike: ${prefs.hardBike||'THU'}, Hard Swim: ${prefs.hardSwim||'WED'}, Strength A: ${prefs.strengthA||'MON'}, Strength B: ${prefs.strengthB||'WED'}, Easy Swim: ${prefs.easySwim||'FRI'}, Mobility: ${prefs.mobility||'FRI,SUN'}
+${context}
 
-Respond as a knowledgeable, direct coach. Use actual watts, paces, and zone data. Be concise but actionable.`;
+Respond as a knowledgeable, direct coach. Use actual watts, paces, and zone data. Be concise but actionable. If the athlete shares audio feedback or notes, acknowledge what they said and incorporate it into your advice.`;
   try{
     const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':Store.state.apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1024,system:sys,messages:msgs.slice(-10).map(m=>({role:m.role==='user'?'user':'assistant',content:m.content}))})});
     const data=await r.json();
@@ -3387,13 +3610,134 @@ async function getAudioUrl(fbKey){
 }
 
 // ============================================================================
+// AI BRAIN — Daily Coaching Insights
+// ============================================================================
+function gatherCoachContext(){
+  const a=Store.getActiveAthlete();const plan=Store.getActivePlan();
+  if(!a||!plan) return '';
+  const today=new Date();const todayKey=today.toISOString().split('T')[0];
+  const dayNames=['SUN','MON','TUE','WED','THU','FRI','SAT'];
+  const todayDay=dayNames[today.getDay()];
+  const months={Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
+
+  // Find current week
+  let currentWeek=null;
+  for(const w of plan.weeks){
+    if(!w.dates)continue;
+    const m=w.dates.match(/([A-Z][a-z]+)\s+(\d+)/);
+    if(!m)continue;
+    const mo=months[m[1]];const dy=parseInt(m[2]);
+    const wkStart=new Date(2026,mo,dy);const wkEnd=new Date(wkStart);wkEnd.setDate(wkEnd.getDate()+6);
+    if(today>=wkStart&&today<=wkEnd){currentWeek=w;break;}
+  }
+
+  // Today's sessions
+  let todaySessions=[];
+  if(currentWeek){
+    const dayData=currentWeek.days.find(d=>d.day===todayDay);
+    todaySessions=dayData?dayData.sessions:[];
+  }
+
+  // Health data
+  const health=(Store.state.healthData||{})[todayKey]||{};
+
+  // Recent feedback (last 7 days)
+  const recentFeedback=[];
+  for(let i=0;i<7;i++){
+    const d=new Date(today);d.setDate(d.getDate()-i);
+    const dk=d.toISOString().split('T')[0];
+    const fb=Store.state.feedback||{};
+    // Check day feedback
+    const dayFb=fb['day-'+dk];
+    if(dayFb){
+      recentFeedback.push({date:dk,type:'day',rpe:dayFb.rpe,note:dayFb.note,transcription:dayFb.audioTranscription});
+    }
+    // Check session feedback for that day
+    Object.entries(fb).forEach(([key,val])=>{
+      if(key.startsWith('fb-')&&key.includes(dk)&&(val.rpe||val.note||val.audioTranscription)){
+        recentFeedback.push({date:dk,type:'session',key,rpe:val.rpe,note:val.note,transcription:val.audioTranscription});
+      }
+    });
+  }
+
+  // Connected services
+  const conn=Store.state.connectedServices||{};
+
+  const pz=calcPowerZones(a.ftp);const rz=calcPaceZones(a.thresholdPace);
+
+  return `ATHLETE: ${a.name} · FTP: ${a.ftp}W (${a.weight?(a.ftp/a.weight).toFixed(1):'?'} W/kg) · Run Threshold: ${formatPace(a.thresholdPace)}/km · Weight: ${a.weight}kg · Race: ${a.raceName||plan.name} on ${a.raceDate||plan.raceDate}
+POWER ZONES: ${pz.map(z=>'Z'+z.zone+' '+z.minWatts+'-'+(z.maxWatts||'∞')+'W').join(' | ')}
+PACE ZONES: ${rz.map(z=>'Z'+z.zone+' '+formatPace(z.minPace)+'-'+formatPace(z.maxPace)+'/km').join(' | ')}
+
+TODAY: ${today.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'})} (${todayDay})
+${currentWeek?`CURRENT WEEK: ${currentWeek.label} — ${currentWeek.name} (Phase: ${currentWeek.phase}, Hours: ${currentWeek.hours})
+WEEK CONTEXT: ${currentWeek.context||''}
+KEY NOTES: ${(currentWeek.flags||[]).join(' | ')}`:'No matching training week found for today.'}
+
+TODAY'S PLANNED SESSIONS:
+${todaySessions.length>0?todaySessions.map((s,i)=>`${i+1}. [${s.tag.toUpperCase()}] ${s.label} — ${s.target}${s.why?' (Why: '+s.why+')':''}`).join('\n'):'Rest day or no sessions planned.'}
+
+HEALTH DATA TODAY:
+HRV: ${health.hrv||'not recorded'} | Sleep Score: ${health.sleep||'not recorded'} | Sleep Hours: ${health.sleepHrs||'?'} | Body Battery: ${health.bodyBattery||'not recorded'} | Resting HR: ${health.restHR||'not recorded'}
+
+RECENT FEEDBACK (last 7 days):
+${recentFeedback.length>0?recentFeedback.map(f=>`[${f.date}] ${f.type}: RPE=${f.rpe||'?'} ${f.note?'Note: "'+f.note+'"':''} ${f.transcription?'Audio: "'+f.transcription+'"':''}`).join('\n'):'No recent feedback recorded.'}
+
+CONNECTED SERVICES: ${Object.keys(conn).filter(k=>conn[k]).join(', ')||'None connected'}`;
+}
+
+async function getCoachInsight(){
+  if(!Store.state.apiKey){showToast('Set your Claude API key first (AI Coach → Set API Key)');return;}
+  const btn=document.getElementById('insight-btn');
+  if(btn){btn.textContent='Analyzing...';btn.disabled=true;}
+
+  const context=gatherCoachContext();
+  const sys=`You are an elite triathlon coach AI embedded in Triple Tri Club. You have access to the athlete's full training plan, health metrics, and recent feedback.
+
+${context}
+
+Based on ALL the data above, provide a concise daily coaching briefing (3-5 sentences max). Include:
+1. Your assessment of today's readiness based on health data and recent feedback
+2. Key focus points for today's sessions
+3. Any modifications you'd suggest based on fatigue/recovery signals
+4. One motivational insight tied to the current training phase
+
+Be direct, specific (use actual watts/paces), and actionable. Don't be generic — reference the specific sessions and data you see.`;
+
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':Store.state.apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:512,system:sys,messages:[{role:'user',content:'Give me your coaching analysis for today.'}]})});
+    const data=await r.json();
+    if(data.content?.[0]){
+      Store.state._todayInsight=data.content[0].text;
+      Store.state._todayInsightDate=new Date().toISOString();
+      Store.save();
+    } else if(data.error){
+      showToast('AI Error: '+data.error.message);
+    }
+  }catch(e){showToast('Connection error: '+e.message);}
+  renderPage();
+}
+
+async function askCoachQuick(question){
+  if(!Store.state.apiKey){showToast('Set your Claude API key first');return;}
+  // Add to AI Coach chat and navigate there
+  const msgs=Store.state.chatMessages||[];
+  msgs.push({role:'user',content:question});
+  Store.update({chatMessages:msgs});
+  navigate('ai-coach');
+  // Auto-send
+  setTimeout(()=>sendChat(),100);
+}
+
+// ============================================================================
 // INIT
 // ============================================================================
 async function init(){
   Store.init();updateAthleteSelect();
   // Handle Strava OAuth callback
   if(window.location.search.includes('code=')){handleStravaCallback();}
-  navigate('today');
+  // Always show profile picker on app entry
+  navigate('profiles');
   // Register service worker for offline/PWA support
   if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{});}
   // Initialize IndexedDB and migrate old audio
