@@ -200,6 +200,154 @@ function parsePace(str) { const pts=str.split(':'); return pts.length===2 ? pars
 function escapeHtml(t) { const d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
 
 // ============================================================================
+// INDEXEDDB AUDIO STORAGE
+// ============================================================================
+const AudioDB = {
+  _db: null,
+  DB_NAME: 'tripleTriAudio',
+  DB_VERSION: 1,
+  STORE_NAME: 'recordings',
+
+  async open() {
+    if (this._db) return this._db;
+    return new Promise((resolve, reject) => {
+      const req = indexedDB.open(this.DB_NAME, this.DB_VERSION);
+      req.onupgradeneeded = (e) => {
+        const db = e.target.result;
+        if (!db.objectStoreNames.contains(this.STORE_NAME)) {
+          db.createObjectStore(this.STORE_NAME, { keyPath: 'id' });
+        }
+      };
+      req.onsuccess = (e) => { this._db = e.target.result; resolve(this._db); };
+      req.onerror = (e) => { console.error('AudioDB open error', e); reject(e); };
+    });
+  },
+
+  async save(id, blob, transcription) {
+    const db = await this.open();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(this.STORE_NAME, 'readwrite');
+      tx.objectStore(this.STORE_NAME).put({
+        id,
+        blob,
+        transcription: transcription || '',
+        date: new Date().toISOString(),
+        size: blob.size
+      });
+      tx.oncomplete = () => resolve();
+      tx.onerror = (e) => reject(e);
+    });
+  },
+
+  async get(id) {
+    const db = await this.open();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(this.STORE_NAME, 'readonly');
+      const req = tx.objectStore(this.STORE_NAME).get(id);
+      req.onsuccess = () => resolve(req.result || null);
+      req.onerror = (e) => reject(e);
+    });
+  },
+
+  async delete(id) {
+    const db = await this.open();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(this.STORE_NAME, 'readwrite');
+      tx.objectStore(this.STORE_NAME).delete(id);
+      tx.oncomplete = () => resolve();
+      tx.onerror = (e) => reject(e);
+    });
+  },
+
+  async getAll() {
+    const db = await this.open();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(this.STORE_NAME, 'readonly');
+      const req = tx.objectStore(this.STORE_NAME).getAll();
+      req.onsuccess = () => resolve(req.result || []);
+      req.onerror = (e) => reject(e);
+    });
+  },
+
+  // Migrate old base64 audio from localStorage feedback into IndexedDB
+  async migrateFromLocalStorage() {
+    const feedback = Store.state.feedback || {};
+    let migrated = 0;
+    for (const [key, fb] of Object.entries(feedback)) {
+      if (fb.audioData && fb.audioData.startsWith('data:')) {
+        try {
+          // Convert base64 data URL to blob
+          const resp = await fetch(fb.audioData);
+          const blob = await resp.blob();
+          await this.save(key, blob, fb.audioTranscription || '');
+          // Remove base64 from localStorage, keep reference
+          fb.audioRef = key;
+          fb.audioDate = fb.audioDate || new Date().toLocaleString();
+          delete fb.audioData;
+          migrated++;
+        } catch (e) { console.warn('Migration failed for', key, e); }
+      }
+    }
+    if (migrated > 0) { Store.save(); console.log(`Migrated ${migrated} audio recordings to IndexedDB`); }
+  }
+};
+
+// ============================================================================
+// SPEECH RECOGNITION (Transcription)
+// ============================================================================
+const Transcriber = {
+  _recognition: null,
+  _transcript: '',
+  _isListening: false,
+
+  isSupported() {
+    return !!(window.SpeechRecognition || window.webkitSpeechRecognition);
+  },
+
+  start() {
+    if (!this.isSupported()) return;
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    this._recognition = new SR();
+    this._recognition.continuous = true;
+    this._recognition.interimResults = false;
+    this._recognition.lang = 'en-US';
+    this._transcript = '';
+    this._isListening = true;
+
+    this._recognition.onresult = (event) => {
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        if (event.results[i].isFinal) {
+          this._transcript += (this._transcript ? ' ' : '') + event.results[i][0].transcript;
+        }
+      }
+    };
+
+    this._recognition.onerror = (e) => {
+      console.warn('SpeechRecognition error:', e.error);
+      this._isListening = false;
+    };
+
+    this._recognition.onend = () => {
+      this._isListening = false;
+    };
+
+    try { this._recognition.start(); } catch (e) { console.warn('SR start failed', e); }
+  },
+
+  stop() {
+    if (this._recognition && this._isListening) {
+      try { this._recognition.stop(); } catch (e) {}
+    }
+    this._isListening = false;
+    return this._transcript;
+  },
+
+  getTranscript() {
+    return this._transcript;
+  }
+};
+
+// ============================================================================
 // PHASE COLORS
 // ============================================================================
 const PC = { recovery:'#64748b', foundation:'#00c9b1', specific:'#f97316', sharpening:'#e11d48', taper:'#a78bfa', raceweek:'#fbbf24' };
@@ -701,25 +849,34 @@ function calcSwimZones(t400,t200){const css=calcCSS(t400,t200);if(!css)return[];
 // ============================================================================
 // STATE
 // ============================================================================
-const STORE_VERSION = 5;
+const STORE_VERSION = 6;
 const Store = {
-  _state:{_v:STORE_VERSION,athletes:[],activeAthleteId:null,plans:[],ui:{currentPage:'dashboard'},chatMessages:[],apiKey:'',brickSel:{},trackSel:{},feedback:{},_recording:null,connectedServices:{}},
+  _state:{_v:STORE_VERSION,athletes:[],activeAthleteId:null,plans:[],ui:{currentPage:'today'},chatMessages:[],apiKey:'',brickSel:{},trackSel:{},feedback:{},_recording:null,connectedServices:{},healthData:{},audioStore:{}},
   _listeners:[],
   init(){
     const saved=localStorage.getItem('trainforge:state');
     if(saved){
       try{
         const parsed=JSON.parse(saved);
-        // If version mismatch, keep only apiKey and chatMessages, reset everything else
         if(parsed._v!==STORE_VERSION){
+          // Keep useful data across version upgrades
           this._state.apiKey=parsed.apiKey||'';
           this._state.chatMessages=parsed.chatMessages||[];
+          if(parsed.athletes&&parsed.athletes.length>0){
+            this._state.athletes=parsed.athletes;
+            this._state.activeAthleteId=parsed.activeAthleteId;
+            this._state.plans=parsed.plans||[];
+            this._state.feedback=parsed.feedback||{};
+            this._state.healthData=parsed.healthData||{};
+            this._state.connectedServices=parsed.connectedServices||{};
+            this._state.audioStore=parsed.audioStore||{};
+          }
         } else {
           this._state={...this._state,...parsed};
         }
       }catch(e){/* corrupted — use defaults */}
     }
-    if(this._state.athletes.length===0) this.createIgnacio();
+    // Do NOT auto-create athletes — show profile picker instead
     if(!this._state.activeAthleteId&&this._state.athletes.length>0) this._state.activeAthleteId=this._state.athletes[0].id;
     // Auto-recover: ensure every athlete has a plan
     this._state.athletes.forEach(a=>{
@@ -727,6 +884,9 @@ const Store = {
         this._state.plans.push(generateCairnsPlan(a));
       }
     });
+    if(!this._state.feedback) this._state.feedback={};
+    if(!this._state.audioStore) this._state.audioStore={};
+    if(!this._state.healthData) this._state.healthData={};
     this.save();
   },
   get state(){return this._state;},
@@ -740,17 +900,7 @@ const Store = {
     if(!plan){plan=generateCairnsPlan(a);this._state.plans.push(plan);this.save();}
     return plan;
   },
-  createIgnacio(){
-    const athlete={id:uid(),name:'Ignacio',sport:'triathlon',ftp:278,thresholdPace:300,css400:360,css200:165,weight:75,maxHR:190,restHR:50,
-      preferences:{
-        longRide:'SAT',brick:'SUN',longRun:'SUN',trackDay:'TUE',hardRun:'TUE',hardBike:'THU',hardSwim:'WED',
-        strengthA:'MON',strengthB:'WED',easySwim:'FRI',mobility:'FRI,SUN'
-      },
-      createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()};
-    this._state.athletes.push(athlete);
-    this._state.activeAthleteId=athlete.id;
-    this._state.plans.push(generateCairnsPlan(athlete));
-  }
+  hasAthletes(){return this._state.athletes.length>0;}
 };
 
 // ============================================================================
@@ -775,9 +925,14 @@ function updateSidebarActive(){
 }
 function renderPage(){
   const main=document.getElementById('main-content');
+  // If no athletes or no active athlete, show profile picker
+  if(!Store.hasAthletes()||!Store.state.activeAthleteId){
+    main.innerHTML=renderProfilePicker();
+    return;
+  }
   const page=Store.state.ui.currentPage;
   const pages={today:renderToday,dashboard:renderDashboard,plan:renderPlanView,overview:renderOverview,calendar:renderCalendar,profiles:renderProfiles,zones:renderZones,raceday:renderRaceDay,mobility:renderMobility,integrations:renderIntegrations,'ai-coach':renderAICoach};
-  main.innerHTML=(pages[page]||renderDashboard)();
+  main.innerHTML=(pages[page]||renderToday)();
   updateSidebarActive();
 }
 function updateAthleteSelect(){
@@ -788,6 +943,278 @@ function updateAthleteSelect(){
 function switchAthlete(id){Store.update({activeAthleteId:id});renderPage();}
 function showToast(msg){const t=document.getElementById('toast');if(t)t.remove();const el=document.createElement('div');el.id='toast';el.className='fixed bottom-6 right-6 bg-bg-tertiary border border-bg-border rounded-lg px-4 py-3 text-sm text-zinc-200 shadow-lg z-50 fade-in';el.textContent=msg;document.body.appendChild(el);setTimeout(()=>el.remove(),3000);}
 function closeModal(){document.getElementById('modal-container').innerHTML='';}
+
+// ============================================================================
+// PROFILE PICKER (First Screen)
+// ============================================================================
+function renderProfilePicker(){
+  const athletes=Store.state.athletes||[];
+  return `<div class="flex items-center justify-center min-h-screen p-4">
+    <div class="w-full max-w-lg fade-in">
+      <div class="text-center mb-8">
+        <svg class="w-16 h-16 tt-logo-glow mx-auto mb-4" viewBox="0 0 100 100" fill="none">
+          <defs><linearGradient id="birdP" x1="10%" y1="80%" x2="90%" y2="20%"><stop offset="0%" stop-color="#1565C0"/><stop offset="50%" stop-color="#2196F3"/><stop offset="100%" stop-color="#42a5f5"/></linearGradient></defs>
+          <path d="M12 68 Q22 38 48 32 Q40 46 46 54 Q52 28 72 18 Q58 40 53 50 Q68 28 88 22 Q63 48 43 68 Q28 78 12 68Z" fill="url(#birdP)"/>
+        </svg>
+        <h1 class="text-2xl font-bold text-white tracking-wide">TRIPLE TRI CLUB</h1>
+        <p class="text-sm text-zinc-500 mt-1">Training Plan Manager</p>
+      </div>
+
+      ${athletes.length>0?`
+        <h2 class="text-sm font-semibold text-zinc-400 uppercase tracking-wider mb-3">Choose your profile</h2>
+        <div class="space-y-2 mb-6">
+          ${athletes.map(a=>`
+            <button onclick="switchAthlete('${a.id}');navigate('today')" class="w-full bg-bg-secondary border border-bg-border rounded-lg p-4 flex items-center gap-4 hover:border-brand/40 transition text-left">
+              <div class="w-12 h-12 rounded-full bg-brand/20 flex items-center justify-center text-brand-light text-lg font-bold flex-shrink-0">${a.name.charAt(0).toUpperCase()}</div>
+              <div class="flex-1 min-w-0">
+                <p class="text-base font-semibold text-white">${a.name}</p>
+                <p class="text-xs text-zinc-500 capitalize">${a.sport||'triathlon'} · FTP ${a.ftp||'--'}W · ${formatPace(a.thresholdPace)}/km</p>
+              </div>
+              <svg class="w-5 h-5 text-zinc-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+            </button>
+          `).join('')}
+        </div>
+        <div class="border-t border-bg-border pt-4">
+          <p class="text-xs text-zinc-600 text-center mb-3">Or create a new profile</p>
+        </div>
+      `:`
+        <p class="text-center text-zinc-500 text-sm mb-6">Get started by creating your athlete profile</p>
+      `}
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <button onclick="startOnboarding('upload')" class="bg-bg-secondary border border-bg-border rounded-lg p-5 hover:border-brand/40 transition text-left group">
+          <div class="w-10 h-10 rounded-lg bg-brand/10 flex items-center justify-center mb-3 group-hover:bg-brand/20 transition">
+            <svg class="w-5 h-5 text-brand-light" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+          </div>
+          <h3 class="text-sm font-semibold text-white mb-1">Upload Training Plan</h3>
+          <p class="text-[11px] text-zinc-500 leading-relaxed">I already have a training plan file (.jsx, .json, .txt, .csv)</p>
+        </button>
+
+        <button onclick="startOnboarding('wizard')" class="bg-bg-secondary border border-bg-border rounded-lg p-5 hover:border-brand/40 transition text-left group">
+          <div class="w-10 h-10 rounded-lg bg-emerald-500/10 flex items-center justify-center mb-3 group-hover:bg-emerald-500/20 transition">
+            <svg class="w-5 h-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
+          </div>
+          <h3 class="text-sm font-semibold text-white mb-1">Build My Plan</h3>
+          <p class="text-[11px] text-zinc-500 leading-relaxed">Answer questions about my fitness and goals to generate a plan</p>
+        </button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function startOnboarding(mode){
+  if(mode==='upload'){
+    document.getElementById('main-content').innerHTML=renderUploadOnboarding();
+  } else {
+    Store.state._wizardStep=1;
+    Store.state._wizardData={};
+    document.getElementById('main-content').innerHTML=renderWizard();
+  }
+}
+
+// ── Upload Onboarding ──
+function renderUploadOnboarding(){
+  return `<div class="flex items-center justify-center min-h-screen p-4">
+    <div class="w-full max-w-lg fade-in">
+      <button onclick="renderPage()" class="text-xs text-zinc-500 hover:text-zinc-300 mb-4 flex items-center gap-1"><svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>Back</button>
+      <h2 class="text-xl font-bold text-white mb-2">Upload Your Training Plan</h2>
+      <p class="text-sm text-zinc-500 mb-6">Drop your file below or click to browse. We'll parse it and create your profile.</p>
+
+      <div id="drop-zone" class="border-2 border-dashed border-bg-border rounded-xl p-10 text-center cursor-pointer hover:border-brand/40 transition"
+           onclick="document.getElementById('onb-file').click()"
+           ondrop="handleOnbDrop(event)" ondragover="event.preventDefault();this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')">
+        <svg class="w-12 h-12 text-zinc-600 mx-auto mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+        <p class="text-sm text-zinc-400 mb-1">Drop your file here</p>
+        <p class="text-[11px] text-zinc-600">Supports: .jsx, .json, .txt, .csv</p>
+        <input type="file" id="onb-file" accept=".jsx,.json,.txt,.csv" onchange="handleOnbFile(this.files[0])" class="hidden">
+      </div>
+
+      <div class="mt-6 p-4 bg-bg-secondary rounded-lg border border-bg-border">
+        <h3 class="text-xs font-semibold text-zinc-400 mb-2">Supported formats:</h3>
+        <div class="space-y-1.5 text-[11px] text-zinc-500">
+          <div class="flex gap-2"><span class="text-brand-light font-mono">.jsx</span> React training plan files (like cairns-v5.jsx)</div>
+          <div class="flex gap-2"><span class="text-brand-light font-mono">.json</span> Structured plan data with weeks/days/sessions</div>
+          <div class="flex gap-2"><span class="text-brand-light font-mono">.txt</span> Text-based training plans (basic parsing)</div>
+          <div class="flex gap-2"><span class="text-brand-light font-mono">.csv</span> Spreadsheet exports of training blocks</div>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function handleOnbDrop(e){e.preventDefault();e.currentTarget.classList.remove('drag-over');if(e.dataTransfer.files.length)handleOnbFile(e.dataTransfer.files[0]);}
+function handleOnbFile(file){if(!file)return;const ev={target:{files:[file],value:''}};importPlanFile(ev);}
+
+// ── Wizard Onboarding ──
+const WIZARD_STEPS=[
+  {id:1,title:'About You',fields:[
+    {key:'name',label:'Full Name',type:'text',placeholder:'e.g. Brendon',required:true},
+    {key:'age',label:'Age',type:'number',placeholder:'e.g. 32'},
+    {key:'gender',label:'Gender',type:'select',options:['Male','Female','Non-binary','Prefer not to say']},
+    {key:'height',label:'Height (cm)',type:'number',placeholder:'e.g. 178'},
+    {key:'weight',label:'Weight (kg)',type:'number',placeholder:'e.g. 75'},
+  ]},
+  {id:2,title:'Your Sport & Experience',fields:[
+    {key:'sport',label:'Primary Sport',type:'select',options:['Triathlon','Cycling','Running','Swimming','Duathlon']},
+    {key:'experience',label:'Experience Level',type:'select',options:['Beginner (< 1 year)','Intermediate (1-3 years)','Advanced (3-7 years)','Elite (7+ years)']},
+    {key:'raceDistance',label:'Target Race Distance',type:'select',options:['Sprint Tri','Olympic Tri','70.3 / Half Ironman','Ironman','Marathon','Half Marathon','10K','Other']},
+    {key:'raceName',label:'Target Race Name (if known)',type:'text',placeholder:'e.g. Cairns 70.3'},
+    {key:'raceDate',label:'Target Race Date',type:'date'},
+    {key:'raceGoal',label:'Target Finish Time',type:'text',placeholder:'e.g. 4:15:00'},
+  ]},
+  {id:3,title:'Performance Metrics',fields:[
+    {key:'ftp',label:'FTP — Functional Threshold Power (watts)',type:'number',placeholder:'e.g. 260 (leave blank if unknown)'},
+    {key:'thresholdPace',label:'Threshold Running Pace (min/km)',type:'text',placeholder:'e.g. 4:30 (leave blank if unknown)'},
+    {key:'swimLevel',label:'Swimming Level',type:'select',options:['Non-swimmer / Learning','Can swim but no structured training','Pool swimmer, comfortable with sets','Open water experienced, CSS tested']},
+    {key:'css400',label:'400m Swim Time Trial (seconds)',type:'number',placeholder:'e.g. 360 (leave blank if unknown)'},
+    {key:'css200',label:'200m Swim Time Trial (seconds)',type:'number',placeholder:'e.g. 165 (leave blank if unknown)'},
+    {key:'maxHR',label:'Max Heart Rate',type:'number',placeholder:'e.g. 190'},
+    {key:'restHR',label:'Resting Heart Rate',type:'number',placeholder:'e.g. 48'},
+    {key:'weeklyHours',label:'Available Training Hours / Week',type:'select',options:['5-8 hours','8-12 hours','12-16 hours','16-20 hours','20+ hours']},
+  ]},
+  {id:4,title:'Weekly Schedule',fields:[
+    {key:'trackDay',label:'Track / Speed Session Day',type:'select',options:['MON','TUE','WED','THU','FRI','SAT','SUN','No fixed day','None']},
+    {key:'longRide',label:'Long Ride Day',type:'select',options:['MON','TUE','WED','THU','FRI','SAT','SUN','No fixed day']},
+    {key:'brick',label:'Brick Session Day (Bike+Run)',type:'select',options:['MON','TUE','WED','THU','FRI','SAT','SUN','No fixed day','None']},
+    {key:'brickIncludesLongRun',label:'Is your long run part of a brick?',type:'select',options:['Yes','No','Sometimes']},
+    {key:'swimDays',label:'Swim Days (select all)',type:'multiselect',options:['MON','TUE','WED','THU','FRI','SAT','SUN']},
+    {key:'strengthDays',label:'Strength / Gym Days',type:'multiselect',options:['MON','TUE','WED','THU','FRI','SAT','SUN','None']},
+    {key:'restDays',label:'Mandatory Rest Days',type:'multiselect',options:['MON','TUE','WED','THU','FRI','SAT','SUN','None']},
+    {key:'hardBike',label:'Hard Bike Interval Day',type:'select',options:['MON','TUE','WED','THU','FRI','SAT','SUN','No fixed day']},
+    {key:'earlyMorning',label:'Can you train before work (5-7am)?',type:'select',options:['Yes, regularly','Sometimes','No']},
+    {key:'doubleDay',label:'Are you OK with 2 sessions in one day?',type:'select',options:['Yes, most days','Some days','Prefer not to']},
+  ]},
+  {id:5,title:'Injuries & Constraints',fields:[
+    {key:'injuries',label:'Any current or recent injuries?',type:'textarea',placeholder:'e.g. ITB issues, Achilles tendinopathy, shoulder impingement...'},
+    {key:'limiters',label:'What do you consider your biggest limiter?',type:'select',options:['Swim fitness','Bike power','Run endurance','Run speed','Nutrition / fuelling','Time management','Injury history','Mental toughness']},
+    {key:'equipment',label:'Key equipment available',type:'multiselect',options:['Power meter','HR monitor','Garmin/watch','Indoor trainer','Pool access','Gym access','TT/Tri bike','Road bike']},
+    {key:'notes',label:'Anything else your coach should know?',type:'textarea',placeholder:'Training history, preferences, concerns...'},
+  ]},
+];
+
+function renderWizard(){
+  const step=Store.state._wizardStep||1;
+  const data=Store.state._wizardData||{};
+  const ws=WIZARD_STEPS.find(s=>s.id===step);
+  if(!ws) return renderProfilePicker();
+  const progress=Math.round((step/WIZARD_STEPS.length)*100);
+
+  return `<div class="flex items-center justify-center min-h-screen p-4">
+    <div class="w-full max-w-lg fade-in">
+      <button onclick="wizardBack()" class="text-xs text-zinc-500 hover:text-zinc-300 mb-4 flex items-center gap-1"><svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>${step===1?'Back':'Previous'}</button>
+
+      <!-- Progress -->
+      <div class="flex items-center gap-3 mb-6">
+        <div class="flex-1 h-1.5 bg-bg-tertiary rounded-full overflow-hidden"><div class="h-full bg-brand rounded-full transition-all" style="width:${progress}%"></div></div>
+        <span class="text-xs text-zinc-500 mono">${step}/${WIZARD_STEPS.length}</span>
+      </div>
+
+      <h2 class="text-xl font-bold text-white mb-1">${ws.title}</h2>
+      <p class="text-sm text-zinc-500 mb-5">Step ${step} of ${WIZARD_STEPS.length}</p>
+
+      <div class="space-y-4">
+        ${ws.fields.map(f=>{
+          const val=data[f.key]||'';
+          if(f.type==='select'){
+            return `<div><label class="block text-xs text-zinc-400 mb-1">${f.label}</label><select id="wiz-${f.key}" class="w-full bg-bg-secondary border border-bg-border rounded-lg px-3 py-2.5 text-sm text-zinc-200"><option value="">Select...</option>${f.options.map(o=>`<option value="${o}" ${val===o?'selected':''}>${o}</option>`).join('')}</select></div>`;
+          }
+          if(f.type==='multiselect'){
+            const selected=(val||'').split(',').filter(Boolean);
+            return `<div><label class="block text-xs text-zinc-400 mb-1.5">${f.label}</label><div class="flex flex-wrap gap-1.5">${f.options.map(o=>`<button type="button" onclick="toggleWizMulti('${f.key}','${o}')" class="px-3 py-1.5 text-xs rounded-lg border transition ${selected.includes(o)?'bg-brand/20 text-brand-light border-brand/30':'bg-bg-secondary text-zinc-400 border-bg-border hover:border-zinc-600'}">${o}</button>`).join('')}</div></div>`;
+          }
+          if(f.type==='textarea'){
+            return `<div><label class="block text-xs text-zinc-400 mb-1">${f.label}</label><textarea id="wiz-${f.key}" rows="3" class="w-full bg-bg-secondary border border-bg-border rounded-lg px-3 py-2.5 text-sm text-zinc-200" placeholder="${f.placeholder||''}">${escapeHtml(val)}</textarea></div>`;
+          }
+          return `<div><label class="block text-xs text-zinc-400 mb-1">${f.label}</label><input id="wiz-${f.key}" type="${f.type}" class="w-full bg-bg-secondary border border-bg-border rounded-lg px-3 py-2.5 text-sm text-zinc-200" value="${escapeHtml(val)}" placeholder="${f.placeholder||''}"></div>`;
+        }).join('')}
+      </div>
+
+      <div class="flex justify-between mt-6">
+        <div></div>
+        ${step<WIZARD_STEPS.length?
+          `<button onclick="wizardNext()" class="px-6 py-2.5 bg-brand hover:bg-brand-dark text-white rounded-lg text-sm transition">Next</button>`
+          :`<button onclick="wizardFinish()" class="px-6 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg text-sm transition">Create My Profile</button>`
+        }
+      </div>
+    </div>
+  </div>`;
+}
+
+function wizardBack(){
+  const step=Store.state._wizardStep||1;
+  if(step<=1){Store.state._wizardStep=null;Store.state._wizardData=null;renderPage();return;}
+  collectWizardData();
+  Store.state._wizardStep=step-1;
+  document.getElementById('main-content').innerHTML=renderWizard();
+}
+
+function wizardNext(){
+  collectWizardData();
+  const step=Store.state._wizardStep||1;
+  // Validate step 1 name
+  if(step===1&&!Store.state._wizardData.name){showToast('Please enter your name');return;}
+  Store.state._wizardStep=step+1;
+  document.getElementById('main-content').innerHTML=renderWizard();
+}
+
+function collectWizardData(){
+  const ws=WIZARD_STEPS.find(s=>s.id===(Store.state._wizardStep||1));if(!ws)return;
+  const data=Store.state._wizardData||{};
+  ws.fields.forEach(f=>{
+    if(f.type==='multiselect')return; // handled by toggleWizMulti
+    const el=document.getElementById('wiz-'+f.key);
+    if(el) data[f.key]=el.value;
+  });
+  Store.state._wizardData=data;
+}
+
+function toggleWizMulti(key,val){
+  const data=Store.state._wizardData||{};
+  let arr=(data[key]||'').split(',').filter(Boolean);
+  if(arr.includes(val))arr=arr.filter(v=>v!==val);else arr.push(val);
+  data[key]=arr.join(',');
+  Store.state._wizardData=data;
+  document.getElementById('main-content').innerHTML=renderWizard();
+}
+
+function wizardFinish(){
+  collectWizardData();
+  const d=Store.state._wizardData;if(!d||!d.name){showToast('Name is required');return;}
+
+  const athlete={
+    id:uid(), name:d.name, sport:(d.sport||'Triathlon').toLowerCase(),
+    age:parseInt(d.age)||null, gender:d.gender||null, height:parseInt(d.height)||null,
+    weight:parseInt(d.weight)||75, ftp:parseInt(d.ftp)||200,
+    thresholdPace:parsePace(d.thresholdPace)||300,
+    css400:parseInt(d.css400)||360, css200:parseInt(d.css200)||165,
+    maxHR:parseInt(d.maxHR)||190, restHR:parseInt(d.restHR)||50,
+    swimLevel:d.swimLevel||null, experience:d.experience||null,
+    raceDistance:d.raceDistance||null, raceName:d.raceName||null,
+    raceDate:d.raceDate||null, raceGoal:d.raceGoal||null,
+    weeklyHours:d.weeklyHours||null, limiters:d.limiters||null,
+    injuries:d.injuries||null, equipment:d.equipment||null, notes:d.notes||null,
+    earlyMorning:d.earlyMorning||null, doubleDay:d.doubleDay||null,
+    preferences:{
+      longRide:d.longRide||'SAT', brick:d.brick||'SUN',
+      longRun:d.brickIncludesLongRun==='Yes'?d.brick||'SUN':'SUN',
+      trackDay:d.trackDay||'TUE', hardBike:d.hardBike||'THU',
+      hardSwim:(d.swimDays||'').split(',')[1]||'WED',
+      strengthA:(d.strengthDays||'').split(',')[0]||'MON',
+      strengthB:(d.strengthDays||'').split(',')[1]||'WED',
+      easySwim:(d.swimDays||'').split(',')[2]||'FRI',
+      mobility:'FRI,SUN',
+      restDays:d.restDays||'',
+    },
+    createdAt:new Date().toISOString(), updatedAt:new Date().toISOString()
+  };
+
+  Store.state.athletes.push(athlete);
+  Store.state.plans.push(generateCairnsPlan(athlete));
+  Store.update({activeAthleteId:athlete.id});
+  Store.state._wizardStep=null;Store.state._wizardData=null;
+  updateAthleteSelect();navigate('today');
+  showToast('Welcome, '+d.name+'! Your training plan has been generated.');
+}
 
 // ============================================================================
 // WHAT'S ON TODAY
@@ -895,7 +1322,8 @@ function renderToday(){
               <button onclick="openFeedback('${fbKey}')" class="text-[10px] px-2 py-1 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">${fb?'View Feedback':'Add Feedback'}</button>
               <button onclick="toggleRecording('${fbKey}')" class="text-[10px] px-2 py-1 rounded ${Store.state._recording===fbKey?'bg-red-500/20 text-red-400 rec-pulse':'bg-red-500/10 text-red-400'} border border-red-500/20">${Store.state._recording===fbKey?'Stop':'Record'}</button>
             </div>
-            ${fb&&fb.audioData?`<audio controls src="${fb.audioData}" class="mt-2 h-8 w-full max-w-xs"></audio>`:''}
+            ${(fb&&(fb.audioRef||fb.audioData))?`<div id="inline-audio-${fbKey}" class="mt-2"><span class="text-[9px] text-zinc-600">Loading audio...</span></div><script>(async()=>{const u=await getAudioUrl('${fbKey}');const el=document.getElementById('inline-audio-${fbKey}');if(el&&u)el.innerHTML='<audio controls src="'+u+'" class="h-8 w-full max-w-xs"></audio>';else if(el)el.innerHTML='';})();</script>`:''}
+            ${fb&&fb.audioTranscription?`<div class="mt-1 text-[10px] text-zinc-500 italic bg-bg-tertiary rounded px-2 py-1">"${escapeHtml(fb.audioTranscription)}"</div>`:''}
             ${fb&&fb.note?`<div class="mt-2 text-xs text-zinc-500 italic">"${escapeHtml(fb.note)}"</div>`:''}
           </div>`;
         }).join('')}
@@ -910,7 +1338,8 @@ function renderToday(){
         <button onclick="openFeedback('${dayFbKey}')" class="text-xs px-3 py-1.5 rounded bg-brand/10 text-brand-light border border-brand/20 hover:bg-brand/20 transition">${dayFb?'View Day Notes':'Write Day Notes'}</button>
         <button onclick="toggleRecording('${dayFbKey}')" class="text-xs px-3 py-1.5 rounded ${Store.state._recording===dayFbKey?'bg-red-500/20 text-red-400 rec-pulse':'bg-red-500/10 text-red-400'} border border-red-500/20 transition">${Store.state._recording===dayFbKey?'Stop Recording':'Record Day Audio'}</button>
       </div>
-      ${dayFb&&dayFb.audioData?`<audio controls src="${dayFb.audioData}" class="mt-2 h-8 w-full max-w-xs"></audio>`:''}
+      ${(dayFb&&(dayFb.audioRef||dayFb.audioData))?`<div id="inline-audio-${dayFbKey}" class="mt-2"><span class="text-[9px] text-zinc-600">Loading audio...</span></div><script>(async()=>{const u=await getAudioUrl('${dayFbKey}');const el=document.getElementById('inline-audio-${dayFbKey}');if(el&&u)el.innerHTML='<audio controls src="'+u+'" class="h-8 w-full max-w-xs"></audio>';else if(el)el.innerHTML='';})();</script>`:''}
+      ${dayFb&&dayFb.audioTranscription?`<div class="mt-1 text-[10px] text-zinc-500 italic bg-bg-tertiary rounded px-2 py-1">"${escapeHtml(dayFb.audioTranscription)}"</div>`:''}
       ${dayFb&&dayFb.note?`<div class="mt-2 text-xs text-zinc-500 italic">"${escapeHtml(dayFb.note)}"</div>`:''}
     </div>
   </div>`;
@@ -1133,7 +1562,7 @@ function renderSession(s,si,dayKey,wkId,ac){
   // Session feedback key
   const fbKey=`${wkId}-${dayKey}-${si}`;
   const fb=Store.state.feedback&&Store.state.feedback[fbKey];
-  const hasAudio=fb&&fb.audioData;
+  const hasAudio=fb&&(fb.audioRef||fb.audioData);
   const hasNote=fb&&fb.note;
 
   // Normal session
@@ -1156,7 +1585,8 @@ function renderSession(s,si,dayKey,wkId,ac){
         <button onclick="event.stopPropagation();openFeedback('${fbKey}')" class="text-[10px] px-2.5 py-1 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 transition">${hasNote||hasAudio?'View Feedback':'Add Feedback'}</button>
         <button onclick="event.stopPropagation();toggleRecording('${fbKey}')" class="text-[10px] px-2.5 py-1 rounded ${Store.state._recording===fbKey?'bg-red-500/20 text-red-400 border border-red-500/30 rec-pulse':'bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20'} transition">${Store.state._recording===fbKey?'Stop Recording':'Record Audio'}</button>
       </div>
-      ${hasAudio?`<div class="mt-2 flex items-center gap-2"><audio controls src="${fb.audioData}" class="h-8 flex-1" style="max-width:300px"></audio><span class="text-[9px] text-zinc-600">${fb.audioDate||''}</span></div>`:''}
+      ${hasAudio?`<div id="plan-audio-${fbKey}" class="mt-2 flex items-center gap-2"><span class="text-[9px] text-zinc-600">Loading...</span></div><script>(async()=>{const u=await getAudioUrl('${fbKey}');const el=document.getElementById('plan-audio-${fbKey}');if(el&&u)el.innerHTML='<audio controls src="'+u+'" class="h-8 flex-1" style="max-width:300px"></audio><span class="text-[9px] text-zinc-600">${fb.audioDate||''}</span>';else if(el)el.innerHTML='';})();</script>`:''}
+      ${fb&&fb.audioTranscription?`<div class="mt-1 text-[10px] text-zinc-500 italic bg-bg-tertiary rounded px-2 py-1">"${escapeHtml(fb.audioTranscription)}"</div>`:''}
       ${hasNote?`<div class="mt-2 p-2 rounded text-xs text-zinc-400 italic" style="background:rgba(255,255,255,0.02)">"${escapeHtml(fb.note)}"</div>`:''}
     `:''}
   </div>`;
@@ -2231,18 +2661,35 @@ function openFeedback(fbKey){
         </div>
         <div>
           <label class="block text-xs text-zinc-400 mb-2">Audio Recording</label>
-          ${fb.audioData?`
-            <audio controls src="${fb.audioData}" class="w-full h-10 mb-2"></audio>
+          ${(fb.audioRef||fb.audioData)?`
+            <div id="audio-player-${fbKey}"><div class="text-[10px] text-zinc-500">Loading audio...</div></div>
+            <script>
+              (async()=>{
+                const url=await getAudioUrl('${fbKey}');
+                const el=document.getElementById('audio-player-${fbKey}');
+                if(el&&url) el.innerHTML='<audio controls src="'+url+'" class="w-full h-10 mb-2"></audio>';
+                else if(el) el.innerHTML='<div class="text-[10px] text-red-400">Audio not found</div>';
+              })();
+            </script>
+            ${fb.audioTranscription?`
+              <div class="mb-2 p-2 bg-bg-tertiary rounded border border-bg-border">
+                <label class="text-[10px] text-zinc-500 uppercase tracking-wider">Transcription</label>
+                <p class="text-xs text-zinc-300 mt-1">${escapeHtml(fb.audioTranscription)}</p>
+              </div>
+            `:''}
             <div class="flex gap-2">
               <button onclick="deleteFeedbackAudio('${fbKey}')" class="text-xs text-red-400 hover:text-red-300 px-2 py-1 rounded border border-red-500/20 transition">Delete Recording</button>
               <span class="text-[10px] text-zinc-600 self-center">Recorded: ${fb.audioDate||'unknown'}</span>
             </div>
           `:`
-            <div class="flex items-center gap-3">
-              <button onclick="toggleRecordingInModal('${fbKey}')" id="modal-rec-btn" class="px-4 py-2 text-sm rounded border transition ${Store.state._recording===fbKey?'bg-red-500/20 text-red-400 border-red-500/30 rec-pulse':'bg-bg-tertiary text-zinc-300 border-bg-border hover:border-brand/30'}">
-                ${Store.state._recording===fbKey?'Stop Recording':'Start Recording'}
-              </button>
-              <span class="text-[10px] text-zinc-600">Uses your microphone. Stored locally only.</span>
+            <div class="flex flex-col gap-2">
+              <div class="flex items-center gap-3">
+                <button onclick="toggleRecordingInModal('${fbKey}')" id="modal-rec-btn" class="px-4 py-2 text-sm rounded border transition ${Store.state._recording===fbKey?'bg-red-500/20 text-red-400 border-red-500/30 rec-pulse':'bg-bg-tertiary text-zinc-300 border-bg-border hover:border-brand/30'}">
+                  ${Store.state._recording===fbKey?'Stop Recording':'Start Recording'}
+                </button>
+                <span class="text-[10px] text-zinc-600">Uses your microphone${Transcriber.isSupported()?' • Auto-transcribes':''}</span>
+              </div>
+              ${Transcriber.isSupported()?'':'<div class="text-[10px] text-yellow-500/70">⚠ Speech recognition not supported in this browser. Audio will still be recorded.</div>'}
             </div>
           `}
         </div>
@@ -2264,11 +2711,18 @@ function saveFeedback(fbKey){
   Store.save();closeModal();renderPage();showToast('Feedback saved!');
 }
 
-function deleteFeedbackAudio(fbKey){
+async function deleteFeedbackAudio(fbKey){
   if(!confirm('Delete this recording?'))return;
   if(Store.state.feedback&&Store.state.feedback[fbKey]){
+    // Delete from IndexedDB
+    if(Store.state.feedback[fbKey].audioRef){
+      try{ await AudioDB.delete(Store.state.feedback[fbKey].audioRef); }catch(e){}
+    }
     delete Store.state.feedback[fbKey].audioData;
+    delete Store.state.feedback[fbKey].audioRef;
     delete Store.state.feedback[fbKey].audioDate;
+    delete Store.state.feedback[fbKey].audioTranscription;
+    delete Store.state.feedback[fbKey].audioUrl;
     Store.save();
   }
   openFeedback(fbKey);showToast('Recording deleted.');
@@ -2278,6 +2732,8 @@ async function toggleRecording(fbKey){
   if(Store.state._recording===fbKey){
     // Stop recording
     if(_mediaRecorder&&_mediaRecorder.state==='recording') _mediaRecorder.stop();
+    // Stop transcription
+    const transcript = Transcriber.stop();
     return;
   }
   // Start recording
@@ -2286,23 +2742,35 @@ async function toggleRecording(fbKey){
     _audioChunks=[];
     _mediaRecorder=new MediaRecorder(stream);
     _mediaRecorder.ondataavailable=e=>{if(e.data.size>0)_audioChunks.push(e.data);};
-    _mediaRecorder.onstop=()=>{
+    _mediaRecorder.onstop=async()=>{
       stream.getTracks().forEach(t=>t.stop());
       const blob=new Blob(_audioChunks,{type:'audio/webm'});
-      const reader=new FileReader();
-      reader.onload=()=>{
-        if(!Store.state.feedback) Store.state.feedback={};
-        if(!Store.state.feedback[fbKey]) Store.state.feedback[fbKey]={};
-        Store.state.feedback[fbKey].audioData=reader.result;
-        Store.state.feedback[fbKey].audioDate=new Date().toLocaleString();
-        Store.state._recording=null;
-        Store.save();renderPage();showToast('Audio saved!');
-      };
-      reader.readAsDataURL(blob);
+      const transcript = Transcriber.stop();
+
+      // Save to IndexedDB
+      try{
+        await AudioDB.save(fbKey, blob, transcript);
+      }catch(e){
+        console.warn('IndexedDB save failed, falling back to localStorage',e);
+      }
+
+      if(!Store.state.feedback) Store.state.feedback={};
+      if(!Store.state.feedback[fbKey]) Store.state.feedback[fbKey]={};
+      Store.state.feedback[fbKey].audioRef=fbKey;
+      Store.state.feedback[fbKey].audioDate=new Date().toLocaleString();
+      Store.state.feedback[fbKey].audioTranscription=transcript||'';
+      // Keep a small data URL fallback for immediate playback
+      const url=URL.createObjectURL(blob);
+      Store.state.feedback[fbKey].audioUrl=url;
+      Store.state._recording=null;
+      Store.save();renderPage();
+      showToast(transcript?'Audio saved & transcribed!':'Audio saved!');
     };
+    // Start speech recognition alongside recording
+    Transcriber.start();
     _mediaRecorder.start();
     Store.state._recording=fbKey;
-    renderPage();showToast('Recording... click again to stop');
+    renderPage();showToast('Recording... speak now. Click again to stop.');
   }catch(err){
     showToast('Microphone access denied. Please allow microphone in browser settings.');
   }
@@ -2319,16 +2787,40 @@ async function toggleRecordingInModal(fbKey){
   }
 }
 
+// Load audio from IndexedDB and return an object URL for playback
+async function getAudioUrl(fbKey){
+  const fb=Store.state.feedback&&Store.state.feedback[fbKey];
+  // If there's already a cached object URL, use it
+  if(fb&&fb.audioUrl) return fb.audioUrl;
+  // If there's old base64 data, use it directly
+  if(fb&&fb.audioData) return fb.audioData;
+  // Try IndexedDB
+  try{
+    const rec=await AudioDB.get(fb&&fb.audioRef||fbKey);
+    if(rec&&rec.blob){
+      const url=URL.createObjectURL(rec.blob);
+      if(fb) fb.audioUrl=url; // cache it
+      return url;
+    }
+  }catch(e){}
+  return null;
+}
+
 // ============================================================================
 // INIT
 // ============================================================================
-function init(){
+async function init(){
   Store.init();updateAthleteSelect();
   // Handle Strava OAuth callback
   if(window.location.search.includes('code=')){handleStravaCallback();}
   navigate('today');
   // Register service worker for offline/PWA support
   if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{});}
+  // Initialize IndexedDB and migrate old audio
+  try{
+    await AudioDB.open();
+    await AudioDB.migrateFromLocalStorage();
+  }catch(e){console.warn('AudioDB init:',e);}
   // Add mobile top padding
   const mc=document.getElementById('main-content');
   if(window.innerWidth<=768&&mc)mc.style.paddingTop='56px';
