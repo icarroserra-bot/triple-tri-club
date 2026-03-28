@@ -58,9 +58,50 @@
     @keyframes recPulse { 0%,100% { opacity:1; box-shadow:0 0 0 0 rgba(239,68,68,0.4); } 50% { opacity:0.8; box-shadow:0 0 0 8px rgba(239,68,68,0); } }
     .tt-logo-glow { filter: drop-shadow(0 0 6px rgba(33,150,243,0.3)); }
     .drag-over { border-color: #2196F3 !important; background: rgba(33,150,243,0.05) !important; }
+    /* Mobile responsive */
+    @media (max-width: 768px) {
+      #sidebar { position: fixed; left: -100%; top: 0; bottom: 0; z-index: 40; width: 260px; transition: left 0.25s ease; }
+      #sidebar.open { left: 0; }
+      #sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 35; }
+      #sidebar-overlay.open { display: block; }
+      #mobile-header { display: flex !important; }
+      #main-content { margin-left: 0 !important; }
+      .modal-backdrop > div { width: 95vw !important; max-width: 95vw !important; margin: 10px; }
+    }
+    @media (min-width: 769px) {
+      #mobile-header { display: none !important; }
+      #sidebar-overlay { display: none !important; }
+    }
+    .bottom-nav { display: none; }
+    @media (max-width: 768px) {
+      .bottom-nav { display: flex; position: fixed; bottom: 0; left: 0; right: 0; z-index: 30; background: #0a0f18; border-top: 1px solid #131d2e; padding: 6px 0 env(safe-area-inset-bottom, 6px); }
+      #main-content { padding-bottom: 70px !important; }
+    }
   </style>
 </head>
 <body class="min-h-screen flex">
+<!-- MOBILE HEADER -->
+<div id="mobile-header" class="fixed top-0 left-0 right-0 z-30 bg-bg-secondary border-b border-bg-border px-4 py-3 items-center justify-between" style="display:none">
+  <button onclick="toggleSidebar()" class="text-zinc-400 hover:text-white">
+    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+  </button>
+  <div class="flex items-center gap-2">
+    <svg class="w-6 h-6 tt-logo-glow" viewBox="0 0 100 100" fill="none"><defs><linearGradient id="birdM" x1="10%" y1="80%" x2="90%" y2="20%"><stop offset="0%" stop-color="#1565C0"/><stop offset="50%" stop-color="#2196F3"/><stop offset="100%" stop-color="#42a5f5"/></linearGradient></defs><path d="M12 68 Q22 38 48 32 Q40 46 46 54 Q52 28 72 18 Q58 40 53 50 Q68 28 88 22 Q63 48 43 68 Q28 78 12 68Z" fill="url(#birdM)"/></svg>
+    <span class="text-sm font-bold text-white">TRIPLE TRI</span>
+  </div>
+  <select id="mobile-athlete-select" onchange="switchAthlete(this.value)" class="bg-bg-tertiary text-xs text-zinc-300 rounded px-2 py-1 border border-bg-border max-w-[100px]"></select>
+</div>
+<div id="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+<!-- BOTTOM NAV (mobile) -->
+<div class="bottom-nav items-center justify-around">
+  <button onclick="navigate('today')" class="bnav flex flex-col items-center gap-0.5 px-2 py-1" data-page="today"><svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m3.343-5.657L5.636 5.636m12.728 12.728L17.657 17.657M6.343 17.657l-.707.707M18.364 6.343l.707-.707"/></svg><span class="text-[9px]">Today</span></button>
+  <button onclick="navigate('plan')" class="bnav flex flex-col items-center gap-0.5 px-2 py-1" data-page="plan"><svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg><span class="text-[9px]">Plan</span></button>
+  <button onclick="navigate('calendar')" class="bnav flex flex-col items-center gap-0.5 px-2 py-1" data-page="calendar"><svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg><span class="text-[9px]">Calendar</span></button>
+  <button onclick="navigate('overview')" class="bnav flex flex-col items-center gap-0.5 px-2 py-1" data-page="overview"><svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg><span class="text-[9px]">Overview</span></button>
+  <button onclick="toggleSidebar()" class="bnav flex flex-col items-center gap-0.5 px-2 py-1"><svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg><span class="text-[9px]">More</span></button>
+</div>
+
 <div id="app" class="flex w-full min-h-screen">
 
   <!-- SIDEBAR -->
@@ -84,6 +125,10 @@
     </div>
 
     <nav class="flex-1 py-2 overflow-y-auto">
+      <div onclick="navigate('today')" class="sidebar-item px-4 py-2.5 flex items-center gap-3 cursor-pointer text-sm" data-page="today">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m3.343-5.657L5.636 5.636m12.728 12.728L17.657 17.657M6.343 17.657l-.707.707M18.364 6.343l.707-.707"/></svg>
+        What's On Today
+      </div>
       <div onclick="navigate('dashboard')" class="sidebar-item px-4 py-2.5 flex items-center gap-3 cursor-pointer text-sm" data-page="dashboard">
         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
         Dashboard
@@ -107,10 +152,6 @@
       <div onclick="navigate('calendar')" class="sidebar-item px-4 py-2.5 flex items-center gap-3 cursor-pointer text-sm" data-page="calendar">
         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
         Calendar
-      </div>
-      <div onclick="navigate('schedule')" class="sidebar-item px-4 py-2.5 flex items-center gap-3 cursor-pointer text-sm" data-page="schedule">
-        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-        Day Preferences
       </div>
       <div onclick="navigate('raceday')" class="sidebar-item px-4 py-2.5 flex items-center gap-3 cursor-pointer text-sm" data-page="raceday">
         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm0 0h18"/></svg>
@@ -660,7 +701,7 @@ function calcSwimZones(t400,t200){const css=calcCSS(t400,t200);if(!css)return[];
 // ============================================================================
 // STATE
 // ============================================================================
-const STORE_VERSION = 4;
+const STORE_VERSION = 5;
 const Store = {
   _state:{_v:STORE_VERSION,athletes:[],activeAthleteId:null,plans:[],ui:{currentPage:'dashboard'},chatMessages:[],apiKey:'',brickSel:{},trackSel:{},feedback:{},_recording:null,connectedServices:{}},
   _listeners:[],
@@ -715,22 +756,200 @@ const Store = {
 // ============================================================================
 // RENDERING
 // ============================================================================
-function navigate(page){Store.update({ui:{...Store.state.ui,currentPage:page}});renderPage();updateSidebarActive();}
-function updateSidebarActive(){document.querySelectorAll('.sidebar-item').forEach(el=>{el.classList.toggle('active',el.dataset.page===Store.state.ui.currentPage);});}
+function toggleSidebar(){
+  const sb=document.getElementById('sidebar');const ov=document.getElementById('sidebar-overlay');
+  sb.classList.toggle('open');ov.classList.toggle('open');
+}
+function navigate(page){
+  Store.update({ui:{...Store.state.ui,currentPage:page}});renderPage();updateSidebarActive();
+  // Close sidebar on mobile
+  const sb=document.getElementById('sidebar');if(sb.classList.contains('open'))toggleSidebar();
+}
+function updateSidebarActive(){
+  const p=Store.state.ui.currentPage;
+  document.querySelectorAll('.sidebar-item').forEach(el=>{el.classList.toggle('active',el.dataset.page===p);});
+  document.querySelectorAll('.bnav').forEach(el=>{
+    const isActive=el.dataset.page===p;
+    el.style.color=isActive?'#2196F3':'#64748b';
+  });
+}
 function renderPage(){
   const main=document.getElementById('main-content');
   const page=Store.state.ui.currentPage;
-  const pages={dashboard:renderDashboard,plan:renderPlanView,overview:renderOverview,calendar:renderCalendar,profiles:renderProfiles,zones:renderZones,schedule:renderSchedule,raceday:renderRaceDay,mobility:renderMobility,integrations:renderIntegrations,'ai-coach':renderAICoach};
+  const pages={today:renderToday,dashboard:renderDashboard,plan:renderPlanView,overview:renderOverview,calendar:renderCalendar,profiles:renderProfiles,zones:renderZones,raceday:renderRaceDay,mobility:renderMobility,integrations:renderIntegrations,'ai-coach':renderAICoach};
   main.innerHTML=(pages[page]||renderDashboard)();
   updateSidebarActive();
 }
 function updateAthleteSelect(){
-  const sel=document.getElementById('athlete-select');
-  sel.innerHTML=Store.state.athletes.map(a=>`<option value="${a.id}" ${a.id===Store.state.activeAthleteId?'selected':''}>${a.name}</option>`).join('');
+  const opts=Store.state.athletes.map(a=>`<option value="${a.id}" ${a.id===Store.state.activeAthleteId?'selected':''}>${a.name}</option>`).join('');
+  document.getElementById('athlete-select').innerHTML=opts;
+  const ms=document.getElementById('mobile-athlete-select');if(ms)ms.innerHTML=opts;
 }
 function switchAthlete(id){Store.update({activeAthleteId:id});renderPage();}
 function showToast(msg){const t=document.getElementById('toast');if(t)t.remove();const el=document.createElement('div');el.id='toast';el.className='fixed bottom-6 right-6 bg-bg-tertiary border border-bg-border rounded-lg px-4 py-3 text-sm text-zinc-200 shadow-lg z-50 fade-in';el.textContent=msg;document.body.appendChild(el);setTimeout(()=>el.remove(),3000);}
 function closeModal(){document.getElementById('modal-container').innerHTML='';}
+
+// ============================================================================
+// WHAT'S ON TODAY
+// ============================================================================
+function renderToday(){
+  const a=Store.getActiveAthlete();const plan=Store.getActivePlan();
+  if(!a||!plan) return '<div class="p-6 text-zinc-400">No athlete or plan selected.</div>';
+
+  // Figure out which week and day corresponds to today
+  const today=new Date();const dayNames=['SUN','MON','TUE','WED','THU','FRI','SAT'];
+  const todayDay=dayNames[today.getDay()];
+  const months={Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
+
+  let currentWeek=null;let todaySessions=[];
+  for(const w of plan.weeks){
+    if(!w.dates)continue;
+    const m=w.dates.match(/([A-Z][a-z]+)\s+(\d+)/);
+    if(!m)continue;
+    const mo=months[m[1]];const dy=parseInt(m[2]);
+    const wkStart=new Date(2026,mo,dy);const wkEnd=new Date(wkStart);wkEnd.setDate(wkEnd.getDate()+6);
+    if(today>=wkStart&&today<=wkEnd){currentWeek=w;break;}
+  }
+
+  if(currentWeek){
+    const dayData=currentWeek.days.find(d=>d.day===todayDay);
+    todaySessions=dayData?dayData.sessions:[];
+  }
+
+  // Health data from Garmin/manual
+  const health=Store.state.healthData||{};
+  const todayKey=today.toISOString().split('T')[0];
+  const todayHealth=health[todayKey]||{};
+
+  // Day-level feedback
+  const dayFbKey='day-'+todayKey;
+  const dayFb=(Store.state.feedback||{})[dayFbKey];
+
+  const ac=currentWeek?PC[currentWeek.phase]||'#2196F3':'#2196F3';
+
+  return `<div class="p-4 md:p-6 fade-in">
+    <div class="flex items-start gap-3 mb-4 flex-wrap">
+      <svg class="w-10 h-10 tt-logo-glow flex-shrink-0" viewBox="0 0 100 100" fill="none">
+        <defs><linearGradient id="birdT" x1="10%" y1="80%" x2="90%" y2="20%"><stop offset="0%" stop-color="#1565C0"/><stop offset="50%" stop-color="#2196F3"/><stop offset="100%" stop-color="#42a5f5"/></linearGradient></defs>
+        <path d="M12 68 Q22 38 48 32 Q40 46 46 54 Q52 28 72 18 Q58 40 53 50 Q68 28 88 22 Q63 48 43 68 Q28 78 12 68Z" fill="url(#birdT)"/>
+      </svg>
+      <div class="flex-1">
+        <h2 class="text-xl md:text-2xl font-bold text-white">What's On Today</h2>
+        <p class="text-sm text-zinc-500">${today.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'})} · ${a.name}</p>
+      </div>
+    </div>
+
+    <!-- Health & readiness -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-4">
+      <div class="bg-bg-secondary rounded-lg border border-bg-border p-3">
+        <p class="text-[10px] text-zinc-600 uppercase">HRV</p>
+        <p class="text-lg font-bold ${todayHealth.hrv>=80?'text-green-400':todayHealth.hrv>=60?'text-yellow-400':'text-red-400'}">${todayHealth.hrv||'--'}</p>
+        <p class="text-[10px] text-zinc-600">${todayHealth.hrv>=80?'Recovered':todayHealth.hrv>=60?'Moderate':todayHealth.hrv?'Fatigued':'No data'}</p>
+      </div>
+      <div class="bg-bg-secondary rounded-lg border border-bg-border p-3">
+        <p class="text-[10px] text-zinc-600 uppercase">Sleep Score</p>
+        <p class="text-lg font-bold ${todayHealth.sleep>=80?'text-green-400':todayHealth.sleep>=60?'text-yellow-400':'text-red-400'}">${todayHealth.sleep||'--'}</p>
+        <p class="text-[10px] text-zinc-600">${todayHealth.sleepHrs?todayHealth.sleepHrs+'h':'No data'}</p>
+      </div>
+      <div class="bg-bg-secondary rounded-lg border border-bg-border p-3">
+        <p class="text-[10px] text-zinc-600 uppercase">Body Battery</p>
+        <p class="text-lg font-bold ${todayHealth.bodyBattery>=60?'text-green-400':todayHealth.bodyBattery>=30?'text-yellow-400':'text-red-400'}">${todayHealth.bodyBattery||'--'}</p>
+        <p class="text-[10px] text-zinc-600">${todayHealth.bodyBattery?'/ 100':'No data'}</p>
+      </div>
+      <div class="bg-bg-secondary rounded-lg border border-bg-border p-3">
+        <p class="text-[10px] text-zinc-600 uppercase">Resting HR</p>
+        <p class="text-lg font-bold text-zinc-200">${todayHealth.restHR||'--'}</p>
+        <p class="text-[10px] text-zinc-600">${todayHealth.restHR?'bpm':'No data'}</p>
+      </div>
+    </div>
+    <button onclick="openHealthInput('${todayKey}')" class="text-[10px] text-brand-light hover:text-white mb-4 inline-block">+ Log today's health data manually</button>
+
+    ${currentWeek?`
+      <!-- Week context -->
+      <div class="rounded-lg p-3 mb-4" style="background:${ac}08;border:1px solid ${ac}22">
+        <div class="flex items-center gap-2 mb-1">
+          <span class="text-[9px] font-bold tracking-widest uppercase" style="color:${ac}">${currentWeek.label} — ${currentWeek.phase}</span>
+          <span class="text-xs text-zinc-500">${currentWeek.hours}</span>
+        </div>
+        <p class="text-sm font-semibold text-zinc-300">${currentWeek.name}</p>
+        ${todayHealth.hrv&&todayHealth.hrv<75?`<div class="mt-2 p-2 rounded bg-red-500/10 border border-red-500/20 text-xs text-red-400">HRV below 75 — consider downgrading hard sessions to Z2 today.</div>`:''}
+      </div>
+
+      <!-- Today's sessions -->
+      <h3 class="text-sm font-semibold text-white mb-2">${todaySessions.length===0||todaySessions.every(s=>s.tag==='rest')?'Rest Day':'Today\'s Sessions'}</h3>
+      <div class="space-y-2 mb-4">
+        ${todaySessions.length===0?'<div class="p-4 bg-bg-secondary rounded-lg border border-bg-border text-sm text-zinc-500">No sessions scheduled. Enjoy the rest!</div>'
+        :todaySessions.map((s,si)=>{
+          const tc=TAG_COLORS[s.tag]||TAG_COLORS.rest;
+          const fbKey=currentWeek.id+'-'+todayDay+'-'+si;
+          const fb=(Store.state.feedback||{})[fbKey];
+          return `<div class="bg-bg-secondary rounded-lg border border-bg-border p-3 md:p-4">
+            <div class="flex items-center gap-2 flex-wrap mb-2">
+              <span class="text-[10px] font-semibold px-2 py-0.5 rounded" style="background:${tc.bg};color:${tc.text};border:1px solid ${tc.border}">${s.tag.toUpperCase()}</span>
+              <span class="text-sm font-medium text-zinc-200 flex-1">${s.label||''}</span>
+            </div>
+            <div class="text-xs mono text-zinc-500 leading-relaxed mb-2">${s.target||''}</div>
+            ${s.why?`<div class="text-xs text-zinc-600 italic mb-2">${s.why}</div>`:''}
+            <div class="flex gap-1.5 flex-wrap">
+              <button onclick="openEditSession(${currentWeek.id},'${todayDay}',${si})" class="text-[10px] px-2 py-1 rounded bg-brand/10 text-brand-light border border-brand/20">Edit</button>
+              <button onclick="openFeedback('${fbKey}')" class="text-[10px] px-2 py-1 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">${fb?'View Feedback':'Add Feedback'}</button>
+              <button onclick="toggleRecording('${fbKey}')" class="text-[10px] px-2 py-1 rounded ${Store.state._recording===fbKey?'bg-red-500/20 text-red-400 rec-pulse':'bg-red-500/10 text-red-400'} border border-red-500/20">${Store.state._recording===fbKey?'Stop':'Record'}</button>
+            </div>
+            ${fb&&fb.audioData?`<audio controls src="${fb.audioData}" class="mt-2 h-8 w-full max-w-xs"></audio>`:''}
+            ${fb&&fb.note?`<div class="mt-2 text-xs text-zinc-500 italic">"${escapeHtml(fb.note)}"</div>`:''}
+          </div>`;
+        }).join('')}
+      </div>
+    `:`<div class="p-4 bg-bg-secondary rounded-lg border border-bg-border text-sm text-zinc-500 mb-4">No plan week matches today's date. Check Plan Overview for week date ranges.</div>`}
+
+    <!-- Day feedback -->
+    <div class="bg-bg-secondary rounded-lg border border-bg-border p-3 md:p-4">
+      <h3 class="text-sm font-semibold text-white mb-2">End of Day Reflection</h3>
+      <p class="text-[10px] text-zinc-600 mb-2">Record how the full day went — review it after the training block</p>
+      <div class="flex gap-1.5 flex-wrap">
+        <button onclick="openFeedback('${dayFbKey}')" class="text-xs px-3 py-1.5 rounded bg-brand/10 text-brand-light border border-brand/20 hover:bg-brand/20 transition">${dayFb?'View Day Notes':'Write Day Notes'}</button>
+        <button onclick="toggleRecording('${dayFbKey}')" class="text-xs px-3 py-1.5 rounded ${Store.state._recording===dayFbKey?'bg-red-500/20 text-red-400 rec-pulse':'bg-red-500/10 text-red-400'} border border-red-500/20 transition">${Store.state._recording===dayFbKey?'Stop Recording':'Record Day Audio'}</button>
+      </div>
+      ${dayFb&&dayFb.audioData?`<audio controls src="${dayFb.audioData}" class="mt-2 h-8 w-full max-w-xs"></audio>`:''}
+      ${dayFb&&dayFb.note?`<div class="mt-2 text-xs text-zinc-500 italic">"${escapeHtml(dayFb.note)}"</div>`:''}
+    </div>
+  </div>`;
+}
+
+function openHealthInput(dateKey){
+  const health=Store.state.healthData||{};const d=health[dateKey]||{};
+  document.getElementById('modal-container').innerHTML=`<div class="modal-backdrop fixed inset-0 z-50 flex items-center justify-center" onclick="if(event.target===this)closeModal()">
+    <div class="bg-bg-secondary rounded-xl border border-zinc-700 w-[400px] shadow-2xl fade-in">
+      <div class="p-4 border-b border-zinc-700"><h3 class="text-lg font-semibold text-white">Log Health Data</h3><p class="text-xs text-zinc-400 mt-1">${dateKey}</p></div>
+      <div class="p-4 space-y-3">
+        <div class="grid grid-cols-2 gap-3">
+          <div><label class="block text-xs text-zinc-400 mb-1">HRV</label><input id="h-hrv" type="number" class="w-full bg-bg-tertiary border border-bg-border rounded px-3 py-2 text-sm text-zinc-200" value="${d.hrv||''}" placeholder="e.g. 85"></div>
+          <div><label class="block text-xs text-zinc-400 mb-1">Sleep Score</label><input id="h-sleep" type="number" class="w-full bg-bg-tertiary border border-bg-border rounded px-3 py-2 text-sm text-zinc-200" value="${d.sleep||''}" placeholder="e.g. 82"></div>
+          <div><label class="block text-xs text-zinc-400 mb-1">Sleep Hours</label><input id="h-sleephrs" type="number" step="0.1" class="w-full bg-bg-tertiary border border-bg-border rounded px-3 py-2 text-sm text-zinc-200" value="${d.sleepHrs||''}" placeholder="e.g. 7.5"></div>
+          <div><label class="block text-xs text-zinc-400 mb-1">Body Battery</label><input id="h-bb" type="number" class="w-full bg-bg-tertiary border border-bg-border rounded px-3 py-2 text-sm text-zinc-200" value="${d.bodyBattery||''}" placeholder="e.g. 75"></div>
+          <div><label class="block text-xs text-zinc-400 mb-1">Resting HR</label><input id="h-rhr" type="number" class="w-full bg-bg-tertiary border border-bg-border rounded px-3 py-2 text-sm text-zinc-200" value="${d.restHR||''}" placeholder="e.g. 48"></div>
+          <div><label class="block text-xs text-zinc-400 mb-1">Stress</label><input id="h-stress" type="number" class="w-full bg-bg-tertiary border border-bg-border rounded px-3 py-2 text-sm text-zinc-200" value="${d.stress||''}" placeholder="e.g. 30"></div>
+        </div>
+      </div>
+      <div class="p-4 border-t border-zinc-700 flex justify-end gap-2">
+        <button onclick="closeModal()" class="px-4 py-2 text-sm text-zinc-400">Cancel</button>
+        <button onclick="saveHealth('${dateKey}')" class="px-4 py-2 text-sm bg-brand text-white rounded">Save</button>
+      </div>
+    </div>
+  </div>`;
+}
+function saveHealth(dateKey){
+  if(!Store.state.healthData) Store.state.healthData={};
+  Store.state.healthData[dateKey]={
+    hrv:parseInt(document.getElementById('h-hrv').value)||null,
+    sleep:parseInt(document.getElementById('h-sleep').value)||null,
+    sleepHrs:parseFloat(document.getElementById('h-sleephrs').value)||null,
+    bodyBattery:parseInt(document.getElementById('h-bb').value)||null,
+    restHR:parseInt(document.getElementById('h-rhr').value)||null,
+    stress:parseInt(document.getElementById('h-stress').value)||null,
+  };
+  Store.save();closeModal();renderPage();showToast('Health data saved!');
+}
 
 // ============================================================================
 // DASHBOARD
@@ -1467,23 +1686,183 @@ function renderIntegrations(){
   </div>`;
 }
 function connectService(key){
-  const svc=SERVICES.find(s=>s.key===key);if(!svc)return;
-  // In production: window.open(svc.authUrl+'?client_id=YOUR_ID&redirect_uri=...&scope='+svc.scopes)
-  // For now: simulate connection
-  const conn=Store.state.connectedServices||{};
-  conn[key]={connected:true,lastSync:new Date().toLocaleString(),token:'simulated'};
-  Store.update({connectedServices:conn});
-  renderPage();showToast(svc.name+' connected! In production, this opens the OAuth flow.');
+  if(key==='strava'){connectStrava();return;}
+  if(key==='garmin'){connectGarmin();return;}
+  if(key==='trainingpeaks'){connectTrainingPeaks();return;}
 }
+
+// ── STRAVA REAL OAUTH ──
+function connectStrava(){
+  // Show config modal for client ID
+  const saved=Store.state.stravaConfig||{};
+  document.getElementById('modal-container').innerHTML=`<div class="modal-backdrop fixed inset-0 z-50 flex items-center justify-center" onclick="if(event.target===this)closeModal()">
+    <div class="bg-bg-secondary rounded-xl border border-zinc-700 w-[500px] shadow-2xl fade-in">
+      <div class="p-4 border-b border-zinc-700">
+        <h3 class="text-lg font-semibold text-white">Connect Strava</h3>
+        <p class="text-xs text-zinc-400 mt-1">You need a Strava API application. Create one at <a href="https://www.strava.com/settings/api" target="_blank" class="text-brand-light underline">strava.com/settings/api</a></p>
+      </div>
+      <div class="p-4 space-y-3">
+        <div class="p-3 rounded bg-orange-500/5 border border-orange-500/15 text-xs text-zinc-400 leading-relaxed">
+          <p class="font-bold text-orange-400 mb-1">Setup (one-time):</p>
+          <ol class="list-decimal ml-4 space-y-1">
+            <li>Go to <a href="https://www.strava.com/settings/api" target="_blank" class="text-brand-light underline">strava.com/settings/api</a></li>
+            <li>Create an app (any name, category: Training)</li>
+            <li>Set Authorization Callback Domain to: <code class="text-brand-light">${window.location.hostname||'localhost'}</code></li>
+            <li>Copy your Client ID below</li>
+          </ol>
+        </div>
+        <div><label class="block text-xs text-zinc-400 mb-1">Client ID</label><input id="strava-cid" class="w-full bg-bg-tertiary border border-bg-border rounded px-3 py-2 text-sm text-zinc-200 mono" value="${saved.clientId||''}" placeholder="e.g. 12345"></div>
+        <div><label class="block text-xs text-zinc-400 mb-1">Client Secret</label><input id="strava-cs" type="password" class="w-full bg-bg-tertiary border border-bg-border rounded px-3 py-2 text-sm text-zinc-200 mono" value="${saved.clientSecret||''}" placeholder="e.g. abc123..."></div>
+      </div>
+      <div class="p-4 border-t border-zinc-700 flex justify-end gap-2">
+        <button onclick="closeModal()" class="px-4 py-2 text-sm text-zinc-400">Cancel</button>
+        <button onclick="startStravaOAuth()" class="px-4 py-2 text-sm bg-orange-500 text-white rounded">Authorize with Strava</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function startStravaOAuth(){
+  const clientId=document.getElementById('strava-cid').value.trim();
+  const clientSecret=document.getElementById('strava-cs').value.trim();
+  if(!clientId||!clientSecret){showToast('Enter both Client ID and Client Secret');return;}
+  Store.state.stravaConfig={clientId,clientSecret};Store.save();
+  const redirect=window.location.origin+window.location.pathname;
+  const url=`https://www.strava.com/oauth/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirect)}&response_type=code&scope=read,activity:read_all&approval_prompt=auto`;
+  closeModal();window.location.href=url;
+}
+
+async function handleStravaCallback(){
+  const params=new URLSearchParams(window.location.search);
+  const code=params.get('code');
+  if(!code)return;
+  // Clear URL params
+  window.history.replaceState({},'',window.location.pathname);
+  const cfg=Store.state.stravaConfig;
+  if(!cfg||!cfg.clientId){showToast('Strava config missing');return;}
+  try{
+    const r=await fetch('https://www.strava.com/oauth/token',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({client_id:cfg.clientId,client_secret:cfg.clientSecret,code:code,grant_type:'authorization_code'})
+    });
+    const data=await r.json();
+    if(data.access_token){
+      const conn=Store.state.connectedServices||{};
+      conn.strava={connected:true,lastSync:new Date().toLocaleString(),
+        accessToken:data.access_token,refreshToken:data.refresh_token,
+        expiresAt:data.expires_at,athlete:data.athlete};
+      Store.update({connectedServices:conn});
+      showToast('Strava connected! Welcome '+data.athlete?.firstname);
+      renderPage();
+    } else {
+      showToast('Strava auth failed: '+(data.message||'Unknown error'));
+    }
+  }catch(e){showToast('Strava connection error: '+e.message);}
+}
+
+async function syncStrava(){
+  const conn=Store.state.connectedServices||{};
+  const strava=conn.strava;if(!strava||!strava.accessToken){showToast('Not connected to Strava');return;}
+  // Check if token expired, refresh if needed
+  if(strava.expiresAt&&strava.expiresAt*1000<Date.now()){
+    const cfg=Store.state.stravaConfig;
+    try{
+      const r=await fetch('https://www.strava.com/oauth/token',{
+        method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({client_id:cfg.clientId,client_secret:cfg.clientSecret,refresh_token:strava.refreshToken,grant_type:'refresh_token'})
+      });
+      const data=await r.json();
+      if(data.access_token){strava.accessToken=data.access_token;strava.expiresAt=data.expires_at;strava.refreshToken=data.refresh_token;}
+    }catch(e){showToast('Token refresh failed');return;}
+  }
+  // Fetch recent activities
+  try{
+    showToast('Syncing Strava activities...');
+    const r=await fetch('https://www.strava.com/api/v3/athlete/activities?per_page=30',{headers:{Authorization:'Bearer '+strava.accessToken}});
+    const acts=await r.json();
+    if(Array.isArray(acts)){
+      if(!Store.state.stravaActivities) Store.state.stravaActivities=[];
+      // Merge new activities
+      const existingIds=new Set(Store.state.stravaActivities.map(a=>a.id));
+      const newActs=acts.filter(a=>!existingIds.has(a.id));
+      Store.state.stravaActivities=[...newActs,...Store.state.stravaActivities].slice(0,200);
+      strava.lastSync=new Date().toLocaleString();
+      Store.update({connectedServices:conn});
+      renderPage();showToast('Synced '+acts.length+' activities from Strava!');
+    } else {
+      showToast('Strava API error: '+(acts.message||'Unknown'));
+    }
+  }catch(e){showToast('Sync error: '+e.message);}
+}
+
+// ── GARMIN CONNECT ──
+function connectGarmin(){
+  document.getElementById('modal-container').innerHTML=`<div class="modal-backdrop fixed inset-0 z-50 flex items-center justify-center" onclick="if(event.target===this)closeModal()">
+    <div class="bg-bg-secondary rounded-xl border border-zinc-700 w-[500px] shadow-2xl fade-in">
+      <div class="p-4 border-b border-zinc-700">
+        <h3 class="text-lg font-semibold text-white">Connect Garmin</h3>
+      </div>
+      <div class="p-4 space-y-3">
+        <p class="text-sm text-zinc-400">Garmin Connect uses OAuth 1.0a which requires a server-side proxy. For now you can:</p>
+        <div class="space-y-2">
+          <div class="p-3 rounded bg-bg-tertiary border border-bg-border">
+            <p class="text-xs font-bold text-cyan-400 mb-1">Option 1: Manual Health Data</p>
+            <p class="text-xs text-zinc-500">Log your daily HRV, sleep score, body battery, and resting HR from the "What's On Today" page. This data influences session recommendations.</p>
+          </div>
+          <div class="p-3 rounded bg-bg-tertiary border border-bg-border">
+            <p class="text-xs font-bold text-cyan-400 mb-1">Option 2: Mark as Connected</p>
+            <p class="text-xs text-zinc-500">Mark Garmin as connected for tracking purposes. Full auto-sync requires deploying a backend proxy.</p>
+          </div>
+        </div>
+      </div>
+      <div class="p-4 border-t border-zinc-700 flex justify-end gap-2">
+        <button onclick="closeModal()" class="px-4 py-2 text-sm text-zinc-400">Cancel</button>
+        <button onclick="markServiceConnected('garmin')" class="px-4 py-2 text-sm text-white rounded" style="background:#11A9ED">Mark Connected</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ── TRAININGPEAKS ──
+function connectTrainingPeaks(){
+  document.getElementById('modal-container').innerHTML=`<div class="modal-backdrop fixed inset-0 z-50 flex items-center justify-center" onclick="if(event.target===this)closeModal()">
+    <div class="bg-bg-secondary rounded-xl border border-zinc-700 w-[500px] shadow-2xl fade-in">
+      <div class="p-4 border-b border-zinc-700">
+        <h3 class="text-lg font-semibold text-white">Connect TrainingPeaks</h3>
+      </div>
+      <div class="p-4 space-y-3">
+        <p class="text-sm text-zinc-400">TrainingPeaks OAuth requires a registered developer app and server-side token exchange.</p>
+        <div class="p-3 rounded bg-bg-tertiary border border-bg-border">
+          <p class="text-xs font-bold text-red-400 mb-1">Manual Tracking</p>
+          <p class="text-xs text-zinc-500">Mark TrainingPeaks as connected for tracking. Use the Export feature to get .JSON data you can import into TrainingPeaks via their calendar.</p>
+        </div>
+      </div>
+      <div class="p-4 border-t border-zinc-700 flex justify-end gap-2">
+        <button onclick="closeModal()" class="px-4 py-2 text-sm text-zinc-400">Cancel</button>
+        <button onclick="markServiceConnected('trainingpeaks')" class="px-4 py-2 text-sm text-white rounded" style="background:#E1251B">Mark Connected</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function markServiceConnected(key){
+  const conn=Store.state.connectedServices||{};
+  conn[key]={connected:true,lastSync:'Manual',token:'manual'};
+  Store.update({connectedServices:conn});closeModal();renderPage();showToast('Marked as connected.');
+}
+
 function disconnectService(key){
   if(!confirm('Disconnect this service?'))return;
   const conn=Store.state.connectedServices||{};
   delete conn[key];Store.update({connectedServices:conn});renderPage();showToast('Disconnected.');
 }
+
 function syncService(key){
+  if(key==='strava'){syncStrava();return;}
   const conn=Store.state.connectedServices||{};
   if(conn[key])conn[key].lastSync=new Date().toLocaleString();
-  Store.update({connectedServices:conn});renderPage();showToast('Sync complete! (simulated — real sync requires backend proxy)');
+  Store.update({connectedServices:conn});renderPage();showToast('Sync marked. For full auto-sync, deploy the backend proxy.');
 }
 
 // ============================================================================
@@ -1535,48 +1914,63 @@ function importPlanFile(event){
 }
 
 function parseJSXPlan(text){
-  // Extract FTP
+  // Extract FTP if present
   const ftpMatch=text.match(/const\s+FTP\s*=\s*(\d+)/);
-  const ftp=ftpMatch?parseInt(ftpMatch[1]):278;
+  const ftp=ftpMatch?parseInt(ftpMatch[1]):0;
 
-  // Extract athlete name from comments or plan name
-  const nameMatch=text.match(/name:\s*["']([^"']+)/);
-  const planName=nameMatch?nameMatch[1]:'Imported Plan';
-
-  // Extract WEEKS array — find the array start
-  const weeksStart=text.indexOf('const WEEKS');
-  if(weeksStart===-1){
-    // Try alternate: look for weeks: [ in generateCairnsPlan or similar
-    return parseJSXInline(text,ftp);
+  // Extract race/plan info from comments
+  const commentLines=text.split('\n').filter(l=>l.trim().startsWith('//'));
+  let raceInfo='';
+  for(const cl of commentLines){
+    if(cl.includes('70.3')||cl.includes('Race')||cl.includes('World')||cl.includes('Ironman'))
+      raceInfo=cl.replace(/\/\/\s*/,'').trim();
   }
 
-  // Parse week blocks using regex patterns
+  // First plan name from any week
+  const nameMatch=text.match(/name:\s*"([^"]+)"/);
+  const planName=raceInfo||nameMatch?nameMatch[1]:'Imported Plan';
+
+  // Parse ALL week blocks — flexible regex that handles both with/without dates
   const weeks=[];
-  const weekRegex=/\{\s*id\s*:\s*(\d+)\s*,\s*label\s*:\s*"([^"]+)"\s*,\s*name\s*:\s*"([^"]+)"\s*,\s*dates\s*:\s*"([^"]+)"\s*,\s*phase\s*:\s*"([^"]+)"\s*,\s*hours\s*:\s*"([^"]+)"/g;
+  // Match the opening of each week object: {  id:X, label:"WX",
+  const weekStartRegex=/\{\s*\n?\s*id\s*:\s*(\d+)\s*,\s*label\s*:\s*"([^"]+)"\s*,\s*name\s*:\s*"([^"]+)"/g;
   let wm;
-  while((wm=weekRegex.exec(text))!==null){
+  while((wm=weekStartRegex.exec(text))!==null){
     const weekId=parseInt(wm[1]);
     const weekBlock=extractBlock(text,wm.index);
-    const days=parseDays(weekBlock,ftp);
+
+    // Extract optional fields flexibly
+    const datesMatch=weekBlock.match(/dates\s*:\s*"([^"]+)"/);
+    const phaseMatch=weekBlock.match(/phase\s*:\s*"([^"]+)"/);
+    const hoursMatch=weekBlock.match(/hours\s*:\s*"([^"]+)"/);
     const totalsMatch=weekBlock.match(/totals\s*:\s*\{\s*swim\s*:\s*([\d.]+)\s*,\s*bike\s*:\s*([\d.]+)\s*,\s*run\s*:\s*([\d.]+)/);
     const contextMatch=weekBlock.match(/context\s*:\s*"([^"]+)"/);
     const flagsMatch=weekBlock.match(/flags\s*:\s*\[([^\]]+)\]/);
     let flags=[];
     if(flagsMatch){flags=flagsMatch[1].match(/"([^"]+)"/g)?.map(f=>f.replace(/"/g,''))||[];}
+
+    const days=parseDays(weekBlock,ftp);
+
     weeks.push({
-      id:weekId, label:wm[2], name:wm[3], dates:wm[4], phase:wm[5], hours:wm[6],
+      id:weekId,
+      label:wm[2],
+      name:wm[3],
+      dates:datesMatch?datesMatch[1]:'',
+      phase:phaseMatch?phaseMatch[1]:'foundation',
+      hours:hoursMatch?hoursMatch[1]:'',
       context:contextMatch?contextMatch[1]:'',
       flags:flags,
       totals:totalsMatch?{swim:parseFloat(totalsMatch[1]),bike:parseFloat(totalsMatch[2]),run:parseFloat(totalsMatch[3])}:{swim:0,bike:0,run:0},
       days:days
     });
   }
-  return {planName,ftp,weeks};
-}
 
-function parseJSXInline(text,ftp){
-  // Fallback for inline plan structures
-  return {planName:'Imported Plan',ftp,weeks:[]};
+  // Extract athlete name from filename-style comments
+  let athleteName='';
+  const bnMatch=text.match(/BRENDON|IGNACIO|[A-Z]{3,}'S\s+RACE/i);
+  if(bnMatch) athleteName=bnMatch[0].replace(/'S\s+RACE/i,'');
+
+  return {planName,ftp,weeks,athleteName};
 }
 
 function extractBlock(text,startIdx){
@@ -1615,14 +2009,47 @@ function parseSessions(block,ftp){
   let sm;
   while((sm=sessRegex.exec(block))!==null){
     const sessStr=extractBlock(block,sm.index);
-    const targetMatch=sessStr.match(/target:\s*(?:`([^`]*)`|"([^"]*)")/);
-    const whyMatch=sessStr.match(/why:\s*"([^"]*)"/);
+    // Extract target — handle backticks, double-quotes with escaped quotes inside
+    let target='';
+    const btMatch=sessStr.match(/target:\s*`([^`]*)`/);
+    if(btMatch){target=btMatch[1];}
+    else{
+      const tIdx=sessStr.indexOf('target:');
+      if(tIdx!==-1){
+        const afterT=sessStr.substring(tIdx+7).trim();
+        if(afterT[0]==='"'){
+          // Extract string handling escaped quotes
+          let i=1;let s='';
+          while(i<afterT.length){
+            if(afterT[i]==='\\'&&i+1<afterT.length){s+=afterT[i+1];i+=2;}
+            else if(afterT[i]==='"'){break;}
+            else{s+=afterT[i];i++;}
+          }
+          target=s;
+        }
+      }
+    }
+    // Extract why
+    let why='';
+    const wIdx=sessStr.indexOf('why:');
+    if(wIdx!==-1){
+      const afterW=sessStr.substring(wIdx+4).trim();
+      if(afterW[0]==='"'){
+        let i=1;let s='';
+        while(i<afterW.length){
+          if(afterW[i]==='\\'&&i+1<afterW.length){s+=afterW[i+1];i+=2;}
+          else if(afterW[i]==='"'){break;}
+          else{s+=afterW[i];i++;}
+        }
+        why=s;
+      }
+    }
+    // Resolve template literals: ${p(0.XX)} → actual watts
+    if(ftp>0) target=target.replace(/\$\{p\(([\d.]+)\)\}/g,(_,pct)=>Math.round(ftp*parseFloat(pct)));
+
     const trackMatch=sessStr.match(/trackKey:\s*"([^"]+)"/);
     const isBrickMatch=sessStr.match(/isBrick\s*:\s*true/);
-    let target=targetMatch?(targetMatch[1]||targetMatch[2]||''):'';
-    // Resolve template literals: ${p(0.XX)} → actual watts
-    target=target.replace(/\$\{p\(([\d.]+)\)\}/g,(_,pct)=>Math.round(ftp*parseFloat(pct)));
-    const sess={tag:sm[1],label:sm[2],target:target,why:whyMatch?whyMatch[1]:''};
+    const sess={tag:sm[1],label:sm[2],target:target,why:why};
     if(trackMatch)sess.trackKey=trackMatch[1];
     if(isBrickMatch){
       sess.isBrick=true;
@@ -1652,7 +2079,7 @@ function showPlanImportModal(planData){
         <p class="text-xs text-zinc-400 mt-1">Parsed ${planData.weeks.length} weeks from the file</p>
       </div>
       <div class="p-4 space-y-3">
-        <div><label class="block text-xs text-zinc-400 mb-1">Athlete Name</label><input id="imp-name" class="w-full bg-bg-tertiary border border-bg-border rounded px-3 py-2 text-sm text-zinc-200" value="${planData.athleteName||'New Athlete'}"></div>
+        <div><label class="block text-xs text-zinc-400 mb-1">Athlete Name</label><input id="imp-name" class="w-full bg-bg-tertiary border border-bg-border rounded px-3 py-2 text-sm text-zinc-200" value="${planData.athleteName||planData.planName?.split(' ')[0]||'New Athlete'}"></div>
         <div><label class="block text-xs text-zinc-400 mb-1">Plan Name</label><input id="imp-plan" class="w-full bg-bg-tertiary border border-bg-border rounded px-3 py-2 text-sm text-zinc-200" value="${planData.planName||'Imported Plan'}"></div>
         <div class="grid grid-cols-3 gap-3">
           <div><label class="block text-xs text-zinc-400 mb-1">FTP (watts)</label><input id="imp-ftp" type="number" class="w-full bg-bg-tertiary border border-bg-border rounded px-3 py-2 text-sm text-zinc-200" value="${planData.ftp||278}"></div>
@@ -1896,9 +2323,18 @@ async function toggleRecordingInModal(fbKey){
 // INIT
 // ============================================================================
 function init(){
-  Store.init();updateAthleteSelect();navigate('dashboard');
+  Store.init();updateAthleteSelect();
+  // Handle Strava OAuth callback
+  if(window.location.search.includes('code=')){handleStravaCallback();}
+  navigate('today');
   // Register service worker for offline/PWA support
   if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{});}
+  // Add mobile top padding
+  const mc=document.getElementById('main-content');
+  if(window.innerWidth<=768&&mc)mc.style.paddingTop='56px';
+  window.addEventListener('resize',()=>{
+    if(mc)mc.style.paddingTop=window.innerWidth<=768?'56px':'0';
+  });
 }
 init();
 </script>
